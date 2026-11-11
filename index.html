@@ -12,9 +12,15 @@
 :root{--red:#C8102E;--ink:#1a1a1a;--bg:#f4f4f2;--card:#fff;--line:#d9d9d4;--mute:#666}
 *{box-sizing:border-box}
 body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
-header{background:var(--ink);color:#fff;padding:14px 16px;border-bottom:4px solid var(--red)}
-header b{font-size:20px;letter-spacing:.5px;color:#fff}header b span{color:var(--red)}
-header small{display:block;color:#bbb;margin-top:2px}
+header{background:var(--ink);color:#fff;padding:12px 16px;border-bottom:4px solid var(--red)}
+.header-wrap{display:flex;justify-content:space-between;align-items:center;max-width:860px;margin:0 auto}
+header b{font-size:19px;letter-spacing:.5px;color:#fff}
+header b span{color:var(--red)}
+header small{display:block;color:#bbb;margin-top:2px;font-size:12px}
+.header-site{display:flex;align-items:center;gap:6px;background:#2a2a2a;padding:5px 10px;border-radius:20px;border:1px solid #444;font-size:13px}
+.header-site b{font-size:13px;color:#ff4d64}
+.btn-change-site{background:transparent;color:#aaa;border:0;padding:2px 4px;font-size:11px;text-decoration:underline;cursor:pointer}
+.btn-change-site:hover{color:#fff}
 .tabs{display:flex;position:sticky;top:0;z-index:5;background:var(--ink)}
 .tabs button{flex:1;padding:13px;border:0;background:#333;color:#ddd;font-size:15px;font-weight:600;cursor:pointer}
 .tabs button.on{background:var(--red);color:#fff}
@@ -39,7 +45,7 @@ textarea{min-height:70px}
 .item.miss{background:#fff1f1;outline:2px solid var(--red)}
 button.send{width:100%;padding:15px;background:var(--red);color:#fff;border:0;border-radius:4px;font-size:17px;font-weight:700;cursor:pointer}
 button.send:disabled{opacity:.6}
-#msg{position:fixed;left:12px;right:12px;bottom:12px;padding:14px;border-radius:6px;color:#fff;display:none;z-index:9;text-align:center;font-weight:600}
+#msg{position:fixed;left:12px;right:12px;bottom:12px;padding:14px;border-radius:6px;color:#fff;display:none;z-index:999;text-align:center;font-weight:600}
 .sig{margin-top:12px}
 .sig canvas{display:block;width:100%;height:150px;border:1px dashed #888;border-radius:4px;background:#fff;touch-action:none;cursor:crosshair}
 .sig.miss canvas{border:2px solid var(--red);background:#fff1f1}
@@ -50,16 +56,47 @@ button.send:disabled{opacity:.6}
 .opts label{min-height:44px;display:flex;align-items:center;padding:6px 16px}
 input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{font-size:16px;min-height:44px}
 body{-webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom)}
-header{padding-top:max(14px,env(safe-area-inset-top))}
+header{padding-top:max(12px,env(safe-area-inset-top))}
 .chk input{min-width:22px;height:22px}
 @media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}main{max-width:1000px}}
+
+/* Modal Login Site Popup */
+#siteModal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px;backdrop-filter:blur(4px)}
+.modal-box{background:#fff;border-radius:8px;max-width:440px;width:100%;padding:22px 20px;box-shadow:0 12px 30px rgba(0,0,0,.35);border-top:5px solid var(--red)}
+.modal-box h2{margin:0 0 6px;font-size:20px;color:var(--ink)}
+.modal-box p{margin:0 0 16px;font-size:13px;color:var(--mute);line-height:1.45}
+.modal-box select{width:100%;padding:12px;font-size:16px;border:1px solid #bbb;border-radius:4px;margin-bottom:16px;background:#fff}
+.modal-box button.btn-save{width:100%;padding:14px;background:var(--red);color:#fff;border:0;border-radius:4px;font-size:16px;font-weight:700;cursor:pointer}
+.modal-box button.btn-save:disabled{opacity:.5;cursor:not-allowed}
 </style>
 </head>
 <body>
-<header><b>Form PDI</b><small>Service Center</small></header>
+<header>
+  <div class="header-wrap">
+    <div>
+      <b>Form PDI</b><small>Service Center</small>
+    </div>
+    <div id="sitePill" class="header-site" style="display:none">
+      <span>Site: <b id="curSiteTxt">-</b></span>
+      <button class="btn-change-site" type="button" onclick="openSiteModal()">Ganti</button>
+    </div>
+  </div>
+</header>
 <div class="tabs"><button id="t-in" class="on" type="button">PDI IN (unit masuk)</button><button id="t-out" type="button">PDI OUT (unit keluar)</button></div>
 <main><div id="app"></div></main>
 <div id="msg" role="status"></div>
+
+<!-- Modal Popup Login Site -->
+<div id="siteModal">
+  <div class="modal-box">
+    <h2>Pilih Site Service Center</h2>
+    <p>Silakan pilih lokasi site tugas Anda. Pilihan ini akan disimpan otomatis sehingga Anda tidak perlu memilih ulang setiap membuka aplikasi.</p>
+    <select id="modalSiteSelect">
+      <option value="">-- Pilih Site Anda --</option>
+    </select>
+    <button class="btn-save" id="btnSaveSite" type="button" disabled>Masuk &amp; Simpan Site</button>
+  </div>
+</div>
 
 <script>
 // ====== ISI SETELAH DEPLOY GOOGLE APPS SCRIPT (lihat panduan) ======
@@ -107,7 +144,41 @@ const FORMS = {
 
 const $=s=>document.querySelector(s);
 const esc=s=>s.replace(/"/g,"&quot;");
+const SITE_STORAGE_KEY = "pdi_selected_site";
+let currentSite = localStorage.getItem(SITE_STORAGE_KEY) || "";
 let cur="IN",cat=CATS[0];
+
+function updateSiteUI(){
+ const pill=$("#sitePill"), txt=$("#curSiteTxt");
+ if(currentSite){
+  pill.style.display="flex";
+  txt.textContent=currentSite;
+ } else {
+  pill.style.display="none";
+ }
+ const sel=$("#site");
+ if(sel && currentSite){
+  sel.value=currentSite;
+  if(cur==="OUT"){loadWO()}
+ }
+}
+
+function openSiteModal(){
+ const modal=$("#siteModal"), sel=$("#modalSiteSelect"), btn=$("#btnSaveSite");
+ sel.innerHTML='<option value="">-- Pilih Site Anda --</option>'+
+  SITES.map(x=>`<option value="${x}"${x===currentSite?' selected':''}>${x}</option>`).join("");
+ btn.disabled=!sel.value;
+ sel.onchange=()=>{btn.disabled=!sel.value};
+ btn.onclick=()=>{
+  if(!sel.value)return;
+  currentSite=sel.value;
+  localStorage.setItem(SITE_STORAGE_KEY, currentSite);
+  modal.style.display="none";
+  updateSiteUI();
+  toast("Site aktif: "+currentSite,"#1b7f3b");
+ };
+ modal.style.display="flex";
+}
 
 function render(){
  const F=FORMS[cur], ev=cat===CATS[0];
@@ -116,7 +187,7 @@ function render(){
  let h=`<fieldset><legend>Kategori Produk</legend><label class="f">Pilih kategori produk<select id="cat">${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}</select></label></fieldset>
  <form id="f" novalidate><fieldset><legend>${F.title} - ${F.no}</legend><div class="grid">
  <label class="f">${F.dateLabel}<input type="date" name="Tanggal" value="${today}" required></label>
- <label class="f">Site / Service Center<select name="Site Service Center" id="site" required><option value="">Pilih site...</option>${SITES.map(x=>`<option>${x}</option>`).join("")}</select></label>
+ <label class="f">Site / Service Center<select name="Site Service Center" id="site" required><option value="">Pilih site...</option>${SITES.map(x=>`<option value="${x}"${x===currentSite?" selected":""}>${x}</option>`).join("")}</select></label>
  ${cur==="OUT"?`<label class="f">No. Work Order (WO) - dari PDI IN<select name="No WO" id="wo" required disabled><option value="">Pilih site dulu...</option></select></label>`:`<label class="f">No. Work Order (WO)<input type="text" name="No WO" required></label>`}
  <label class="f">Jenis Layanan<select name="Jenis Layanan" required><option value="">Pilih...</option>${LAYANAN.map(x=>`<option>${x}</option>`).join("")}</select></label>
  <label class="f">Model / Tipe Unit<input type="text" name="Model Unit" required></label>
@@ -141,10 +212,22 @@ function render(){
  <button class="send" type="submit">Kirim ${F.title}</button></form>`;
  $("#app").innerHTML=h;
  $("#cat").onchange=e=>{cat=e.target.value;render()};
- if(cur==="OUT"){$("#site").onchange=loadWO;$("#wo").onchange=fillFromWO}
+ 
+ $("#site").onchange=e=>{
+  currentSite=e.target.value;
+  if(currentSite){localStorage.setItem(SITE_STORAGE_KEY,currentSite)}
+  updateSiteUI();
+  if(cur==="OUT"){loadWO()}
+ };
+ 
+ if(cur==="OUT"){
+  $("#wo").onchange=fillFromWO;
+  if(currentSite){loadWO()}
+ }
  $("#f").addEventListener("submit",submit);
  initPads();
 }
+
 let woItems=[];
 function jsonp(url,ms){return new Promise((res,rej)=>{
  const cb="cb"+Date.now()+Math.floor(Math.random()*1e4),sc=document.createElement("script");
@@ -156,7 +239,7 @@ function jsonp(url,ms){return new Promise((res,rej)=>{
 function setOpts(sel,first,list){sel.innerHTML="";const o0=document.createElement("option");o0.value="";o0.textContent=first;sel.appendChild(o0);
  list.forEach(w=>{const o=document.createElement("option");o.value=w.wo;o.textContent=w.wo+(w.model?" - "+w.model:"");sel.appendChild(o)})}
 async function loadWO(){
- const site=$("#site").value,sel=$("#wo");woItems=[];sel.disabled=true;
+ const site=$("#site").value||currentSite,sel=$("#wo");woItems=[];if(!sel)return;sel.disabled=true;
  if(!site){setOpts(sel,"Pilih site dulu...",[]);return}
  setOpts(sel,"Memuat daftar WO...",[]);
  try{
@@ -187,7 +270,7 @@ function initPads(){
  });
 }
 
-function toast(t,c){const m=$("#msg");m.textContent=t;m.style.background=c;m.style.display="block";clearTimeout(m._t);m._t=setTimeout(()=>m.style.display="none",5000)}
+function toast(t,c){const m=$("#msg");m.textContent=t;m.style.background=c;m.style.display="block";clearTimeout(m._t);m._t=setTimeout(()=>m.style.display="none",4000)}
 
 async function submit(ev){
  ev.preventDefault();
@@ -227,9 +310,41 @@ async function submit(ev){
  }
 }
 
-function tab(w){cur=w;$("#t-in").classList.toggle("on",w==="IN");$("#t-out").classList.toggle("on",w==="OUT");render();window.scrollTo(0,0)}
-$("#t-in").onclick=()=>tab("IN");$("#t-out").onclick=()=>tab("OUT");
+// Navigasi & Integrasi Tombol Back HP
+history.replaceState({tab:"IN"},"","#pdi-in");
+
+function tab(w, push=true){
+ if(cur===w)return;
+ cur=w;
+ $("#t-in").classList.toggle("on",w==="IN");
+ $("#t-out").classList.toggle("on",w==="OUT");
+ if(push){
+  if(w==="OUT"){
+   history.pushState({tab:"OUT"},"","#pdi-out");
+  } else {
+   history.pushState({tab:"IN"},"","#pdi-in");
+  }
+ }
+ render();
+ window.scrollTo(0,0);
+}
+
+// Tangani tombol Back HP/Browser: Jika di PDI OUT -> Kembali ke PDI IN
+window.addEventListener("popstate", e=>{
+ const target=(e.state&&e.state.tab)||(location.hash==="#pdi-out"?"OUT":"IN");
+ if(target!==cur){
+  tab(target, false);
+ }
+});
+
+$("#t-in").onclick=()=>tab("IN");
+$("#t-out").onclick=()=>tab("OUT");
+
 render();
+updateSiteUI();
+if(!currentSite){
+ openSiteModal();
+}
 </script>
 </body>
 </html>
