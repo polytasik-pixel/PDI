@@ -2,43 +2,158 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#C8102E">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Form PDI">
 <title>Form PDI - Service Center</title>
 <!-- Library Barcode / QR Code Scanner -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script src="html5-qrcode.min.js"></script>
+<script>
+if (typeof Html5Qrcode === "undefined") {
+  const s = document.createElement("script");
+  s.src = "https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";
+  document.head.appendChild(s);
+}
+</script>
 <style>
-:root{--red:#C8102E;--ink:#1a1a1a;--bg:#f4f4f2;--card:#fff;--line:#d9d9d4;--mute:#666}
+:root{
+  --red:#C8102E;
+  --green:#16a34a;
+  --green-dark:#15803d;
+  --green-deep:#166534;
+  --ink:#1a1a1a;
+  --bg:#f4f4f2;
+  --card:#fff;
+  --line:#d9d9d4;
+  --mute:#666;
+}
 *{box-sizing:border-box}
-body{margin:0;padding:1mm;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;-webkit-text-size-adjust:100%;padding-bottom:max(1mm,env(safe-area-inset-bottom))}
-header{background:var(--ink);color:#fff;padding:8px 1mm;border-bottom:3px solid var(--red);margin:-1mm -1mm 0 -1mm;padding-top:max(8px,env(safe-area-inset-top))}
-.header-wrap{display:flex;justify-content:space-between;align-items:center;max-width:100%;margin:0 auto;padding:0 1mm}
+body{
+  margin:0;
+  padding:1mm; /* Padding 1mm sesuai permintaan */
+  font-family:"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:14px;
+  -webkit-text-size-adjust:100%;
+  padding-bottom:max(8px,env(safe-area-inset-bottom));
+}
+header{
+  background:var(--ink);
+  color:#fff;
+  padding:8px 6px;
+  border-bottom:3px solid var(--red);
+  margin:-1mm -1mm 0 -1mm;
+  padding-top:max(8px,env(safe-area-inset-top));
+}
+.header-wrap{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  max-width:100%;
+  margin:0 auto;
+  padding:0 2px;
+}
 header b{font-size:18px;letter-spacing:.3px;color:#fff}
 header b span{color:var(--red)}
 header small{display:block;color:#bbb;margin-top:1px;font-size:11px}
-.header-site{display:flex;align-items:center;gap:4px;background:#2a2a2a;padding:4px 8px;border-radius:16px;border:1px solid #444;font-size:12px}
+.header-site{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  background:#2a2a2a;
+  padding:4px 8px;
+  border-radius:16px;
+  border:1px solid #444;
+  font-size:12px;
+}
 .header-site b{font-size:12px;color:#ff4d64}
-.btn-change-site{background:transparent;color:#aaa;border:0;padding:2px 4px;font-size:11px;text-decoration:underline;cursor:pointer}
+.btn-change-site{
+  background:transparent;
+  color:#aaa;
+  border:0;
+  padding:2px 4px;
+  font-size:11px;
+  text-decoration:underline;
+  cursor:pointer;
+}
 .btn-change-site:hover{color:#fff}
-.tabs{display:flex;position:sticky;top:0;z-index:5;background:var(--ink);margin:0 -1mm 6px -1mm}
-.tabs button{flex:1;padding:11px 4px;border:0;background:#333;color:#ddd;font-size:14px;font-weight:600;cursor:pointer}
-.tabs button.on{background:var(--red);color:#fff}
-main{max-width:100%;margin:0 auto;padding:1mm 0}
-fieldset{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--red);margin:0 0 8px;padding:8px 1mm}
-legend{font-weight:700;font-size:13px;padding:0 4px}
+
+/* TABS NAVIGASI - Tombol Pilih PDI IN & PDI OUT Aktif = WARNA MERAH */
+.tabs{
+  display:flex;
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:var(--ink);
+  margin:0 -1mm 6px -1mm;
+}
+.tabs button{
+  flex:1;
+  padding:12px 4px;
+  border:0;
+  background:#333;
+  color:#ddd;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background .15s ease;
+}
+.tabs button.on{
+  background:var(--red) !important; /* Warna Merah */
+  color:#fff !important;
+}
+
+main{max-width:100%;margin:0 auto;padding:4px 0}
+fieldset{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-left:4px solid var(--red);
+  margin:0 0 8px;
+  padding:8px 8px 10px;
+  border-radius:2px;
+}
+legend{font-weight:700;font-size:13px;padding:0 4px;color:var(--ink)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
-label.f{display:block;font-size:12px;color:var(--mute);margin-bottom:2px}
-input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{width:100%;padding:8px;border:1px solid #bbb;border-radius:4px;font:inherit;margin-top:2px;background:#fff;color:var(--ink);font-size:15px;min-height:42px}
+
+label.f{display:block;font-size:12px;color:var(--mute);margin-bottom:2px;font-weight:500}
+input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{
+  width:100%;
+  padding:8px 10px;
+  border:1px solid #bbb;
+  border-radius:4px;
+  font:inherit;
+  margin-top:2px;
+  background:#fff;
+  color:var(--ink);
+  font-size:14px;
+  min-height:42px;
+  box-sizing:border-box;
+}
 textarea{min-height:65px}
 
-/* Input Group dengan Tombol Scan */
+/* Input Group dengan Tombol Scan (hanya di PDI IN) */
 .input-with-btn{display:flex;gap:4px;margin-top:2px}
 .input-with-btn input{margin-top:0 !important;flex:1}
-.btn-scan{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--ink);color:#fff;border:1px solid #444;border-radius:4px;padding:0 10px;cursor:pointer;font-weight:600;font-size:13px;min-height:42px}
+.btn-scan{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  background:var(--ink);
+  color:#fff;
+  border:1px solid #444;
+  border-radius:4px;
+  padding:0 12px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:13px;
+  min-height:42px;
+}
 .btn-scan:hover,.btn-scan:active{background:var(--red);border-color:var(--red)}
 .btn-scan svg{stroke:#fff}
 
@@ -46,27 +161,114 @@ textarea{min-height:65px}
 #techBox select,#techBox input{margin-top:0 !important}
 
 /* Tampilan Warning Validasi Field Kosong */
-.field-warn{border:2px solid var(--red) !important;background:#fff5f5 !important;box-shadow:0 0 0 3px rgba(200,16,46,.18) !important}
-.warn-msg{display:flex;align-items:center;gap:4px;color:var(--red);font-size:11px;font-weight:700;margin-top:3px}
+.field-warn{
+  border:2px solid var(--red) !important;
+  background:#fff5f5 !important;
+  box-shadow:0 0 0 3px rgba(200,16,46,.18) !important;
+}
+.warn-msg{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  color:var(--red);
+  font-size:11px;
+  font-weight:700;
+  margin-top:3px;
+}
 .warn-msg svg{flex:0 0 auto;stroke:var(--red)}
 
+/* CHECKLIST & KOTAK TOMBOL AKTIF WARNA HIJAU */
 .item{padding:7px 0;border-top:1px solid #eee}
 .item:first-of-type{border-top:0}
 .nm{margin-bottom:5px;font-size:13px}
 .opts{display:flex;gap:4px;flex-wrap:wrap}
-.opts label{flex:0 0 auto;border:1px solid #bbb;border-radius:4px;padding:5px 10px;cursor:pointer;font-size:13px;user-select:none;min-height:40px;display:flex;align-items:center}
+.opts label{
+  flex:1 1 30%;
+  text-align:center;
+  justify-content:center;
+  border:1px solid #bbb;
+  border-radius:4px;
+  padding:6px 6px;
+  cursor:pointer;
+  font-size:13px;
+  user-select:none;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  box-sizing:border-box;
+  background:#fff;
+  color:var(--ink);
+  transition:all .1s ease;
+}
 .opts input{position:absolute;opacity:0}
-.opts label:has(input:checked){background:var(--ink);color:#fff;border-color:var(--ink)}
-.opts label.bad:has(input:checked){background:var(--red);border-color:var(--red)}
+
+/* KOTAK TOMBOL OPSI TERPILIH: HIJAU */
+.opts label:has(input:checked), .opts label.sel{
+  background:var(--green) !important;
+  color:#fff !important;
+  border-color:var(--green) !important;
+  font-weight:700;
+}
+.opts label.bad:has(input:checked), .opts label.bad.sel{
+  background:var(--red) !important;
+  color:#fff !important;
+  border-color:var(--red) !important;
+  font-weight:700;
+}
 .opts label:has(input:focus-visible){outline:3px solid #0a6cff}
-.note{margin-top:5px;padding:5px 7px;font-size:12px;min-height:36px}
+
+.note{margin-top:5px;padding:5px 8px;font-size:12px;min-height:36px}
 .item.miss{background:#fff1f1;outline:2px solid var(--red);border-radius:4px;padding:7px 6px}
 .item.miss::after{content:"⚠️ Wajib diperiksa & dipilih";color:var(--red);font-weight:700;font-size:11px;display:block;margin-top:4px}
-button.send{width:100%;padding:14px;background:var(--red);color:#fff;border:0;border-radius:4px;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px}
-button.send:disabled{opacity:.6}
-#msg{position:fixed;left:1mm;right:1mm;bottom:1mm;padding:12px;border-radius:6px;color:#fff;display:none;z-index:999;text-align:center;font-weight:600;font-size:13px}
+
+/* TOMBOL SIMPAN / KIRIM BAWAH: HIJAU TUA & TEKS PUTIH */
+button.send{
+  width:100%;
+  padding:14px;
+  background:var(--green-dark) !important; /* Hijau Tua */
+  color:#FFFFFF !important;              /* Teks Putih */
+  border:0;
+  border-radius:4px;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  margin-top:6px;
+  letter-spacing:.3px;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+  transition:background .15s ease;
+}
+button.send:hover{
+  background:var(--green-deep) !important;
+  color:#FFFFFF !important;              /* Teks Putih */
+}
+button.send:disabled{opacity:.5;cursor:not-allowed}
+
+#msg{
+  position:fixed;
+  left:4px;
+  right:4px;
+  bottom:4px;
+  padding:12px;
+  border-radius:6px;
+  color:#fff;
+  display:none;
+  z-index:999;
+  text-align:center;
+  font-weight:600;
+  font-size:13px;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
 .sig{margin-top:8px}
-.sig canvas{display:block;width:100%;height:130px;border:1px dashed #888;border-radius:4px;background:#fff;touch-action:none;cursor:crosshair}
+.sig canvas{
+  display:block;
+  width:100%;
+  height:130px;
+  border:1px dashed #888;
+  border-radius:4px;
+  background:#fff;
+  touch-action:none;
+  cursor:crosshair;
+}
 .sig.miss canvas{border:2px solid var(--red);background:#fff1f1}
 .sig.miss::after{content:"⚠️ Tanda tangan wajib diisi";color:var(--red);font-weight:700;font-size:11px;display:block;margin-top:4px}
 .sig .bar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mute);margin-bottom:2px}
@@ -76,500 +278,2385 @@ button.send:disabled{opacity:.6}
 @media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}main{max-width:960px}}
 
 /* Modal Login Site Popup */
-#siteModal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px;backdrop-filter:blur(4px)}
-.modal-box{background:#fff;border-radius:8px;max-width:440px;width:100%;padding:20px 16px;box-shadow:0 12px 30px rgba(0,0,0,.35);border-top:5px solid var(--red)}
+#siteModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  padding:16px;
+  backdrop-filter:blur(4px);
+}
+.modal-box{
+  background:#fff;
+  border-radius:8px;
+  max-width:440px;
+  width:100%;
+  padding:20px 16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  border-top:5px solid var(--red);
+}
 .modal-box h2{margin:0 0 6px;font-size:19px;color:var(--ink)}
 .modal-box p{margin:0 0 14px;font-size:13px;color:var(--mute);line-height:1.4}
-.modal-box select{width:100%;padding:11px;font-size:15px;border:1px solid #bbb;border-radius:4px;margin-bottom:14px;background:#fff}
-.modal-box button.btn-save{width:100%;padding:13px;background:var(--red);color:#fff;border:0;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer}
+.modal-box select{
+  width:100%;
+  padding:11px;
+  font-size:15px;
+  border:1px solid #bbb;
+  border-radius:4px;
+  margin-bottom:14px;
+  background:#fff;
+}
+.modal-box button.btn-save{
+  width:100%;
+  padding:13px;
+  background:var(--red);
+  color:#fff;
+  border:0;
+  border-radius:4px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
 .modal-box button.btn-save:disabled{opacity:.5;cursor:not-allowed}
 
 /* Modal Barcode Scanner */
-#scannerModal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:10000;padding:12px;backdrop-filter:blur(3px)}
-.scanner-box{background:#1e1e1e;color:#fff;border-radius:8px;max-width:480px;width:100%;padding:16px;box-shadow:0 12px 35px rgba(0,0,0,.5);border:2px solid var(--red)}
-.scanner-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+#scannerModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+  padding:12px;
+  backdrop-filter:blur(3px);
+}
+.scanner-box{
+  background:#1e1e1e;
+  color:#fff;
+  border-radius:8px;
+  max-width:480px;
+  width:100%;
+  padding:16px;
+  box-shadow:0 12px 35px rgba(0,0,0,.5);
+  border:2px solid var(--red);
+}
+.scanner-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
 .scanner-top h3{margin:0;font-size:16px;color:#fff}
-.btn-close-scanner{background:#333;color:#fff;border:1px solid #666;border-radius:4px;padding:6px 12px;cursor:pointer;font-size:13px}
+.btn-close-scanner{
+  background:#333;
+  color:#fff;
+  border:1px solid #555;
+  border-radius:4px;
+  padding:6px 12px;
+  cursor:pointer;
+  font-size:13px;
+}
 .btn-close-scanner:hover{background:var(--red);border-color:var(--red)}
-#readerContainer{width:100%;min-height:260px;background:#000;border-radius:6px;overflow:hidden;position:relative}
-#reader{width:100%}
+#reader{width:100%;min-height:250px;background:#000;border-radius:4px;overflow:hidden}
 .scanner-tip{font-size:12px;color:#aaa;text-align:center;margin-top:10px}
+
+/* ============================================================ */
+/* TOMBOL CETAK & MODAL CETAK PDF */
+/* ============================================================ */
+.btn-print-act {
+  background: #0D47A1;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+  transition: background 0.2s;
+}
+.btn-print-act:hover {
+  background: #1565C0;
+}
+.btn-print-act-lg {
+  background: #0D47A1;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  transition: background 0.2s;
+}
+.btn-print-act-lg:hover {
+  background: #1565C0;
+}
+
+#printModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 14px;
+  backdrop-filter: blur(2px);
+}
+.print-modal-box {
+  background: #fff;
+  color: #222;
+  border-radius: 8px;
+  max-width: 520px;
+  width: 100%;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border-top: 5px solid var(--red);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+#btnDoPrint, button#btnDoPrint, .print-modal-box .btn-save {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+#btnDoPrint:disabled, button#btnDoPrint:disabled {
+  color: #FFFFFF !important;
+  opacity: 0.65;
+}
+.modal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+.modal-top h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--red);
+  font-weight: 700;
+}
+.btn-close-modal {
+  background: #eee;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-close-modal:hover {
+  background: #ddd;
+}
+
+/* ============================================================ */
+/* AREA DOKUMEN CETAK & ATURAN PRINT PDF */
+/* ============================================================ */
+#printReportArea {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm 8mm 10mm;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Sembunyikan SEMUA elemen body secara total kecuali #printReportArea */
+  body > *:not(#printReportArea),
+  header, nav, main, #app, #f, .wo-box, fieldset.wo-box, #printModal, #scannerModal, #siteModal, #globalLoader, #msg, .toast, footer {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: -99999px !important;
+    left: -99999px !important;
+  }
+
+body.is-printing > *:not(#printReportArea) {
+  display: none !important;
+}
+body.is-printing main,
+body.is-printing #app,
+body.is-printing #f,
+body.is-printing .wo-box,
+body.is-printing fieldset {
+  display: none !important;
+}
+  }
+
+  /* Area Dokumen Cetak Utama */
+  #printReportArea {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #111 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 8.5pt !important;
+    line-height: 1.25 !important;
+  }
+
+  #printReportArea * {
+    visibility: visible !important;
+  }
+
+  .print-page {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .print-page-break {
+    page-break-after: always !important;
+    break-after: page !important;
+    height: 0 !important;
+    display: block !important;
+    visibility: hidden !important;
+  }
+
+  .print-header {
+    border-bottom: 2px solid #C8102E;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .print-header-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8pt;
+    font-weight: 700;
+    color: #444;
+    border-bottom: 1.5px solid #C8102E;
+    padding-bottom: 3px;
+    margin-bottom: 6px;
+  }
+  .print-brand-title {
+    font-size: 14pt;
+    font-weight: 800;
+    color: #C8102E !important;
+    letter-spacing: 0.5px;
+  }
+  .print-brand-sub {
+    font-size: 8pt;
+    color: #555;
+    font-weight: 600;
+  }
+  .print-doc-meta {
+    text-align: right;
+  }
+  .print-doc-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #111;
+  }
+  .print-doc-sub {
+    font-size: 7.5pt;
+    color: #555;
+  }
+  .print-doc-no {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #C8102E;
+    margin-top: 1px;
+  }
+
+  table.print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 5px;
+    font-size: 8.5pt;
+    page-break-inside: auto;
+  }
+  table.print-table th, table.print-table td {
+    border: 1px solid #777;
+    padding: 2.5px 5px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.print-table th {
+    background-color: #f2f2f2 !important;
+    color: #111;
+    font-weight: 700;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  table.print-table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .print-section-hdr {
+    background: #C8102E !important;
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 8.5pt;
+    padding: 2.5px 5px;
+    margin-top: 5px;
+    margin-bottom: 2px;
+    border-radius: 2px;
+    page-break-after: avoid;
+    break-after: avoid;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .badge-ok {
+    font-weight: 700;
+    color: #2E7D32 !important;
+  }
+  .badge-ng {
+    font-weight: 700;
+    color: #C8102E !important;
+  }
+  .badge-na {
+    color: #777 !important;
+  }
+
+  .print-signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .sig-col {
+    width: 31%;
+    border: 1px solid #777;
+    border-radius: 4px;
+    padding: 4px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .sig-col-title {
+    font-size: 8pt;
+    font-weight: 700;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+  }
+  .sig-img-box {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+  }
+  .sig-img-box img {
+    max-height: 44px;
+    max-width: 90%;
+    object-fit: contain;
+  }
+  .sig-name {
+    font-size: 8.5pt;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+  .sig-date {
+    font-size: 7pt;
+    color: #555;
+  }
+  .print-footer {
+    margin-top: 6px;
+    padding-top: 3px;
+    border-top: 1px dashed #999;
+    font-size: 7pt;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+
+/* Animasi Sederhana Loading di Tengah Layar (Tanpa Kotak, Transparan di Tengah) */
+#globalLoader {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18); /* Transparan tipis tanpa kotak */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  pointer-events: auto;
+}
+.loader-spinner {
+  width: 46px;
+  height: 46px;
+  border: 4px solid rgba(255, 255, 255, 0.35);
+  border-top: 4px solid var(--red); /* Merah Polytron tegas */
+  border-radius: 50%;
+  animation: spinLoader 0.7s linear infinite;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+}
+@keyframes spinLoader {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 </style>
 </head>
 <body>
-<header>
-  <div class="header-wrap">
-    <div>
-      <b>Form PDI</b><small>Service Center</small>
-    </div>
-    <div id="sitePill" class="header-site" style="display:none">
-      <span>Site: <b id="curSiteTxt">-</b></span>
-      <button class="btn-change-site" type="button" onclick="openSiteModal()">Ganti</button>
-    </div>
-  </div>
-</header>
-<div class="tabs"><button id="t-in" class="on" type="button">PDI IN (unit masuk)</button><button id="t-out" type="button">PDI OUT (unit keluar)</button></div>
-<main><div id="app"></div></main>
-<div id="msg" role="status"></div>
 
-<!-- Modal Popup Login Site -->
-<div id="siteModal">
-  <div class="modal-box">
-    <h2>Pilih Site Service Center</h2>
-    <p>Silakan pilih lokasi site tugas Anda. Pilihan ini akan disimpan otomatis sehingga Anda tidak perlu memilih ulang setiap membuka aplikasi.</p>
-    <select id="modalSiteSelect">
-      <option value="">-- Pilih Site Anda --</option>
-    </select>
-    <button class="btn-save" id="btnSaveSite" type="button" disabled>Masuk &amp; Simpan Site</button>
+
+<!-- Modal Cetak PDF PDI (IN & OUT) -->
+<div id="printModal">
+  <div class="print-modal-box">
+    <div class="modal-top">
+      <h3>🖨️ Cetak Dokumen PDI (IN & OUT)</h3>
+      <button type="button" class="btn-close-modal" onclick="closePrintModal()">✕ Tutup</button>
+    </div>
+    
+    <div style="background:#FFF3E0; border-left:4px solid #FF9800; padding:8px 12px; margin-bottom:12px; font-size:13px; color:#E65100; border-radius:3px;">
+      Pilih NO. CASE untuk mencetak dokumen pemeriksaan lengkap gabungan <strong>PDI IN & PDI OUT</strong> dalam format PDF resmi.
+    </div>
+
+    <div style="margin-bottom:10px; font-size:13px;">
+      Site Service Center: <strong id="printSiteLabel" style="color:var(--red); font-size:14px;">-</strong>
+    </div>
+
+    <label class="f" style="margin-bottom:12px; font-size:13px; font-weight:600;">Pilih NO. CASE (Site Aktif):
+      <select id="printSclSelect" onchange="onPrintSCLSelected()" style="width:100%; padding:10px; font-size:14px; font-weight:600; border:1px solid #aaa; border-radius:4px;">
+        <option value="">Memuat daftar NO. CASE...</option>
+      </select>
+    </label>
+
+    <!-- Info Pratinjau Singkat SCL -->
+    <div id="printPreviewBox" style="display:none; background:#F8F9FA; border:1px solid #DDD; border-radius:6px; padding:12px; margin-bottom:15px; font-size:13px;">
+      <div style="font-weight:bold; font-size:14px; color:#111; margin-bottom:6px;" id="prevSCLTitle">-</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#444;">
+        <div>Tipe/Model: <strong id="prevModel">-</strong></div>
+        <div>No. Rangka/VIN: <strong id="prevVIN" class="mono">-</strong></div>
+        <div>Status PDI IN: <span id="prevStatusIn" style="font-weight:bold; color:#2E7D32;">✓ Ada</span></div>
+        <div>Status PDI OUT: <span id="prevStatusOut" style="font-weight:bold; color:#1565C0;">-</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+      <button type="button" id="btnDoPrint" onclick="executePrintPDF()" class="btn-save" style="flex:2; background:#C8102E; color:#FFFFFF !important; font-size:15px; font-weight:700; padding:12px;" disabled>
+        🖨️ Cetak / Simpan PDF
+      </button>
+      <button type="button" class="btn-close-modal" onclick="closePrintModal()" style="flex:1; padding:12px;">Batal</button>
+    </div>
   </div>
 </div>
 
-<!-- Modal Scanner Barcode / QR -->
+<!-- Area Cetak PDF (Hanya Aktif Saat window.print) -->
+<div id="printReportArea" class="print-doc-area"></div>
+
+
+<!-- Animasi Sederhana Loading di Tengah Layar (Tanpa Kotak) -->
+<div id="globalLoader">
+  <div class="loader-spinner"></div>
+</div>
+
+<!-- Header Aplikasi -->
+<header>
+  <div class="header-wrap">
+    <div>
+      <b>POLYTRON <span>PDI</span></b>
+      <small>Pre-Delivery Inspection Service Center</small>
+    </div>
+    <div class="header-site">
+      <span>Site:</span>
+      <b id="activeSiteBadge">- Belum Dipilih -</b>
+      <button type="button" class="btn-change-site" onclick="openSiteModal()" title="Ubah Site">Ganti</button>
+    </div>
+  </div>
+</header>
+
+<!-- Tabs Menu Utama: PDI IN & PDI OUT (Tombol Aktif = Merah) -->
+<nav class="tabs">
+  <button id="t-in" class="on" type="button">PDI IN</button>
+  <button id="t-out" type="button">PDI OUT</button>
+</nav>
+
+<main id="app"></main>
+<div id="msg"></div>
+
+<!-- Modal Popup Pilih Site Service Center (Hanya menampilkan KODE site) -->
+<div id="siteModal">
+  <div class="modal-box">
+    <h2>Pilih Site Service Center</h2>
+    <p>Silakan pilih kode site lokasi tugas Anda. Pilihan ini akan disimpan otomatis.</p>
+    <select id="modalSiteSelect">
+      <option value="">-- Pilih Kode Site --</option>
+    </select>
+    <button type="button" class="btn-save" id="btnSaveSite" disabled onclick="saveSiteSelection()">Simpan & Lanjutkan</button>
+  </div>
+</div>
+
+<!-- Modal Barcode / QR Scanner Kamera -->
 <div id="scannerModal">
   <div class="scanner-box">
     <div class="scanner-top">
-      <h3>Scan Barcode / QR Seri</h3>
-      <button class="btn-close-scanner" type="button" onclick="stopScanner()">Tutup / Batal</button>
+      <h3>📷 Scan Barcode / QR Code No. Seri</h3>
+      <button type="button" class="btn-close-scanner" onclick="stopScanner()">Tutup ✕</button>
     </div>
-    <div id="readerContainer">
-      <div id="reader"></div>
-    </div>
+    <div id="reader"></div>
     <div class="scanner-tip">Arahkan kamera ke kode batang pada unit / dus. Scanner akan tertutup otomatis saat terbaca.</div>
   </div>
 </div>
 
 <script>
-// ====== ISI SETELAH DEPLOY GOOGLE APPS SCRIPT (lihat panduan) ======
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrFrAKjTjaGvblJsA4_HBaGOZlzV7DPbzOb-cghSMb3R2oRChr4LFf-aw64iIcVLNW/exec";
-// ===================================================================
+// ID Spreadsheet Tunggal (PDIIN, PDOUT, BARANG, TEKNISI)
+const SPREADSHEET_ID = "1UPR7CyINoIWpOvRIKrUApgCt5pVygvgQf4lVDFEU7KI";
 
-// ID Spreadsheet Google
-const SHEET_DOC_ID = "1zV-Oc6YyVbfMb_N-TvsBW9_A8XFOwLS5n5EXnWxDvUs";
-const GID_BARANG = "1919416964";
-const GID_TEKNISI = "1832751733";
+// Nama Sheet Database Tunggal Resmi Sesuai Permintaan User
+const SHEET_NAME_IN = "PDIIN";
+const SHEET_NAME_OUT = "PDOUT";
 
-const PRODUCT_STORAGE_KEY = "pdi_product_map_cache";
-const TEKNISI_STORAGE_KEY = "pdi_teknisi_map_cache";
+// URL Google Apps Script Endpoint
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzliDfvM4-GNTZRXRwkwCrlvyzmJmoSXzaoCJq9VtEf-1B8tkoioS_PCJo1kJ0S7E2S/exec";
+const SITE_STORAGE_KEY = "pdi_user_site";
+const HISTORY_STORAGE_KEY = "pdi_in_history";
 
-// Initial embedded map Barang (923 items dari sheet)
-const INITIAL_PRODUCT_MAP = {"A10P":"PS-PRB175R","A01E":"PS-PAS10D28","A0V3":"PS-PRA16DMY","A106":"PS-PRG190S","A0ZV":"PS-PWC615X","A0RR":"PS-PLD43TAG5959","A03Z":"PS-PLD50B8750W","A0JV":"PS-PWM8073B","A0MY":"PS-PRB217PR","A0DY":"PS-PRC1201Y","A02F":"PS-PRB179R","A0QH":"PS-PRB217LB","A0TE":"PS-PRA18DRX","A0O8":"PS-PLD50UG5959","A109":"PS-PLD40CV8969","8905":"PS-PAW90517WM","A0H5":"PS-PCF118","A12Z":"PS-PRB217TY","A0MC":"PS-PWM8076G","3019":"PS-PWC777","A112":"PS-PLD32AG5759","A0BQ":"PS-PLD40BV8958","8556":"PS-PLD32T1850","A0MX":"PS-PRB157PR","6636":"PS-PLD40TS156","5853":"PS-PLD24D8511","A0PU":"PS-PLD24V1853","A0DR":"PS-PLD24D1850M","8899":"PS-PAW80517WB","A0AL":"PS-PLD24V123","A0Z2":"PS-PLD24V1853Y","A0DS":"PS-PLD32V1853","A0AP":"PS-PLD24TV1855","SCL/":"PS-PR225SMX","A0AM":"PS-PLD24V223","A0XI":"PS-PASPRO12F6","A0Z3":"PS-PLD24TV1855Y","A034":"PS-PRA18MNX","A14Q":"PS-PRA17DRD","A0MW":"PS-PRB177PR","8575":"PS-PLD24D123NV","A0ZW":"PS-PWC500X","A0RE":"PS-PLD43BAG9953E","A094":"PS-PLD32V0753","A0M8":"PS-PLD24MV1859","8725":"PS-PWC776","9921":"PS-PLD32D1852","5841":"PS-PLD32D7511","6787":"PS-PRM28BNB","A0V7":"PS-PRA18DMY","A0O4":"PS-PLD43BAG5959","A0ZC":"PS-PLD32BAG9858","9829":"PS-PAW90518B","A07F":"PS-SCN148X","A0DG":"PS-PAW9527X","8898":"PS-PLD43B150","A0KR":"PS-PASPRO15F3","A0M9":"PS-PLD32MV1859","7782":"PS-PLD24T8511S","3456":"PS-PRG24KCP","A0TG":"PS-PRA16DRX","A0NE":"PS-PAW9028Y","A0IA":"PS-PRA18ALR","A0AC":"PS-PLD32BV1558G2","A0MD":"PS-PWM9076G","5667":"PS-PRM28QS","A092":"PS-PLD32V1852","7191":"PS-PLD32T7511S","A0AG":"PS-PLD50V8753","A0PW":"PS-PLD32TV1755","A10F":"PS-PLD32CV1869S","A14J":"PS-PLD43BG9058","A03Y":"PS-PLD43B1550W","8555":"PS-PLD32D1850","A0ZQ":"PS-PAS10DF28","7197":"PS-PAW85511WS","A077":"PS-PWM851R","A022":"PS-PRW29MNX","6689":"PS-PAS2A15BA","A0ZD":"PS-PLD32TAG9855","6920":"PS-PLD40D150","A0JW":"PS-PWM8073P","8900":"PS-PAW80517WM","A0UW":"PS-PAW7029Y","A0AD":"PS-PLD32BV1558","4380":"PS-PAW8513M","9853":"PS-PRX180Y","A0SM":"PS-PAW7028WL","3717":"PS-PAW7511WM","A0TA":"PS-PRA18CRX","A0MK":"PS-PRW23MTR","A0NF":"PS-PAW1028Y","6586":"PS-PLD24D123","A02G":"PS-PRB189B","A14B":"PS-PLD43RG9059","A0VV":"PS-PWM1203X","8511":"PS-PWM8363B","A07G":"PS-SCN188X","8574":"PS-PLD24T1850","A0QX":"PS-PEV30M1AT","A10E":"PS-PLD24CV1869S","8829":"PS-PAS8B28","8576":"PS-PAS69GA","9938":"PS-PWC778X","9877":"PS-PLD43T150","A07H":"PS-SCN238X","858":"PS-PRS460B","A00N":"PS-PLD32B1550W","4029":"PS-PWM8567WGS","A0LT":"PS-PRA18MOW","5844":"PS-PLD32D9505","A0GH":"PS-PWM9072B","4816":"PS-PRM23STR","A0DF":"PS-PAW8527X","A07B":"PS-PRM490X","3835":"PS-PLD32T100","A020":"PS-PRW23MNX","9976":"PS-SCN187","A08C":"PS-PWM951B","4800":"PS-PRD18LYS","6284":"PS-SCN141X","6917":"PS-PLD40TS153U","A0JT":"PS-PWM7073B","A08A":"PS-PWM801B","A047":"PS-PLD43BAG9953","A071":"PS-PWM701R","A0TC":"PS-PRA16CRX","A0C3":"PS-PAW9527R","A0GG":"PS-PWM9072N","A01M":"PS-PLD32B1551","A0ZX":"PS-PAS8BF28","8896":"PS-PLD32B1550","A0NB":"PS-PAW1028W","A0RA":"PS-PLD32BAG9953E","A0RV":"PS-PWM1076Y","A0JU":"PS-PWM7073P","A0KO":"PS-PAS8FF22","7783":"PS-PLD32TS1503S","A0AN":"PS-PWC600","3411":"PS-PLD32T710","A01N":"PS-PLD32B8951","2958":"PS-PLD32T700","A0RG":"PS-PLD43AG9953E","A141":"PS-PLD32RG9059","A02J":"PS-PRB219R","A0UY":"PS-PAW9029Y","A149":"PS-PLD32BG9058","A0B4":"PS-PLD43BV1558","A03H":"PS-PRW23MNR","3726":"PS-PAW8512M","A0BZ":"PS-PAW7527R","A0SC":"PS-PLD50BUG9959","A0DE":"PS-PAW7527X","5699":"PS-PRM28QB","A0LS":"PS-PRA17MOB","4330":"PS-SCN231L","A0O9":"PS-PLD50BUG5959","9886":"PS-PRB238R","A01O":"PS-PLD43B8951","A0TF":"PS-PRA17DRX","A0HR":"PS-PWC778XUV","A0GD":"PS-PWM7072B","A0B3":"PS-PLD43V1553","A0XS":"PS-PLD32CV1869","9902":"PS-PLD24B8550","652":"PS-PRH47W","A0MJ":"PS-PRA18MTR","3235":"PS-PWM7056GG","A0TD":"PS-PRA15CRX","A02A":"PS-PLD43AG9953","6850":"PS-PRM21BNR","A144":"PS-PLD32TG9055","A0KZ":"PS-PMA9525B","A02H":"PS-PRB189R","A145":"PS-PPSPRO7M22","A0L7":"PS-PLD43V8853","A0T5":"PS-PRM21DRX","8505":"PS-PWM8363P","6895":"PS-PWM8366P","A0LW":"PS-PRW23MOB","1216":"PS-PR210SMI","A0ND":"PS-PAW8028Y","3501":"PS-PRN211S","3376":"PS-PWM1401R","8449":"PS-PLD50TS883G","A03X":"PS-PLD40B8850W","4329":"PS-SCN230L","9828":"PS-PAW80518B","A0RQ":"PS-PLD32TAG5959","3377":"PS-PWM1401G","A0RU":"PS-PWM9076Y","3683":"PS-SCN232","A03W":"PS-PLD32BAG9953","A00X":"PS-PLD55BU8850W","A0SN":"PS-PAW7028Y","A07I":"PS-PWC778LX","A0T4":"PS-PRM21CRX","1053":"PS-PWC103C","A0XY":"PS-PLD43CV8869","A04C":"PS-PWM7366HP","A0QJ":"PS-PRB237LB","7188":"PS-PLD32T1550S","A093":"PS-PLD32TV1855","A0GC":"PS-PWM7072N","A0AF":"PS-PLD50AV8759","A0XX":"PS-PLD43CV1569","3446":"PS-PRG21KCG","6638":"PS-PMA9502BA","A00G":"PS-PLD32AD1508G","A0MB":"PS-PWM7076G","9930":"PS-PLD40AS8858","A0AS":"PS-PLD40V8953","3682":"PS-SCN182","6631":"PS-PLD43TS153","A0M1":"PS-PMA9526B","A07A":"PS-PRM430X","1945":"PS-PWM9569C","A0FW":"PS-PAW8527M","6635":"PS-PLD40TS153","A06A":"PS-PLD40B8951","A0XR":"PS-PLD24CV1869","3718":"PS-PAW7511WS","A0PV":"PS-PLD32V1753","A02I":"PS-PRB219B","A0LU":"PS-PRA18MOB","6633":"PS-PLD43S153","9873":"PS-PAS8E28","6264":"PS-PLD32T1550","A0XW":"PS-PCF329","A0KU":"PS-PMA9522B","A130":"PS-PRB237TY","A0VS":"PS-PWM1203B","A0ZY":"PS-PAS8CF28","3216":"PS-PRG21BGR","A186":"PS-PWM1081Y","A0ZT":"PS-PLD43BAG9500","A111":"PS-PPS8L22","A0V5":"PS-PRA17DMY","A0O1":"PS-PLD32AG5959","A00I":"PS-PLD43AS1558G","A07J":"PS-PWC778LV","A0M0":"PS-PRW29MOB","A0N9":"PS-PAW8028W","3217":"PS-PRG21BGV","7793":"PS-PLD32S1503S","9884":"PS-PLD32AD1508","6903":"PS-PMA9501BGA","8920":"PS-PRX212R","9894":"PS-PLD24D1852","A0O5":"PS-PLD43BUG5959","5849":"PS-PLD32T7511","A0AU":"PS-PAC05VH","A04D":"PS-PWM7366HB","A0P8":"PS-PRM21PLX","A0SL":"PS-PLD43TAG9959","3410":"PS-PLD32D710","4766":"PS-PRM21QX","A0BA":"PS-PWM1402X","A006":"PS-PAS8F28","4764":"PS-PRM28QX","A0KQ":"PS-PASPRO12F3","3719":"PS-PAW7512B","8083":"PS-PRA18BNR","A0RS":"PS-PWM7076Y","A0ZU":"PS-PLD50UG5500","4973":"PS-PLD32T100TV","4484":"PS-SCN233D","A0QB":"PS-PRB187LB","3753":"PS-SCN230","A0VU":"PS-PWM1403X","A079":"PS-PWM951R","A02C":"PS-PRB159B","A0RP":"PS-PWM1082B","3816":"PS-PWC777WR","8897":"PS-PLD40B150","9455":"PS-PLD43AS1558","3724":"PS-PAW8511WS","A02B":"PS-PLD50AG9953","A04H":"PS-PWM9366HB","A0LQ":"PS-PRA15MOB","A0O2":"PS-PLD32BAG5959","A02T":"PS-PRA16BNB","A023":"PS-PRW23VX","4547":"PS-PAS79(BU)","A0A6":"PS-PLD24V0853","A07N":"PS-PWM752R","A04S":"PS-PLD50BUA8859W","A089":"PS-PWM751B","A162":"PS-PRA18DMR","A14P":"PS-PRA18DRD","A0DK":"PS-PLD40AG9953NT","A0XV":"PS-PCF229","8495":"PS-PWM7363B","7185":"PS-PAW75511WM","A0FG":"PS-PAW9527M","A0EB":"PS-PLD40V6153","A06F":"PS-PLD40BS8953","A04G":"PS-PWM9366HP","A0VT":"PS-PWM1403B","9830":"PS-PAW10518B","4765":"PS-PRM23QX","A119":"PS-DG32C103","8551":"PS-PLD32T1506E","A0DV":"PS-PLD43V7153","A0ZS":"PS-PMA9527B","880":"PS-PRS480X","A0FA":"PS-PMA9506BGNF","A0RT":"PS-PWM8076Y","A18S":"PS-PLD24CV1869Y","A132":"PS-PRB186RS","A095":"PS-PLD32TV0755","6701":"PS-PMA9501WA","A0AQ":"PS-PLD24TV0855","A09G":"PS-PLD43TV1556","A0VC":"PS-PRM21DMY","A0UC":"PS-PRA15DRX","A0YT":"PS-PRW29HB","5847":"PS-PLD32T1500","A0XQ":"PS-PASPRO10F6","A0MT":"PS-PWM1076G","958":"PS-PAW70501WB","A02D":"PS-PRB159R","5804":"PS-PRM21QV","9899":"PS-PLD43BS153","A0KN":"PS-PAS10DF22","A021":"PS-PRW25MNX","A150":"PS-PLD43TA5055","A02E":"PS-PRB179B","A0HT":"PS-PWC778WUV","A0GF":"PS-PWM8072B","A024":"PS-PRW25VX","3280":"PS-PRG22LTR","7094":"PS-PLD55US8850","6710":"PS-PMA9503BA","7861":"PS-PLD32D1500S","3599":"PS-PWM8567WB","A025":"PS-PRW29VX","A0ET":"PS-PMA9502BNF","6756":"PS-PRX171W","A0FV":"PS-PAW7527M","3278":"PS-PRG21LTV","A0QD":"PS-PRB177LB","5843":"PS-PLD32D7520","5794":"PS-PLD43S863","A07X":"PS-PLD40AD8959","A0YR":"PS-PAS8E20B","A0TY":"PS-PRA17CMS","4231":"PS-PAW7513N","A07C":"PS-PRM431X","A0C1":"PS-PAW8527R","1840":"PS-PAS78","A0SB":"PS-PLD50UG9959","4821":"PS-PRM28STV","A0KV":"PS-PAS8BF22","7216":"PS-PAW95512S","A0I1":"PS-PRA15ALR","7187":"PS-PAW85511WB","A0AW":"PS-PAC09VH","A12P":"PS-FOXSAT","A0SA":"PS-PAW75518B","7222":"PS-PAW75513M","1254":"PS-SCP1170LE","A0KX":"PS-PMA9320B","A0GE":"PS-PWM8072N","A07D":"PS-PRM491X","0A1M":"PS-PFL7051","A0TB":"PS-PRA17CRX","6282":"PS-SCN140X","A183":"PS-PWM7081Y","3729":"PS-PAW9511WM","A18Y":"PS-PRB200R","6600":"PS-PLD43S883","9928":"PS-PLD40B880","9730":"PS-PWC103BL","4810":"PS-PRM21SLX","A0N0":"PS-PRB287PR","4235":"PS-SCN180L","A0UZ":"PS-PAW1029Y","6769":"PS-PRM21HORF","6580":"PS-PRB183G","9978":"PS-SCN237","A0CP":"PS-PMA9310BG","3661":"PS-PLD24D901","A029":"PS-PLD32AG9953","9810":"PS-SCH51","A0O6":"PS-PLD43UG5959","A0AE":"PS-PLD50BV8758","5715":"PS-SCN186B","3406":"PS-PLD24D810","0A2P":"PS-PRS455S","3720":"PS-PAW7512M","3817":"PS-PWC777WB","866":"PS-PRS560X","874":"PS-PFL8101","3722":"PS-PAW8511WB","A04E":"PS-PWM8366HP","4382":"PS-PAW9513M","5769":"PS-PRM23QN","4739":"PS-PRO18LLX","A0H2":"PS-PMA9507BA","873":"PS-PFL7101","A0QF":"PS-PRB157LB","4733":"PS-PRO18BGVIN","3723":"PS-PAW8511WM","3162":"PS-PRG16KMB","3601":"PS-PWM9567WB","3732":"PS-PAW9512M","A096":"PS-PLD32TV1555","6897":"PS-PRO16ANB","A0UX":"PS-PAW8029Y","A003":"PS-PRH51X","A0U4":"PS-PRM21CMS","8915":"PS-PAW90517WB","6163":"PS-PLD32D1550","1581":"PS-PR22BGB","6891":"PS-PWM9366B","3198":"PS-PRG24KMB","A0DH":"PS-PLD40AG9953","0A35":"PS-PRS451Y","A0MI":"PS-PRA17MTR","5768":"PS-PRM21QN","6784":"PS-PWM8366B","9900":"PS-PLD50BS873","6925":"PS-PLD43D150","A0XU":"PS-PCF129","A185":"PS-PWM9081Y","A0R1":"PS-PRC1202G","4713":"PS-PRO15KTR","A0H7":"PS-PCF318","599":"PS-PCF115","A048":"PS-PLD50BAG9953","4381":"PS-PAW7513M","8573":"PS-PLD24D1850","A0S5":"PS-PWM1082X","A0P1":"PS-PRA18ORX","3218":"PS-PRG21BGB","A104":"PS-PLD50UV8959","4383":"PS-PAW9513B","3679":"PS-SCN181","4485":"PS-SCN143D","4516":"PS-BB5510(U)","0A0F":"PS-PFL7050","A0V1":"PS-PRA15DMY","5338":"PS-PMA9502","4833":"PS-PAS59(BUM)","A14T":"PS-PRA16DRD","1650":"PS-PAS21B","4102":"PS-PRN160GC","3731":"PS-PAW9512B","3633":"PS-PRG21KTR","A0A8":"PS-PLD55BUA8859","6579":"PS-PRB183B","3730":"PS-PAW9511WS","4730":"PS-PRO18AGVIN","A0NA":"PS-PAW9028W","4232":"PS-PAW8513B","A03J":"PS-PRW29MNR","7749":"PS-PAW95513M","6896":"PS-PWM9366P","3214":"PS-PRG16BGRN","5712":"PS-SCN146B","7578":"PS-PAW85513N","A0L4":"PS-PDV620T2","A07P":"PS-PWM802R","4132":"PS-PWM8070R","A0I6":"PS-PRA17ALR","5855":"PS-PLD24D9501","8922":"PS-PAS8C28","A0OD":"PS-PRA15ORX","3919":"PS-PRG24LTG","8082":"PS-PRA18ANB","6654":"PS-PAC05VX-M","A0MH":"PS-PRA15MTR","1646":"PS-SCP1181","A0IF":"PS-PRM21BLB","6632":"PS-PLD43TS156","A0EM":"PS-PTS2K25NFO","9847":"PS-PRB288B","6584":"PS-PRB173G","7215":"PS-PAW95512M","A075":"PS-PWM801R","3211":"PS-PRG16AGRN","5695":"PS-PRM21QB","A02L":"PS-PRB239R","A0ZP":"PS-PAS8EF28","A0OZ":"PS-PRA18PLX","A18X":"PS-PRB200Y","A0AZ":"PS-PAC05VZ","5792":"PS-PLD40TS853","6659":"PS-PLD32V7510S","A184":"PS-PWM8081Y","5969":"PS-PRM21FLR","A15D":"PS-PLD43UG5059","4010":"PS-PAC05VX","7196":"PS-PAW85511WM","A0QL":"PS-PRB287LB","A0MZ":"PS-PRB237PR","A14V":"PS-PLD40RG9059","5968":"PS-PRM21FLBL","9875":"PS-PAS8E12","A07T":"PS-PWM952R","A0LV":"PS-PRW23MOW","4236":"PS-SCN181L","A0L5":"PS-PDV700T2","A0L1":"PS-PAS8EF22","A0UE":"PS-PRA15DMS","A0OG":"PS-PRM21OLX","A15M":"PS-PLD55QG9059","A14R":"PS-PRA15DRD","5856":"PS-PLD24T8511","A004":"PS-PAS8F12","A18U":"PS-PLD32CV2269","6864":"PS-PRM23BNB","5850":"PS-PLD20D9501","3027":"PS-PLD24T800W","A02R":"PS-PRA16ANB","A0B0":"PS-PAC09VZ","9874":"PS-PAS8E22","9838":"PS-PAS8B22","A02S":"PS-PRA16BNR","6927":"PS-PWM8357XG","A0GI":"PS-PWM9572N","A0KW":"PS-PMA9321B","6717":"PS-PMA9506BA","8448":"PS-PLD50S883G","A0T8":"PS-PRM28CRX","3197":"PS-PRG24KMV","A0FB":"PS-PAS8F22NF","A10K":"PS-PRB186R","4732":"PS-PRO18BGRIN","9462":"PS-PLD50AS8858","4230":"PS-PAW7513B","9460":"PS-PLD40AS1558","9878":"PS-PLD50S873","959":"PS-PAW70501WX","7186":"PS-PAW75511WS","A068":"PS-PLD43BS1553W","1577":"PS-PR21BGR","5851":"PS-PLD22D9500","A0OB":"PS-PRA15OLX","5805":"PS-PRM23QV","A0S9":"PS-PAW75517WM","7223":"PS-PAW75513N","A0PA":"PS-PRM21PRX","1214":"PS-PR227VB","0A1N":"PS-PFL8051","3733":"PS-PAW9512S","6642":"PS-PMA9505WA","A0F0":"PS-PMA9501WNF","A110":"PS-PPS8L12","1054":"PS-PWC107G","A0M2":"PS-SCN187R","A0T7":"PS-PRM23DRX","A0DQ":"PS-PAC09VZS","A0PX":"PS-PRW23ZX","4571":"PS-PAS28(B)","A0LY":"PS-PRW25MOB","A0BB":"PS-PWM1402R","A0SH":"PS-PASPRO15F5","A125":"PS-PRB157TY","0A28":"PS-PRS510X","3497":"PS-PLD40D100","4574":"PS-PAS68(B)","A0I3":"PS-PRA16ALB","5845":"PS-PLD32D1500","A15O":"PS-PLD50UG5059","A16W":"PS-PAS10DF38","3905":"PS-PRG18LTC","A0Q6":"PS-PLD55UG5959","5601":"PS-PLD32T711TY","A0VE":"PS-PRM23DMY","7523":"PS-PAW85513B","4057":"PS-PRG22LTPN","A164":"PS-PAS8FF28R","A0H6":"PS-PCF218","A10J":"PS-PRB186B","A06B":"PS-PLD40T8950","A07E":"PS-PRM495X","A18I":"PS-PLD40CV8969V","A08B":"PS-PWM851B","4729":"PS-PRO18AGRIN","A0MV":"PS-PRB187PR","A0RC":"PS-PLD32AG9953E","A0F8":"PS-PMA9505BGNF","A0DJ":"PS-PLD55UV5920","A0KE":"PS-PLD43V8953","6716":"PS-PMA9503WA","A04F":"PS-PWM8366HB","A0U1":"PS-PRA16DMS","6918":"PS-PLD40S153U","A178":"PS-PAW8029TY","A0IC":"PS-PRA18BLR","8315":"PS-PAS29GA","7199":"PS-PAW95511WM","2951":"PS-PLD24T800","3030":"PS-SCP151C","6699":"PS-PMA9505BA","A0EW":"PS-PAS8E22NF","6815":"PS-PRO16BNB","4728":"PS-PRO16LLW","A0CW":"PS-PAS8E10","A0EO":"PS-PAS2A15BNFO","8075":"PS-PRA18ANR","1583":"PS-PR24BGR","4717":"PS-PRO16BGRN","9883":"PS-PLD50B870","6852":"PS-PRM21BNB","A19I":"PS-PWM7081V","A18H":"PS-PLD43CV8869V","1099":"PS-SCP123","A0DD":"PS-SCN236WX","6602":"PS-PLD50TS883","A0L6":"PS-PAS12AF15","3716":"PS-PAW7511WB","A0U9":"PS-PRM28DMS","A182":"PS-PRM21DRD","9757":"PS-SCP151","5665":"PS-PRM21QS","8092":"PS-PRA18BNB","A11T":"PS-PLD65UG5959","A15Q":"PS-PLD55UG5059","4684":"PS-PWC778","A0LP":"PS-PRA15MOW","A15L":"PS-PLD50QG9059","A0F9":"PS-PMA9505RSNF","8748":"PS-PRM28QXI","4705":"PS-PRM21BGV","A0ZA":"PS-PLD43TCV8865","A073":"PS-PWM751R","A06C":"PS-PLD40D8950","4105":"PS-PRN180GC","3200":"PS-PRG24LMR","4032":"PS-PWM9567WGS","9777":"PS-PLD50B880","A14Y":"PS-PLD32BV2258","A0GJ":"PS-PWM9572B","6906":"PS-PRM23HOV","4720":"PS-PRO16KTR","1579":"PS-PR21BGV","7189":"PS-PLD32T1500S","A15V":"PS-PASPRO12F7","A0U2":"PS-PRA17DMS","7198":"PS-PAW95511WB","A18F":"PS-PAW9029TS","0A0N":"PS-PFL1105H","9845":"PS-PRB218R","A031":"PS-PRA17MNX","A1AH":"PS-PLD32RG5059","A08O":"PS-PRX180T","6905":"PS-PRM23HORF","5316":"PS-PLD24D901Y","A061":"PS-PLD24D9050","3635":"PS-PRG21KTV","A18E":"PS-PAW8029TS","A179":"PS-PAW1029TY","A15U":"PS-PASPRO10F7","A19P":"PS-PRM20CRD","A02O":"PS-PRA15ANR","6572":"PS-PRM23FLR","5770":"PS-PRM28QN","8404":"PS-PLD32T1506S","4927":"PS-PMA9501","A0LR":"PS-PRA17MOW","A15P":"PS-PLD50BUG5058","A0S8":"PS-PAW75517WB","8464":"PS-PWM7363P","6865":"PS-PRO15ANR","3208":"PS-PRG18BGRIN","A17E":"PS-PAW9029TY","A19K":"PS-PWM9081V","4004":"PS-PAC09LE","6949":"PS-PWM7367WGS","8065":"PS-PRA17BNR","A1AM":"PS-SCN228","6711":"PS-PMA9300BA","1702":"PS-PAS68","A0C5":"PS-PRW296Y","A10Q":"PS-PRA18JS","A143":"PS-PASPRO15F7","6810":"PS-PRO16BNR","7182":"PS-PAW75511WB","9979":"PS-SCN288","A0OL":"PS-PRA16ORX","A19J":"PS-PWM8081V","2344":"PS-PAS08I","8074":"PS-PRA17BNB","A00H":"PS-PLD40AS8858G","3477":"PS-PLD32D715","3688":"PS-PLD32D100","3205":"PS-PRG18AGRIN","3806":"PS-PRN181RC","9296":"PS-PRB188B","A15E":"PS-PLD43BUG5058","A0EN":"PS-PMA9300WNF","A1AI":"PS-PLD32TG5055","A0ER":"PS-PASPRO12F2NF","A16R":"PS-PWM8073DB","1211":"PS-PR189SB","A1AL":"PS-SCN287","3203":"PS-PRG24LMX","2890":"PS-PR24KMB","A0NY":"PS-PRM495MOW","A0ZB":"PS-PLD43BCV8868","A0U7":"PS-PRM23DMS","A088":"PS-PWM701B","6934":"PS-PWM7358RS","5852":"PS-PLD22D1150","A177":"PS-PAW7029TY","3241":"PS-PWM7056WB","A1AF":"PS-SCN280","7907":"PS-PRA17GORF","A1AV":"PS-PRM20CLD","4808":"PS-PRM21STR","7219":"PS-PAW75513B","1681":"PS-DTIB2367C","4483":"PS-SCN183D","5931":"PS-PRZ211SP","3047":"PS-PLD32D905","4711":"PS-PRY211SV","0A0G":"PS-PFL8050","A10H":"PS-PRA18JR","A0ZR":"PS-PAS8FF28","4557":"PS-PAS78(BU)","9281":"PS-PRB178B","5964":"PS-PWM9058GS","A0T6":"PS-PRM23CRX","A00L":"PS-PLD43S883B","871":"PS-PRC1901R","7209":"PS-PAW75512S","A167":"PS-PAC09VZI","4756":"PS-PRY181GC","5930":"PS-PRZ211GS","3032":"PS-SCP1171C","9855":"PS-PRX212S","6634":"PS-PLD40S153","3033":"PS-PAS79","A1AJ":"PS-PLD32BG5058","A1AE":"PS-SCN220","5902":"PS-PCF217","2872":"PS-PR18KMR","3277":"PS-PRG21LTR","9695":"PS-PWM1368B","7781":"PS-PAW95513N","A0XN":"PS-PEC8410","0A1O":"PS-PFL8105H","A0OX":"PS-PRA18OLX","3210":"PS-PRG18BGBIN","4384":"PS-PAW9513N","A0AY":"PS-PAC18VH","1703":"PS-PAS67","4033":"PS-PWM9567WRS","A124":"PS-PRB177TY","A09X":"PS-PAC18VX-1","A00K":"PS-PLD50AS8858G","8815":"PS-PWM9368B","A0BH":"PS-PRW252T","1589":"PS-PLD32D700","A16P":"PS-PWM7073DB","A142":"PS-PTS12KF25N","9924":"PS-PRH51R","3680":"PS-SCN231","A0J0":"PS-PRB187R","A0VG":"PS-PRM28DMY","A0DP":"PS-PAC05VZS","8544":"PS-PASPRO15F2","2287":"PS-PR18KHG","4524":"PS-PHT925L(U)","A0OW":"PS-PRA17PRX","876":"PS-PFL7103","A122":"PS-PRB187TY","9802":"PS-PR245SMX","8543":"PS-PASPRO12F2","5785":"PS-PAC18VG","A0OF":"PS-PRA16OLX","A09A":"PS-PLD32TV1056","A1AK":"PS-PLD43TG5055","A0KJ":"PS-PTS12KF25","5718":"PS-SCN236B","A0KK":"PS-PTS12KF15","A1AD":"PS-SCN190","4815":"PS-PRM21KTV","6639":"PS-PMA9503GA","5854":"PS-PLD24D8520","A100":"PS-PMD22VF9930","4735":"PS-PRO18KTR","A0U5":"PS-PRM21DMS","6648":"PS-PMA9310BA","8798":"PS-PWM7368B","8109":"PS-PRM21HHW","A16O":"PS-PWM7073DG","955":"PS-PCF217-1","1257":"PS-SCP1171LE","872":"PS-PRC1901DG","A1AG":"PS-SCN227","A16Q":"PS-PWM8073DG","5967":"PS-PWM1058GS","A19L":"PS-PWM1081V","637":"PS-PAC10NK","A0YC":"PS-PRA17ZS","4278":"PS-PWM9070Y","2720":"PS-PWM9569PW","A17G":"PS-PLD100QV5925","5966":"PS-PWM1058RS","5689":"PS-PWM7057BS","3209":"PS-PRG18BGVIN","A19S":"PS-PLD32TV1755S","A129":"PS-PPS4PH12","A1AZ":"PS-PLD43RG5059","6006":"PS-PWM9567CC","A1C1":"PS-PLD32TC1865","954":"PS-PCF117-1","4233":"PS-PAW8513N","5903":"PS-PCF317","1937":"PS-PWM7569C","2393":"PS-BB3501","8024":"PS-PRA18HOB","5899":"PS-SCN186W","5690":"PS-PWM8057BS","A0YD":"PS-PRW23ZS","3274":"PS-PRG24BGR","6863":"PS-PRM23BNR","A0OR":"PS-PRA17PLX","A1A2":"PS-PEV15R1AT","A0ES":"PS-PMA9311NF","5954":"PS-PRZ181GC","3173":"PS-PRG21KMX","3481":"PS-PCF315","5848":"PS-PLD32T1506","4704":"PS-PRM21BGB","7549":"PS-PAW85513M","6519":"PS-PRO17HOR","4031":"PS-PWM9567WBS","A0U3":"PS-PRA18DMS","A0TZ":"PS-PRA18CMS","A02M":"PS-PRB289B","3634":"PS-PRG21KTB","A1AA":"PS-PPS10L22","3056":"PS-PLD22D900","9315":"PS-PRB218B","A0IE":"PS-PRM21BLR","A1AP":"PS-PEV30M5AT","A0LZ":"PS-PRW29MOW","3283":"PS-PRG24LTR","A18D":"PS-PAW7029TS","A194":"PS-PWC888YUV","A1CC":"PS-PLD32CV1869C","A1C3":"PS-PCF218-3","6640":"PS-PMA9300WA","2271":"PS-PR18BGRIN","6948":"PS-PWM7367WBS","A0O7":"PS-PLD40AG5959","A11X":"PS-PRD18JY","815":"PS-PRS450B","9922":"PS-PLD65UV5902","3171":"PS-PRG21KMV","4809":"PS-PRM21STV","2662":"PS-PLM32M55","A0I7":"PS-PRA17ALB","8569":"PS-PWC777BX","1029":"PS-PAS28","4709":"PS-PRM28BGR","9375":"PS-PR2M51F1","3281":"PS-PRG22LTV","A1C2":"PS-PCF118-3","3223":"PS-PRG16BGVN","3236":"PS-PWM7056WR","A0NS":"PS-PRM490MOW","4814":"PS-PRM21KTR","A03I":"PS-PRW25MNR","4327":"PS-SCN141L","A0YA":"PS-PRA18ZS","A0OP":"PS-PRA17OLX","2978":"PS-PR21KMR1","A02Q":"PS-PRA16ANR","A1DU":"PS-PRA18MNSH","0A0A":"PS-SCN1020","A165":"PS-PAC05VZI","1853":"PS-PR16BGBN","A1A5":"PS-PASPRO8F3","4104":"PS-PRN180RC","A1B0":"PS-PLD43BG5058","A0FC":"PS-PASPRO15F2NF","2947":"PS-PLD24D552","8438":"PS-PWM8358XSL","6745":"PS-PRO18HORF","865":"PS-PRS550T","814":"PS-PRS450W","8669":"PS-PTS2K25","2649":"PS-PR16BGY","3282":"PS-PRG22LTB","A03T":"PS-PCF317-1","3546":"PS-PRG15KTR","3668":"PS-PRN180B","A1DC":"PS-PRM21CRX3","A0C4":"PS-PRW256Y","A19B":"PS-PLD43UG3059","A0I8":"PS-PRA17BLR","8058":"PS-PRA17ANR","A1EG":"PS-PRM21DRD3","A1DJ":"PS-PRW23MOB3","A1D7":"PS-PRB219R3","6700":"PS-PMA9501BA","A1DI":"PS-PRW23MNX3","A1DD":"PS-PRM21DMY3","1241":"PS-SCP122LE","A1DN":"PS-PRW29MNX3","940":"PS-PAC09VX-1","3229":"PS-PWM8556WR","A1DR":"PS-PRB179Y","3725":"PS-PAW8512B","A0F4":"PS-PMA9300BGNF","6641":"PS-PMA9300GA","A0EL":"PS-PAS12SA15NFO","5666":"PS-PRM23QS","A166":"PS-PAC05VZSI","7858":"PS-PLD32D1520S","4731":"PS-PRO18AGBIN","6591":"PS-PWM1057B1","4326":"PS-SCN140L","3220":"PS-PRG22BGV","7875":"PS-PRF17QN","0A3U":"PS-PCA200D","A1DE":"PS-PRM21DRX3"};
-let PRODUCT_MAP = Object.assign({}, INITIAL_PRODUCT_MAP);
+// Daftar KODE Site Resmi (Hanya Kode 3-Huruf terurut alfabetis)
+const SITE_CODES = [
+  "ABN", "ACH", "BDG", "BDU", "BGR", "BJN", "BKL", "BKS", "BNJ", "BWI", 
+  "CDG", "CGN", "CKR", "CRB", "DPK", "DPS", "GTO", "JBI", "JBR", "JKT", 
+  "JSL", "JSS", "JTR", "KDI", "KDR", "KDS", "KLT", "KPG", "LPG", "MAK", 
+  "MAN", "MDN", "MDU", "MGL", "MLG", "MTR", "PDG", "PKB", "PKL", "PLB", 
+  "PLU", "PNP", "PPS", "PRK", "PTK", "PWT", "RTP", "SBN", "SBU", "SBY", 
+  "SKB", "SLO", "SMD", "SMG", "TGR", "TSM", "YOG"
+];
 
-// Muat cache barang dari localStorage
-try {
- const cached = localStorage.getItem(PRODUCT_STORAGE_KEY);
- if(cached) {
-  const parsed = JSON.parse(cached);
-  if(Object.keys(parsed).length > 50) PRODUCT_MAP = Object.assign({}, INITIAL_PRODUCT_MAP, parsed);
- }
-} catch(e) {}
+function normalizeSite(s){
+ if(!s) return "";
+ s = s.trim().toUpperCase();
+ if(s.startsWith("PDS ")) s = s.slice(4).trim();
+ const dashIdx = s.indexOf("-");
+ if(dashIdx > 0) s = s.substring(0, dashIdx).trim();
+ const found = SITE_CODES.find(code => code === s || s.includes(code));
+ return found || s;
+}
 
-// Muat cache teknisi dari localStorage
+function getSiteDisplayName(code){
+ return code ? normalizeSite(code) : "- Belum Dipilih -";
+}
+
+const CATS = ["Motor Listrik (EV)", "Non-EV / Elektronik"];
+const LAYANAN = ["Walk-in", "Home", "Dealer", "Out of Town"];
+const S_IN = ["Bagus", "Rusak"];
+const S_OUT = ["OK", "Tidak OK"];
+
+// Peta Produk Awal (Offline cache)
+let PRODUCT_MAP = {"A10P":"PS-PRB175R","A01E":"PS-PAS10D28","A0V3":"PS-PRA16DMY","A106":"PS-PRG190S","A0ZV":"PS-PWC615X","A0RR":"PS-PLD43TAG5959","A03Z":"PS-PLD50B8750W","A0JV":"PS-PWM8073B","A0MY":"PS-PRB217PR","A0DY":"PS-PRC1201Y","A02F":"PS-PRB179R","A0QH":"PS-PRB217LB","A0TE":"PS-PRA18DRX","A0O8":"PS-PLD50UG5959","A109":"PS-PLD40CV8969","8905":"PS-PAW90517WM","A0H5":"PS-PCF118","A12Z":"PS-PRB217TY","A0MC":"PS-PWM8076G","3019":"PS-PWC777","A112":"PS-PLD32AG5759","A0BQ":"PS-PLD40BV8958","8556":"PS-PLD32T1850","A0MX":"PS-PRB157PR","6636":"PS-PLD40TS156","5853":"PS-PLD24D8511","A0PU":"PS-PLD24V1853","A0DR":"PS-PLD24D1850M","8899":"PS-PAW80517WB","A0AL":"PS-PLD24V123","A0Z2":"PS-PLD24V1853Y","A0DS":"PS-PLD32V1853","A0AP":"PS-PLD24TV1855","SCL/":"PS-PR225SMX","A0AM":"PS-PLD24V223","A0XI":"PS-PASPRO12F6","A0Z3":"PS-PLD24TV1855Y","A034":"PS-PRA18MNX","A14Q":"PS-PRA17DRD","A0MW":"PS-PRB177PR","8575":"PS-PLD24D123NV","A0ZW":"PS-PWC500X","A0RE":"PS-PLD43BAG9953E","A094":"PS-PLD32V0753","A0M8":"PS-PLD24MV1859","8725":"PS-PWC776","9921":"PS-PLD32D1852","5841":"PS-PLD32D7511","6787":"PS-PRM28BNB","A0V7":"PS-PRA18DMY","A0O4":"PS-PLD43BAG5959","A0ZC":"PS-PLD32BAG9858","9829":"PS-PAW90518B","A07F":"PS-SCN148X","A0DG":"PS-PAW9527X","8898":"PS-PLD43B150","A0KR":"PS-PASPRO15F3","A0M9":"PS-PLD32MV1859","7782":"PS-PLD24T8511S","3456":"PS-PRG24KCP","A0TG":"PS-PRA16DRX","A0NE":"PS-PAW9028Y","A0IA":"PS-PRA18ALR","A0AC":"PS-PLD32BV1558G2","A0MD":"PS-PWM9076G","5667":"PS-PRM28QS","A092":"PS-PLD32V1852","7191":"PS-PLD32T7511S","A0AG":"PS-PLD50V8753","A0PW":"PS-PLD32TV1755","A10F":"PS-PLD32CV1869S","A14J":"PS-PLD43BG9058","A03Y":"PS-PLD43B1550W","8555":"PS-PLD32D1850","A0ZQ":"PS-PAS10DF28","7197":"PS-PAW85511WS","A077":"PS-PWM851R","A022":"PS-PRW29MNX","6689":"PS-PAS2A15BA","A0ZD":"PS-PLD32TAG9855","6920":"PS-PLD40D150","A0JW":"PS-PWM8073P","8900":"PS-PAW80517WM","A0UW":"PS-PAW7029Y","A0AD":"PS-PLD32BV1558","4380":"PS-PAW8513M","9853":"PS-PRX180Y","A0SM":"PS-PAW7028WL","3717":"PS-PAW7511WM","A0TA":"PS-PRA18CRX","A0MK":"PS-PRW23MTR","A0NF":"PS-PAW1028Y","6586":"PS-PLD24D123","A02G":"PS-PRB189B","A14B":"PS-PLD43RG9059","A0VV":"PS-PWM1203X","8511":"PS-PWM8363B","A07G":"PS-SCN188X","8574":"PS-PLD24T1850","A0QX":"PS-PEV30M1AT","A10E":"PS-PLD24CV1869S","8829":"PS-PAS8B28","8576":"PS-PAS69GA","9938":"PS-PWC778X","9877":"PS-PLD43T150","A07H":"PS-SCN238X","858":"PS-PRS460B","A00N":"PS-PLD32B1550W","4029":"PS-PWM8567WGS","A0LT":"PS-PRA18MOW","5844":"PS-PLD32D9505","A0GH":"PS-PWM9072B","4816":"PS-PRM23STR","A0DF":"PS-PAW8527X","A07B":"PS-PRM490X","3835":"PS-PLD32T100","A020":"PS-PRW23MNX","9976":"PS-SCN187","A08C":"PS-PWM951B","4800":"PS-PRD18LYS","6284":"PS-SCN141X","6917":"PS-PLD40TS153U","A0JT":"PS-PWM7073B","A08A":"PS-PWM801B","A047":"PS-PLD43BAG9953","A071":"PS-PWM701R","A0TC":"PS-PRA16CRX","A0C3":"PS-PAW9527R","A0GG":"PS-PWM9072N","A01M":"PS-PLD32B1551","A0ZX":"PS-PAS8BF28","8896":"PS-PLD32B1550","A0NB":"PS-PAW1028W","A0RA":"PS-PLD32BAG9953E","A0RV":"PS-PWM1076Y","A0JU":"PS-PWM7073P","A0KO":"PS-PAS8FF22","7783":"PS-PLD32TS1503S","A0AN":"PS-PWC600","3411":"PS-PLD32T710","A01N":"PS-PLD32B8951","2958":"PS-PLD32T700","A0RG":"PS-PLD43AG9953E","A141":"PS-PLD32RG9059","A02J":"PS-PRB219R","A0UY":"PS-PAW9029Y","A149":"PS-PLD32BG9058","A0B4":"PS-PLD43BV1558","A03H":"PS-PRW23MNR","3726":"PS-PAW8512M","A0BZ":"PS-PAW7527R","A0SC":"PS-PLD50BUG9959","A0DE":"PS-PAW7527X","5699":"PS-PRM28QB","A0LS":"PS-PRA17MOB","4330":"PS-SCN231L","A0O9":"PS-PLD50BUG5959","9886":"PS-PRB238R","A01O":"PS-PLD43B8951","A0TF":"PS-PRA17DRX","A0HR":"PS-PWC778XUV","A0GD":"PS-PWM7072B","A0B3":"PS-PLD43V1553","A0XS":"PS-PLD32CV1869","9902":"PS-PLD24B8550","652":"PS-PRH47W","A0MJ":"PS-PRA18MTR","3235":"PS-PWM7056GG","A0TD":"PS-PRA15CRX","A02A":"PS-PLD43AG9953","6850":"PS-PRM21BNR","A144":"PS-PLD32TG9055","A0KZ":"PS-PMA9525B","A02H":"PS-PRB189R","A145":"PS-PPSPRO7M22","A0L7":"PS-PLD43V8853","A0T5":"PS-PRM21DRX","8505":"PS-PWM8363P","6895":"PS-PWM8366P","A0LW":"PS-PRW23MOB","1216":"PS-PR210SMI","A0ND":"PS-PAW8028Y","3501":"PS-PRN211S","3376":"PS-PWM1401R","8449":"PS-PLD50TS883G","A03X":"PS-PLD40B8850W","4329":"PS-SCN230L","9828":"PS-PAW80518B","A0RQ":"PS-PLD32TAG5959","3377":"PS-PWM1401G","A0RU":"PS-PWM9076Y","3683":"PS-SCN232","A03W":"PS-PLD32BAG9953","A00X":"PS-PLD55BU8850W","A0SN":"PS-PAW7028Y","A07I":"PS-PWC778LX","A0T4":"PS-PRM21CRX","1053":"PS-PWC103C","A0XY":"PS-PLD43CV8869","A04C":"PS-PWM7366HP","A0QJ":"PS-PRB237LB","7188":"PS-PLD32T1550S","A093":"PS-PLD32TV1855","A0GC":"PS-PWM7072N","A0AF":"PS-PLD50AV8759","A0XX":"PS-PLD43CV1569","3446":"PS-PRG21KCG","6638":"PS-PMA9502BA","A00G":"PS-PLD32AD1508G","A0MB":"PS-PWM7076G","9930":"PS-PLD40AS8858","A0AS":"PS-PLD40V8953","3682":"PS-SCN182","6631":"PS-PLD43TS153","A0M1":"PS-PMA9526B","A07A":"PS-PRM430X","1945":"PS-PWM9569C","A0FW":"PS-PAW8527M","6635":"PS-PLD40TS153","A06A":"PS-PLD40B8951","A0XR":"PS-PLD24CV1869","3718":"PS-PAW7511WS","A0PV":"PS-PLD32V1753","A02I":"PS-PRB219B","A0LU":"PS-PRA18MOB","6633":"PS-PLD43S153","9873":"PS-PAS8E28","6264":"PS-PLD32T1550","A0XW":"PS-PCF329","A0KU":"PS-PMA9522B","A130":"PS-PRB237TY","A0VS":"PS-PWM1203B","A0ZY":"PS-PAS8CF28","3216":"PS-PRG21BGR","A186":"PS-PWM1081Y","A0ZT":"PS-PLD43BAG9500","A111":"PS-PPS8L22","A0V5":"PS-PRA17DMY","A0O1":"PS-PLD32AG5959","A00I":"PS-PLD43AS1558G","A07J":"PS-PWC778LV","A0M0":"PS-PRW29MOB","A0N9":"PS-PAW8028W","3217":"PS-PRG21BGV","7793":"PS-PLD32S1503S","9884":"PS-PLD32AD1508","6903":"PS-PMA9501BGA","8920":"PS-PRX212R","9894":"PS-PLD24D1852","A0O5":"PS-PLD43BUG5959","5849":"PS-PLD32T7511","A0AU":"PS-PAC05VH","A04D":"PS-PWM7366HB","A0P8":"PS-PRM21PLX","A0SL":"PS-PLD43TAG9959","3410":"PS-PLD32D710","4766":"PS-PRM21QX","A0BA":"PS-PWM1402X","A006":"PS-PAS8F28","4764":"PS-PRM28QX","A0KQ":"PS-PASPRO12F3","3719":"PS-PAW7512B","8083":"PS-PRA18BNR","A0RS":"PS-PWM7076Y","A0ZU":"PS-PLD50UG5500","4973":"PS-PLD32T100TV","4484":"PS-SCN233D","A0QB":"PS-PRB187LB","3753":"PS-SCN230","A0VU":"PS-PWM1403X","A079":"PS-PWM951R","A02C":"PS-PRB159B","A0RP":"PS-PWM1082B","3816":"PS-PWC777WR","8897":"PS-PLD40B150","9455":"PS-PLD43AS1558","3724":"PS-PAW8511WS","A02B":"PS-PLD50AG9953","A04H":"PS-PWM9366HB","A0LQ":"PS-PRA15MOB","A0O2":"PS-PLD32BAG5959","A02T":"PS-PRA16BNB","A023":"PS-PRW23VX","4547":"PS-PAS79(BU)","A0A6":"PS-PLD24V0853","A07N":"PS-PWM752R","A04S":"PS-PLD50BUA8859W","A089":"PS-PWM751B","A162":"PS-PRA18DMR","A14P":"PS-PRA18DRD","A0DK":"PS-PLD40AG9953NT","A0XV":"PS-PCF229","8495":"PS-PWM7363B","7185":"PS-PAW75511WM","A0FG":"PS-PAW9527M","A0EB":"PS-PLD40V6153","A06F":"PS-PLD40BS8953","A04G":"PS-PWM9366HP","A0VT":"PS-PWM1403B","9830":"PS-PAW10518B","4765":"PS-PRM23QX","A119":"PS-DG32C103","8551":"PS-PLD32T1506E","A0DV":"PS-PLD43V7153","A0ZS":"PS-PMA9527B","880":"PS-PRS480X","A0FA":"PS-PMA9506BGNF","A0RT":"PS-PWM8076Y","A18S":"PS-PLD24CV1869Y","A132":"PS-PRB186RS","A095":"PS-PLD32TV0755","6701":"PS-PMA9501WA","A0AQ":"PS-PLD24TV0855","A09G":"PS-PLD43TV1556","A0VC":"PS-PRM21DMY","A0UC":"PS-PRA15DRX","A0YT":"PS-PRW29HB","5847":"PS-PLD32T1500","A0XQ":"PS-PASPRO10F6","A0MT":"PS-PWM1076G","958":"PS-PAW70501WB","A02D":"PS-PRB159R","5804":"PS-PRM21QV","9899":"PS-PLD43BS153","A0KN":"PS-PAS10DF22","A021":"PS-PRW25MNX","A150":"PS-PLD43TA5055","A02E":"PS-PRB179B","A0HT":"PS-PWC778WUV","A0GF":"PS-PWM8072B","A024":"PS-PRW25VX","3280":"PS-PRG22LTR","7094":"PS-PLD55US8850","6710":"PS-PMA9503BA","7861":"PS-PLD32D1500S","3599":"PS-PWM8567WB","A025":"PS-PRW29VX","A0ET":"PS-PMA9502BNF","6756":"PS-PRX171W","A0FV":"PS-PAW7527M","3278":"PS-PRG21LTV","A0QD":"PS-PRB177LB","5843":"PS-PLD32D7520","5794":"PS-PLD43S863","A07X":"PS-PLD40AD8959","A0YR":"PS-PAS8E20B","A0TY":"PS-PRA17CMS","4231":"PS-PAW7513N","A07C":"PS-PRM431X","A0C1":"PS-PAW8527R","1840":"PS-PAS78","A0SB":"PS-PLD50UG9959","4821":"PS-PRM28STV","A0KV":"PS-PAS8BF22","7216":"PS-PAW95512S","A0I1":"PS-PRA15ALR","7187":"PS-PAW85511WB","A0AW":"PS-PAC09VH","A12P":"PS-FOXSAT","A0SA":"PS-PAW75518B","7222":"PS-PAW75513M","1254":"PS-SCP1170LE","A0KX":"PS-PMA9320B","A0GE":"PS-PWM8072N","A07D":"PS-PRM491X","0A1M":"PS-PFL7051","A0TB":"PS-PRA17CRX","6282":"PS-SCN140X","A183":"PS-PWM7081Y","3729":"PS-PAW9511WM","A18Y":"PS-PRB200R","6600":"PS-PLD43S883","9928":"PS-PLD40B880","9730":"PS-PWC103BL","4810":"PS-PRM21SLX","A0N0":"PS-PRB287PR","4235":"PS-SCN180L","A0UZ":"PS-PAW1029Y","6769":"PS-PRM21HORF","6580":"PS-PRB183G","9978":"PS-SCN237","A0CP":"PS-PMA9310BG","3661":"PS-PLD24D901","A029":"PS-PLD32AG9953","9810":"PS-SCH51","A0O6":"PS-PLD43UG5959","A0AE":"PS-PLD50BV8758","5715":"PS-SCN186B","3406":"PS-PLD24D810","0A2P":"PS-PRS455S","3720":"PS-PAW7512M","3817":"PS-PWC777WB","866":"PS-PRS560X","874":"PS-PFL8101","3722":"PS-PAW8511WB","A04E":"PS-PWM8366HP","4382":"PS-PAW9513M","5769":"PS-PRM23QN","4739":"PS-PRO18LLX","A0H2":"PS-PMA9507BA","873":"PS-PFL7101","A0QF":"PS-PRB157LB","4733":"PS-PRO18BGVIN","3723":"PS-PAW8511WM","3162":"PS-PRG16KMB","3601":"PS-PWM9567WB","3732":"PS-PAW9512M","A096":"PS-PLD32TV1555","6897":"PS-PRO16ANB","A0UX":"PS-PAW8029Y","A003":"PS-PRH51X","A0U4":"PS-PRM21CMS","8915":"PS-PAW90517WB","6163":"PS-PLD32D1550","1581":"PS-PR22BGB","6891":"PS-PWM9366B","3198":"PS-PRG24KMB","A0DH":"PS-PLD40AG9953","0A35":"PS-PRS451Y","A0MI":"PS-PRA17MTR","5768":"PS-PRM21QN","6784":"PS-PWM8366B","9900":"PS-PLD50BS873","6925":"PS-PLD43D150","A0XU":"PS-PCF129","A185":"PS-PWM9081Y","A0R1":"PS-PRC1202G","4713":"PS-PRO15KTR","A0H7":"PS-PCF318","599":"PS-PCF115","A048":"PS-PLD50BAG9953","4381":"PS-PAW7513M","8573":"PS-PLD24D1850","A0S5":"PS-PWM1082X","A0P1":"PS-PRA18ORX","3218":"PS-PRG21BGB","A104":"PS-PLD50UV8959","4383":"PS-PAW9513B","3679":"PS-SCN181","4485":"PS-SCN143D","4516":"PS-BB5510(U)","0A0F":"PS-PFL7050","A0V1":"PS-PRA15DMY","5338":"PS-PMA9502","4833":"PS-PAS59(BUM)","A14T":"PS-PRA16DRD","1650":"PS-PAS21B","4102":"PS-PRN160GC","3731":"PS-PAW9512B","3633":"PS-PRG21KTR","A0A8":"PS-PLD55BUA8859","6579":"PS-PRB183B","3730":"PS-PAW9511WS","4730":"PS-PRO18AGVIN","A0NA":"PS-PAW9028W","4232":"PS-PAW8513B","A03J":"PS-PRW29MNR","7749":"PS-PAW95513M","6896":"PS-PWM9366P","3214":"PS-PRG16BGRN","5712":"PS-SCN146B","7578":"PS-PAW85513N","A0L4":"PS-PDV620T2","A07P":"PS-PWM802R","4132":"PS-PWM8070R","A0I6":"PS-PRA17ALR","5855":"PS-PLD24D9501","8922":"PS-PAS8C28","A0OD":"PS-PRA15ORX","3919":"PS-PRG24LTG","8082":"PS-PRA18ANB","6654":"PS-PAC05VX-M","A0MH":"PS-PRA15MTR","1646":"PS-SCP1181","A0IF":"PS-PRM21BLB","6632":"PS-PLD43TS156","A0EM":"PS-PTS2K25NFO","9847":"PS-PRB288B","6584":"PS-PRB173G","7215":"PS-PAW95512M","A075":"PS-PWM801R","3211":"PS-PRG16AGRN","5695":"PS-PRM21QB","A02L":"PS-PRB239R","A0ZP":"PS-PAS8EF28","A0OZ":"PS-PRA18PLX","A18X":"PS-PRB200Y","A0AZ":"PS-PAC05VZ","5792":"PS-PLD40TS853","6659":"PS-PLD32V7510S","A184":"PS-PWM8081Y","5969":"PS-PRM21FLR","A15D":"PS-PLD43UG5059","4010":"PS-PAC05VX","7196":"PS-PAW85511WM","A0QL":"PS-PRB287LB","A0MZ":"PS-PRB237PR","A14V":"PS-PLD40RG9059","5968":"PS-PRM21FLBL","9875":"PS-PAS8E12","A07T":"PS-PWM952R","A0LV":"PS-PRW23MOW","4236":"PS-SCN181L","A0L5":"PS-PDV700T2","A0L1":"PS-PAS8EF22","A0UE":"PS-PRA15DMS","A0OG":"PS-PRM21OLX","A15M":"PS-PLD55QG9059","A14R":"PS-PRA15DRD","5856":"PS-PLD24T8511","A004":"PS-PAS8F12","A18U":"PS-PLD32CV2269","6864":"PS-PRM23BNB","5850":"PS-PLD20D9501","3027":"PS-PLD24T800W","A02R":"PS-PRA16ANB","A0B0":"PS-PAC09VZ","9874":"PS-PAS8E22","9838":"PS-PAS8B22","A02S":"PS-PRA16BNR","6927":"PS-PWM8357XG","A0GI":"PS-PWM9572N","A0KW":"PS-PMA9321B","6717":"PS-PMA9506BA","8448":"PS-PLD50S883G","A0T8":"PS-PRM28CRX","3197":"PS-PRG24KMV","A0FB":"PS-PAS8F22NF","A10K":"PS-PRB186R","4732":"PS-PRO18BGRIN","9462":"PS-PLD50AS8858","4230":"PS-PAW7513B","9460":"PS-PLD40AS1558","9878":"PS-PLD50S873","959":"PS-PAW70501WX","7186":"PS-PAW75511WS","A068":"PS-PLD43BS1553W","1577":"PS-PR21BGR","5851":"PS-PLD22D9500","A0OB":"PS-PRA15OLX","5805":"PS-PRM23QV","A0S9":"PS-PAW75517WM","7223":"PS-PAW75513N","A0PA":"PS-PRM21PRX","1214":"PS-PR227VB","0A1N":"PS-PFL8051","3733":"PS-PAW9512S","6642":"PS-PMA9505WA","A0F0":"PS-PMA9501WNF","A110":"PS-PPS8L12","1054":"PS-PWC107G","A0M2":"PS-SCN187R","A0T7":"PS-PRM23DRX","A0DQ":"PS-PAC09VZS","A0PX":"PS-PRW23ZX","4571":"PS-PAS28(B)","A0LY":"PS-PRW25MOB","A0BB":"PS-PWM1402R","A0SH":"PS-PASPRO15F5","A125":"PS-PRB157TY","0A28":"PS-PRS510X","3497":"PS-PLD40D100","4574":"PS-PAS68(B)","A0I3":"PS-PRA16ALB","5845":"PS-PLD32D1500","A15O":"PS-PLD50UG5059","A16W":"PS-PAS10DF38","3905":"PS-PRG18LTC","A0Q6":"PS-PLD55UG5959","5601":"PS-PLD32T711TY","A0VE":"PS-PRM23DMY","7523":"PS-PAW85513B","4057":"PS-PRG22LTPN","A164":"PS-PAS8FF28R","A0H6":"PS-PCF218","A10J":"PS-PRB186B","A06B":"PS-PLD40T8950","A07E":"PS-PRM495X","A18I":"PS-PLD40CV8969V","A08B":"PS-PWM851B","4729":"PS-PRO18AGRIN","A0MV":"PS-PRB187PR","A0RC":"PS-PLD32AG9953E","A0F8":"PS-PMA9505BGNF","A0DJ":"PS-PLD55UV5920","A0KE":"PS-PLD43V8953","6716":"PS-PMA9503WA","A04F":"PS-PWM8366HB","A0U1":"PS-PRA16DMS","6918":"PS-PLD40S153U","A178":"PS-PAW8029TY","A0IC":"PS-PRA18BLR","8315":"PS-PAS29GA","7199":"PS-PAW95511WM","2951":"PS-PLD24T800","3030":"PS-SCP151C","6699":"PS-PMA9505BA","A0EW":"PS-PAS8E22NF","6815":"PS-PRO16BNB","4728":"PS-PRO16LLW","A0CW":"PS-PAS8E10","A0EO":"PS-PAS2A15BNFO","8075":"PS-PRA18ANR","1583":"PS-PR24BGR","4717":"PS-PRO16BGRN","9883":"PS-PLD50B870","6852":"PS-PRM21BNB","A19I":"PS-PWM7081V","A18H":"PS-PLD43CV8869V","1099":"PS-SCP123","A0DD":"PS-SCN236WX","6602":"PS-PLD50TS883","A0L6":"PS-PAS12AF15","3716":"PS-PAW7511WB","A0U9":"PS-PRM28DMS","A182":"PS-PRM21DRD","9757":"PS-SCP151","5665":"PS-PRM21QS","8092":"PS-PRA18BNB","A11T":"PS-PLD65UG5959","A15Q":"PS-PLD55UG5059","4684":"PS-PWC778","A0LP":"PS-PRA15MOW","A15L":"PS-PLD50QG9059","A0F9":"PS-PMA9505RSNF","8748":"PS-PRM28QXI","4705":"PS-PRM21BGV","A0ZA":"PS-PLD43TCV8865","A073":"PS-PWM751R","A06C":"PS-PLD40D8950","4105":"PS-PRN180GC","3200":"PS-PRG24LMR","4032":"PS-PWM9567WGS","9777":"PS-PLD50B880","A14Y":"PS-PLD32BV2258","A0GJ":"PS-PWM9572B","6906":"PS-PRM23HOV","4720":"PS-PRO16KTR","1579":"PS-PR21BGV","7189":"PS-PLD32T1500S","A15V":"PS-PASPRO12F7","A0U2":"PS-PRA17DMS","7198":"PS-PAW95511WB","A18F":"PS-PAW9029TS","0A0N":"PS-PFL1105H","9845":"PS-PRB218R","A031":"PS-PRA17MNX","A1AH":"PS-PLD32RG5059","A08O":"PS-PRX180T","6905":"PS-PRM23HORF","5316":"PS-PLD24D901Y","A061":"PS-PLD24D9050","3635":"PS-PRG21KTV","A18E":"PS-PAW8029TS","A179":"PS-PAW1029TY","A15U":"PS-PASPRO10F7","A19P":"PS-PRM20CRD","A02O":"PS-PRA15ANR","6572":"PS-PRM23FLR","5770":"PS-PRM28QN","8404":"PS-PLD32T1506S","4927":"PS-PMA9501","A0LR":"PS-PRA17MOW","A15P":"PS-PLD50BUG5058","A0S8":"PS-PAW75517WB","8464":"PS-PWM7363P","6865":"PS-PRO15ANR","3208":"PS-PRG18BGRIN","A17E":"PS-PAW9029TY","A19K":"PS-PWM9081V","4004":"PS-PAC09LE","6949":"PS-PWM7367WGS","8065":"PS-PRA17BNR","A1AM":"PS-SCN228","6711":"PS-PMA9300BA","1702":"PS-PAS68","A0C5":"PS-PRW296Y","A10Q":"PS-PRA18JS","A143":"PS-PASPRO15F7","6810":"PS-PRO16BNR","7182":"PS-PAW75511WB","9979":"PS-SCN288","A0OL":"PS-PRA16ORX","A19J":"PS-PWM8081V","2344":"PS-PAS08I","8074":"PS-PRA17BNB","A00H":"PS-PLD40AS8858G","3477":"PS-PLD32D715","3688":"PS-PLD32D100","3205":"PS-PRG18AGRIN","3806":"PS-PRN181RC","9296":"PS-PRB188B","A15E":"PS-PLD43BUG5058","A0EN":"PS-PMA9300WNF","A1AI":"PS-PLD32TG5055","A0ER":"PS-PASPRO12F2NF","A16R":"PS-PWM8073DB","1211":"PS-PR189SB","A1AL":"PS-SCN287","3203":"PS-PRG24LMX","2890":"PS-PR24KMB","A0NY":"PS-PRM495MOW","A0ZB":"PS-PLD43BCV8868","A0U7":"PS-PRM23DMS","A088":"PS-PWM701B","6934":"PS-PWM7358RS","5852":"PS-PLD22D1150","A177":"PS-PAW7029TY","3241":"PS-PWM7056WB","A1AF":"PS-SCN280","7907":"PS-PRA17GORF","A1AV":"PS-PRM20CLD","4808":"PS-PRM21STR","7219":"PS-PAW75513B","1681":"PS-DTIB2367C","4483":"PS-SCN183D","5931":"PS-PRZ211SP","3047":"PS-PLD32D905","4711":"PS-PRY211SV","0A0G":"PS-PFL8050","A10H":"PS-PRA18JR","A0ZR":"PS-PAS8FF28","4557":"PS-PAS78(BU)","9281":"PS-PRB178B","5964":"PS-PWM9058GS","A0T6":"PS-PRM23CRX","A00L":"PS-PLD43S883B","871":"PS-PRC1901R","7209":"PS-PAW75512S","A167":"PS-PAC09VZI","4756":"PS-PRY181GC","5930":"PS-PRZ211GS","3032":"PS-SCP1171C","9855":"PS-PRX212S","6634":"PS-PLD40S153","3033":"PS-PAS79","A1AJ":"PS-PLD32BG5058","A1AE":"PS-SCN220","5902":"PS-PCF217","2872":"PS-PR18KMR","3277":"PS-PRG21LTR","9695":"PS-PWM1368B","7781":"PS-PAW95513N","A0XN":"PS-PEC8410","0A1O":"PS-PFL8105H","A0OX":"PS-PRA18OLX","3210":"PS-PRG18BGBIN","4384":"PS-PAW9513N","A0AY":"PS-PAC18VH","1703":"PS-PAS67","4033":"PS-PWM9567WRS","A124":"PS-PRB177TY","A09X":"PS-PAC18VX-1","A00K":"PS-PLD50AS8858G","8815":"PS-PWM9368B","A0BH":"PS-PRW252T","1589":"PS-PLD32D700","A16P":"PS-PWM7073DB","A142":"PS-PTS12KF25N","9924":"PS-PRH51R","3680":"PS-SCN231","A0J0":"PS-PRB187R","A0VG":"PS-PRM28DMY","A0DP":"PS-PAC05VZS","8544":"PS-PASPRO15F2","2287":"PS-PR18KHG","4524":"PS-PHT925L(U)","A0OW":"PS-PRA17PRX","876":"PS-PFL7103","A122":"PS-PRB187TY","9802":"PS-PR245SMX","8543":"PS-PASPRO12F2","5785":"PS-PAC18VG","A0OF":"PS-PRA16OLX","A09A":"PS-PLD32TV1056","A1AK":"PS-PLD43TG5055","A0KJ":"PS-PTS12KF25","5718":"PS-SCN236B","A0KK":"PS-PTS12KF15","A1AD":"PS-SCN190","4815":"PS-PRM21KTV","6639":"PS-PMA9503GA","5854":"PS-PLD24D8520","A100":"PS-PMD22VF9930","4735":"PS-PRO18KTR","A0U5":"PS-PRM21DMS","6648":"PS-PMA9310BA","8798":"PS-PWM7368B","8109":"PS-PRM21HHW","A16O":"PS-PWM7073DG","955":"PS-PCF217-1","1257":"PS-SCP1171LE","872":"PS-PRC1901DG","A1AG":"PS-SCN227","A16Q":"PS-PWM8073DG","5967":"PS-PWM1058GS","A19L":"PS-PWM1081V","637":"PS-PAC10NK","A0YC":"PS-PRA17ZS","4278":"PS-PWM9070Y","2720":"PS-PWM9569PW","A17G":"PS-PLD100QV5925","5966":"PS-PWM1058RS","5689":"PS-PWM7057BS","3209":"PS-PRG18BGVIN","A19S":"PS-PLD32TV1755S","A129":"PS-PPS4PH12","A1AZ":"PS-PLD43RG5059","6006":"PS-PWM9567CC","A1C1":"PS-PLD32TC1865","954":"PS-PCF117-1","4233":"PS-PAW8513N","5903":"PS-PCF317","1937":"PS-PWM7569C","2393":"PS-BB3501","8024":"PS-PRA18HOB","5899":"PS-SCN186W","5690":"PS-PWM8057BS","A0YD":"PS-PRW23ZS","3274":"PS-PRG24BGR","6863":"PS-PRM23BNR","A0OR":"PS-PRA17PLX","A1A2":"PS-PEV15R1AT","A0ES":"PS-PMA9311NF","5954":"PS-PRZ181GC","3173":"PS-PRG21KMX","3481":"PS-PCF315","5848":"PS-PLD32T1506","4704":"PS-PRM21BGB","7549":"PS-PAW85513M","6519":"PS-PRO17HOR","4031":"PS-PWM9567WBS","A0U3":"PS-PRA18DMS","A0TZ":"PS-PRA18CMS","A02M":"PS-PRB289B","3634":"PS-PRG21KTB","A1AA":"PS-PPS10L22","3056":"PS-PLD22D900","9315":"PS-PRB218B","A0IE":"PS-PRM21BLR","A1AP":"PS-PEV30M5AT","A0LZ":"PS-PRW29MOW","3283":"PS-PRG24LTR","A18D":"PS-PAW7029TS","A194":"PS-PWC888YUV","A1CC":"PS-PLD32CV1869C","A1C3":"PS-PCF218-3","6640":"PS-PMA9300WA","2271":"PS-PR18BGRIN","6948":"PS-PWM7367WBS","A0O7":"PS-PLD40AG5959","A11X":"PS-PRD18JY","815":"PS-PRS450B","9922":"PS-PLD65UV5902","3171":"PS-PRG21KMV","4809":"PS-PRM21STV","2662":"PS-PLM32M55","A0I7":"PS-PRA17ALB","8569":"PS-PWC777BX","1029":"PS-PAS28","4709":"PS-PRM28BGR","9375":"PS-PR2M51F1","3281":"PS-PRG22LTV","A1C2":"PS-PCF118-3","3223":"PS-PRG16BGVN","3236":"PS-PWM7056WR","A0NS":"PS-PRM490MOW","4814":"PS-PRM21KTR","A03I":"PS-PRW25MNR","4327":"PS-SCN141L","A0YA":"PS-PRA18ZS","A0OP":"PS-PRA17OLX","2978":"PS-PR21KMR1","A02Q":"PS-PRA16ANR","A1DU":"PS-PRA18MNSH","0A0A":"PS-SCN1020","A165":"PS-PAC05VZI","1853":"PS-PR16BGBN","A1A5":"PS-PASPRO8F3","4104":"PS-PRN180RC","A1B0":"PS-PLD43BG5058","A0FC":"PS-PASPRO15F2NF","2947":"PS-PLD24D552","8438":"PS-PWM8358XSL","6745":"PS-PRO18HORF","865":"PS-PRS550T","814":"PS-PRS450W","8669":"PS-PTS2K25","2649":"PS-PR16BGY","3282":"PS-PRG22LTB","A03T":"PS-PCF317-1","3546":"PS-PRG15KTR","3668":"PS-PRN180B","A1DC":"PS-PRM21CRX3","A0C4":"PS-PRW256Y","A19B":"PS-PLD43UG3059","A0I8":"PS-PRA17BLR","8058":"PS-PRA17ANR","A1EG":"PS-PRM21DRD3","A1DJ":"PS-PRW23MOB3","A1D7":"PS-PRB219R3","6700":"PS-PMA9501BA","A1DI":"PS-PRW23MNX3","A1DD":"PS-PRM21DMY3","1241":"PS-SCP122LE","A1DN":"PS-PRW29MNX3","940":"PS-PAC09VX-1","3229":"PS-PWM8556WR","A1DR":"PS-PRB179Y","3725":"PS-PAW8512B","A0F4":"PS-PMA9300BGNF","6641":"PS-PMA9300GA","A0EL":"PS-PAS12SA15NFO","5666":"PS-PRM23QS","A166":"PS-PAC05VZSI","7858":"PS-PLD32D1520S","4731":"PS-PRO18AGBIN","6591":"PS-PWM1057B1","4326":"PS-SCN140L","3220":"PS-PRG22BGV","7875":"PS-PRF17QN","0A3U":"PS-PCA200D","A1DE":"PS-PRM21DRX3"};
+
+// Peta Teknisi Per Site
 let TEKNISI_MAP = {};
-try {
- const cachedTek = localStorage.getItem(TEKNISI_STORAGE_KEY);
- if(cachedTek) TEKNISI_MAP = JSON.parse(cachedTek);
-} catch(e) {}
 
-// Google Visualization JSONP Loader (Bebas CORS, jalan di file:/// maupun web)
-function loadGviz(gid, cbName, timeoutMs = 15000) {
+let currentSite = normalizeSite(localStorage.getItem(SITE_STORAGE_KEY) || "");
+let cur = "IN";
+let cat = CATS[0];
+let selectedSCL = "";
+let pendingSCLItems = [];
+
+const $ = s => document.querySelector(s);
+const esc = s => (s||"").replace(/"/g,"&quot;");
+
+function toast(t, bg="#15803d", ms=3000){
+ const m=$("#msg");
+ m.textContent=t;
+ m.style.background=bg;
+ m.style.display="block";
+ clearTimeout(m._t);
+ m._t=setTimeout(()=>m.style.display="none", ms);
+}
+
+// Dialog Login Pilih Site (Hanya Menampilkan KODE Site Saja)
+function openSiteModal(){
+ const modal=$("#siteModal");
+ const sel=$("#modalSiteSelect");
+ sel.innerHTML='<option value="">-- Pilih Kode Site --</option>' +
+  SITE_CODES.map(code=>`<option value="${code}"${code===currentSite?' selected':''}>${code}</option>`).join("");
+ $("#btnSaveSite").disabled = !sel.value;
+ sel.onchange = e => { $("#btnSaveSite").disabled = !e.target.value; };
+ modal.style.display="flex";
+}
+
+function saveSiteSelection(){
+ const val=$("#modalSiteSelect").value;
+ if(!val) return;
+ currentSite=val;
+ localStorage.setItem(SITE_STORAGE_KEY, currentSite);
+ $("#siteModal").style.display="none";
+ updateSiteUI();
+ renderTechField(currentSite);
+ if(cur==="OUT"){ loadSCL(); }
+ const siteSelect = $("#site");
+ if(siteSelect){ siteSelect.value=currentSite; }
+ toast("Site berhasil disetel: " + currentSite);
+}
+
+function updateSiteUI(){
+ const badge=$("#activeSiteBadge");
+ if(badge){
+  badge.textContent = getSiteDisplayName(currentSite);
+ }
+}
+
+// Helper GViz API untuk mengambil data Sheet secara langsung (CORS-Safe via JSONP)
+function fetchGvizSheet(sheetName, timeoutMs = 15000) {
  return new Promise((resolve, reject) => {
+  const cbName = "gvizSheet_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
   const sc = document.createElement("script");
   const cleanup = () => {
    clearTimeout(timer);
    delete window[cbName];
-   sc.remove();
+   if(sc.parentNode) sc.remove();
   };
   const timer = setTimeout(() => {
    cleanup();
-   reject(new Error("Timeout load gviz"));
+   reject(new Error("Timeout loading sheet " + sheetName));
   }, timeoutMs);
 
-  window[cbName] = (res) => {
+  window[cbName] = (data) => {
    cleanup();
-   resolve(res);
+   resolve(data);
   };
 
   sc.onerror = () => {
    cleanup();
-   reject(new Error("Network error gviz"));
+   reject(new Error("Network error loading sheet " + sheetName));
   };
 
-  sc.src = "https://docs.google.com/spreadsheets/d/" + SHEET_DOC_ID + "/gviz/tq?tqx=responseHandler:" + cbName + "&gid=" + gid;
+  sc.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=responseHandler:${cbName}`;
   document.head.appendChild(sc);
  });
 }
 
-// Background sync data Barang dari Google Sheet via GViz JSONP
+// Background Sync Data Produk dari Sheet BARANG
 async function syncProductMap() {
- const cb = "gvizBarang_" + Date.now();
  try {
-  const res = await loadGviz(GID_BARANG, cb);
+  const res = await fetchGvizSheet("BARANG");
   if(!res || !res.table || !res.table.rows) return;
   const newMap = {};
   res.table.rows.forEach(r => {
    if(!r || !r.c || r.c.length < 2) return;
-   const k = r.c[0] && r.c[0].v != null ? String(r.c[0].v).trim().toUpperCase() : "";
-   const v = r.c[1] && r.c[1].v != null ? String(r.c[1].v).trim() : "";
-   if(k && v && k !== "KODE") {
-    newMap[k] = v;
-   }
+   const c0 = r.c[0], c1 = r.c[1];
+   const k = (c0 && c0.v !== null && c0.v !== undefined) ? String(c0.v).trim().toUpperCase() : "";
+   const v = (c1 && c1.v !== null && c1.v !== undefined) ? String(c1.v).trim() : "";
+   if(k && v) newMap[k] = v;
   });
-  if(Object.keys(newMap).length > 50) {
+  if(Object.keys(newMap).length > 0) {
    PRODUCT_MAP = Object.assign({}, PRODUCT_MAP, newMap);
-   localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(PRODUCT_MAP));
+   console.log("Peta Barang disinkronkan, jumlah:", Object.keys(PRODUCT_MAP).length);
+   updateModelDatalist();
   }
- } catch(e) {}
+ } catch(e) {
+  console.log("Menggunakan cache peta produk offline.");
+ }
 }
 
-// Background sync data Teknisi dari Google Sheet via GViz JSONP
+function updateModelDatalist(){
+ const dl = document.getElementById("modelDatalist");
+ if(!dl) return;
+ const distinctModels = Array.from(new Set(Object.values(PRODUCT_MAP))).sort();
+ dl.innerHTML = distinctModels.map(m => `<option value="${m}">`).join("");
+}
+
+// Background Sync Data Teknisi dari Sheet TEKNISI
 async function syncTeknisiMap() {
- const cb = "gvizTeknisi_" + Date.now();
  try {
-  const res = await loadGviz(GID_TEKNISI, cb);
+  const res = await fetchGvizSheet("TEKNISI");
   if(!res || !res.table || !res.table.rows) return;
   const newTekMap = {};
   res.table.rows.forEach(r => {
    if(!r || !r.c || r.c.length < 2) return;
-   const pds = r.c[0] && r.c[0].v != null ? String(r.c[0].v).trim().toUpperCase() : "";
-   const tech = r.c[1] && r.c[1].v != null ? String(r.c[1].v).trim() : "";
-   if(pds && tech && pds !== "PDS" && !tech.toUpperCase().includes("TEKNISI")) {
-    if(!newTekMap[pds]) newTekMap[pds] = [];
-    if(!newTekMap[pds].includes(tech)) newTekMap[pds].push(tech);
+   const c0 = r.c[0], c1 = r.c[1];
+   const rawSite = (c0 && c0.v !== null && c0.v !== undefined) ? String(c0.v).trim().toUpperCase() : "";
+   const rawTek = (c1 && c1.v !== null && c1.v !== undefined) ? String(c1.v).trim() : "";
+   if(!rawSite || !rawTek || rawSite === "PDS") return;
+
+   const siteCode = normalizeSite(rawSite);
+   if(!newTekMap[siteCode]) newTekMap[siteCode] = [];
+   if(!newTekMap[siteCode].includes(rawTek)) {
+    newTekMap[siteCode].push(rawTek);
    }
   });
-  if(Object.keys(newTekMap).length > 0) {
-   TEKNISI_MAP = newTekMap;
-   localStorage.setItem(TEKNISI_STORAGE_KEY, JSON.stringify(TEKNISI_MAP));
-   renderTechField(currentSite);
-  }
- } catch(e) {}
+  TEKNISI_MAP = newTekMap;
+  renderTechField(currentSite);
+  console.log("Peta Teknisi disinkronkan untuk", Object.keys(newTekMap).length, "site.");
+ } catch(e) {
+  console.log("Teknisi map sync offline");
+ }
 }
 
 syncProductMap();
 syncTeknisiMap();
 
-const SITES=["ABN", "ACH", "BDG", "BDU", "BGR", "BJN", "BKL", "BKS", "BNJ", "BWI", "CDG", "CGN", "CKR", "CRB", "DPK", "DPS", "GTO", "JBI", "JBR", "JBS", "JKT", "JSL", "JTR", "KDI", "KDR", "KDS", "KLT", "KPG", "LPG", "MAK", "MAN", "MDN", "MDU", "MGL", "MLG", "MTJ", "MTR", "PDG", "PKB", "PKL", "PLB", "PLU", "PNP", "PPS", "PRK", "PTK", "PWT", "RTP", "SBN", "SBU", "SBY", "SKB", "SLO", "SMD", "SMG", "TGR", "TSM", "YOG", "Cileungsi", "Indramayu/jatibarang", "Tegal PKL", "Probolinggo JBR", "Pamekasan SBU", "Cibubur", "Ciledug JSL", "PSR CILACAP PWT", "PSR + BALIKPN SMD", "PSR BUKITTGG PDG", "PSR + BATAM PKB", "PSR + BIMA MTR", "PSR+ LABUAN", "PSR LUBUK PPS", "PSR+ KAYUAGUNG PPS", "PSR MUARA BUNGO JBI", "PSR METRO LPG", "PSR LAHAT PPS", "PSR BATURJ PPS", "PSR FL0RES KPG", "PSR TRNATE MAN", "PSR Bau2 KDI", "PSR Tarakan SMD", "PSR Berau SMD", "PSR Bontang SMD"];
-const LAYANAN = ["Home","Walk-in","Dealer","Out of Town"];
-const S_IN = ["Baik","Rusak","Tdk Ada"];
-const S_OUT = ["OK","Tidak OK","N/A"];
+// ==============================================================================
+// MASTER AUTO-SYNC DARI GOOGLE SHEETS (SINGLE SOURCE OF TRUTH)
+// Mengambil data otomatis setiap 5 menit (300.000 ms)
+// ==============================================================================
+let isSyncingAll = false;
+let lastDatabaseSyncTime = new Date();
 
-const CATS=["EV 2 Wheels","Home Appliances","Audio/Video"];
-const KG=["Kunci kontak / Smart key","Charger & kabel charger","Buku manual / kartu garansi","Aksesoris standar bawaan (jika ada)"];
-const FORMS = {
- IN:{ title:"PDI IN", no:"FR-SC-PDI-IN", dateLabel:"Tanggal Masuk", odo:"Odometer Masuk (Km)", bat:"Level Baterai Masuk (%)",
-  tech:"Teknisi Penerima", opts:S_IN, bad:"Rusak",
-  sections:{
-   EV:[
-   ["A. Kelengkapan Unit",["Kunci kontak / Smart key","Charger & kabel charger","Buku manual / kartu garansi","Aksesoris standar bawaan (jika ada)","Spion kiri & kanan","Jok / seat","Box / bagasi (jika ada)"]],
-   ["B. Kondisi Fisik / Bodi",["Body depan (lecet / retak / pecah)","Body belakang (lecet / retak / pecah)","Cat & stiker bodi","Lampu depan","Lampu belakang / rem","Lampu sein kiri & kanan","Spakbor depan & belakang","Standar samping & standar tengah"]]],
-   GEN:[
-   ["A. Kelengkapan Unit",["Unit utama","Kabel power / adaptor","Remote / aksesoris standar (jika ada)","Buku manual / kartu garansi","Dus / packing (jika ada)"]],
-   ["B. Kondisi Fisik",["Casing / bodi depan","Casing / bodi belakang & samping","Layar / panel display (jika ada)","Tombol & kenop kontrol","Label / stiker nomor seri terbaca","Kaki / roda / penyangga (jika ada)"]]]},
-  texts:["Keluhan Konsumen","Catatan Tambahan Teknisi"],
-  agree:"Konsumen menyetujui kondisi awal unit sesuai checklist ini" },
- OUT:{ title:"PDI OUT", no:"FR-SC-PDI-OUT (draft, menyesuaikan PDI IN)", dateLabel:"Tanggal Keluar", odo:"Odometer Keluar (Km)", bat:"Level Baterai Keluar (%)",
-  tech:"Teknisi / QC Pemeriksa", opts:S_OUT, bad:"Tidak OK",
-  sections:{
-   EV:[
-   ["A. Verifikasi Pekerjaan",["Keluhan konsumen sudah teratasi","Pekerjaan sesuai Work Order","Part bekas dikembalikan / dicatat (jika diminta)","Tidak ada baut / komponen longgar"]],
-   ["B. Kondisi Fisik, Bodi & Kebersihan",["Tidak ada kerusakan baru dibanding PDI IN","Baut body / cover / fairing kencang, tidak ada yang kendor","Unit bersih (bodi, jok, velg)","Lampu depan, belakang & sein berfungsi","Spion kiri & kanan","Jok / box terpasang & terkunci baik"]],
-   ["C. Sistem Kelistrikan & Baterai",["Baterai terpasang & segel utuh","Dashboard menyala normal, tanpa kode error","Klakson","Port / konektor charging","Level baterai cukup untuk serah terima"]],
-   ["D. Sistem Pengereman",["Rem depan","Rem belakang","Lampu rem menyala","Baut kaliper, bracket & handle rem kencang, tidak ada yang kendor","Kabel / hose rem tidak kendor & tidak bocor"]],
-   ["E. Ban, Velg & Suspensi",["Kondisi & tekanan ban depan","Kondisi & tekanan ban belakang","Baut roda kencang","Suspensi depan & belakang"]],
-   ["F. Test Ride",["Suara motor normal","Respon throttle halus","Tidak ada getaran / bunyi abnormal","Pengereman saat test ride normal"]],
-   ["G. Kelengkapan Dikembalikan",KG]],
-   GEN:[
-   ["A. Verifikasi Pekerjaan",["Keluhan konsumen sudah teratasi","Pekerjaan sesuai Work Order","Part bekas dikembalikan / dicatat (jika diminta)","Tidak ada baut / komponen longgar pada casing"]],
-   ["B. Kondisi Fisik & Kebersihan",["Tidak ada kerusakan baru dibanding PDI IN","Unit bersih","Layar / panel display (jika ada)","Tombol & kenop kontrol berfungsi"]],
-   ["C. Fungsi Unit",["Menyala / standby normal","Fungsi utama normal","Tidak ada suara / bau / panas abnormal"]],
-   ["D. Kelengkapan Dikembalikan",["Kabel power / adaptor","Remote / aksesoris standar","Buku manual / kartu garansi"]]]},
-  texts:["Ringkasan Pekerjaan","Catatan Tambahan Teknisi"],
-  agree:"Konsumen menerima unit dan menyetujui hasil pekerjaan" }
-};
+async function syncAllDatabaseFromGoogleSheets(isAuto = false) {
+  if (isSyncingAll) return;
+  isSyncingAll = true;
+  updateSyncBadge("syncing");
 
-const $=s=>document.querySelector(s);
-const esc=s=>s.replace(/"/g,"&quot;");
-const SITE_STORAGE_KEY = "pdi_selected_site";
-let currentSite = localStorage.getItem(SITE_STORAGE_KEY) || "";
-let cur="IN",cat=CATS[0];
+  try {
+    // 1. Ambil data terbaru dari sheet BARANG dan TEKNISI
+    await Promise.all([
+      syncProductMap().catch(e => console.log("Sync Barang error:", e)),
+      syncTeknisiMap().catch(e => console.log("Sync Teknisi error:", e))
+    ]);
 
-function updateSiteUI(){
- const pill=$("#sitePill"), txt=$("#curSiteTxt");
- if(currentSite){
-  pill.style.display="flex";
-  txt.textContent=currentSite;
- } else {
-  pill.style.display="none";
- }
- const sel=$("#site");
- if(sel && currentSite){
-  sel.value=currentSite;
-  if(cur==="OUT"){loadWO()}
- }
- renderTechField(currentSite);
-}
+    // 2. Jika saat ini di tab PDI OUT, segarkan daftar No. SCL dari sheet PDIIN & PDOUT
+    if (cur === "OUT") {
+      await loadSCL();
+    }
 
-function openSiteModal(){
- const modal=$("#siteModal"), sel=$("#modalSiteSelect"), btn=$("#btnSaveSite");
- sel.innerHTML='<option value="">-- Pilih Site Anda --</option>'+
-  SITES.map(x=>`<option value="${x}"${x===currentSite?' selected':''}>${x}</option>`).join("");
- btn.disabled=!sel.value;
- sel.onchange=()=>{btn.disabled=!sel.value};
- btn.onclick=()=>{
-  if(!sel.value)return;
-  currentSite=sel.value;
-  localStorage.setItem(SITE_STORAGE_KEY, currentSite);
-  modal.style.display="none";
-  updateSiteUI();
-  toast("Site aktif: "+currentSite,"#1b7f3b");
- };
- modal.style.display="flex";
-}
+    // 3. Jika modal cetak sedang terbuka, segarkan daftar SCL
+    const printModal = $("#printModal");
+    if (printModal && printModal.style.display === "flex") {
+      await loadPrintSclList();
+    }
 
-// Fungsi mencari teknisi berdasarkan Site/PDS
-function getTeknisiForSite(site){
- if(!site) return [];
- const s = site.trim().toUpperCase();
- if(TEKNISI_MAP[s] && TEKNISI_MAP[s].length) return TEKNISI_MAP[s];
- for(const k in TEKNISI_MAP){
-  const ku = k.trim().toUpperCase();
-  if(ku === s || ku.includes(s) || s.includes(ku)){
-   if(TEKNISI_MAP[k] && TEKNISI_MAP[k].length) return TEKNISI_MAP[k];
+    lastDatabaseSyncTime = new Date();
+    updateSyncBadge("success");
+    if (!isAuto) {
+      toast("Data berhasil disinkronkan dengan Google Sheets", "#15803d");
+    }
+  } catch(err) {
+    console.warn("Gagal sinkronisasi data Google Sheets:", err);
+    updateSyncBadge("error");
+  } finally {
+    isSyncingAll = false;
   }
- }
- return [];
 }
 
-// Render Dropdown / Input Teknisi secara dinamis sesuai site
-function renderTechField(site){
+function updateSyncBadge(status) {
+  const badge = $("#syncStatusBadge");
+  if (!badge) return;
+  const timeStr = lastDatabaseSyncTime ? lastDatabaseSyncTime.toLocaleTimeString("id-ID", { hour:"2-digit", minute:"2-digit" }) : "-";
+
+  if (status === "syncing") {
+    badge.innerHTML = '<span style="color:#E65100;">🔄 Sinkron...</span>';
+  } else if (status === "error") {
+    badge.innerHTML = `<span style="color:#C8102E;" title="Gagal sinkron. Klik untuk mencoba lagi">⚠️ Sinkron (${timeStr})</span>`;
+  } else {
+    badge.innerHTML = `<span style="color:#2E7D32;" title="Sinkron otomatis setiap 5 menit. Klik untuk sinkron sekarang">🔄 Sinkron: ${timeStr}</span>`;
+  }
+}
+
+// Timer Interval: Otomatis Sinkronisasi Setiap 5 Menit (5 x 60 x 1000 ms)
+const AUTO_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+setInterval(() => {
+  console.log("⏰ Menjalankan Auto-Sync Database Google Sheets (5 Menit)...");
+  syncAllDatabaseFromGoogleSheets(true);
+}, AUTO_SYNC_INTERVAL_MS);
+
+
+function renderTechField(siteName){
  const box = $("#techBox");
  if(!box) return;
- const activeSite = site || currentSite || ($("#site") ? $("#site").value : "");
- const list = getTeknisiForSite(activeSite);
- 
- if(list.length > 0){
+ const siteCode = normalizeSite(siteName || currentSite);
+ const techs = (siteCode && TEKNISI_MAP[siteCode]) ? TEKNISI_MAP[siteCode] : [];
+
+ if(techs.length > 0){
   box.innerHTML = `
-   <select name="Teknisi" id="techSelect" required onchange="onTechChange(this)">
-    <option value="">Pilih teknisi (${activeSite})...</option>
-    ${list.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join("")}
-    <option value="__manual__">+ Ketik Nama Lain...</option>
+   <select name="Teknisi" id="techSelect" required>
+     <option value="">-- Pilih Teknisi (${siteCode}) --</option>
+     ${techs.map(t=>`<option value="${t}">${t}</option>`).join("")}
+     <option value="__OTHER__">+ Ketik Nama Lain...</option>
    </select>
-   <input type="text" id="techManual" placeholder="Ketik nama teknisi..." style="display:none;margin-top:5px">
+   <input type="text" id="customTechInput" placeholder="Ketik nama teknisi..." style="display:none;margin-top:4px;">
   `;
+  const sel = $("#techSelect");
+  const cust = $("#customTechInput");
+  sel.onchange = () => {
+   if(sel.value === "__OTHER__"){
+    cust.style.display = "block";
+    cust.required = true;
+    cust.focus();
+   } else {
+    cust.style.display = "none";
+    cust.required = false;
+    cust.value = "";
+   }
+  };
  } else {
-  box.innerHTML = `
-   <input type="text" name="Teknisi" id="techInput" placeholder="${activeSite ? 'Ketik nama teknisi (' + activeSite + ')...' : 'Pilih site dulu atau ketik nama teknisi...'}" required>
-  `;
+  box.innerHTML = `<input type="text" name="Teknisi" id="techSelect" placeholder="Ketik nama teknisi..." required>`;
  }
 }
 
-function onTechChange(sel){
- const manual = $("#techManual");
- if(sel.value === "__manual__"){
-  sel.removeAttribute("name");
-  sel.required = false;
-  if(manual){
-   manual.style.display = "block";
-   manual.required = true;
-   manual.name = "Teknisi";
-   manual.focus();
-  }
- } else {
-  sel.name = "Teknisi";
-  sel.required = true;
-  if(manual){
-   manual.style.display = "none";
-   manual.required = false;
-   manual.removeAttribute("name");
-   manual.value = "";
+// Helper pencari model unit secara presisi
+function findProductModel(val){
+ if(!val) return "";
+ const raw = String(val).trim().toUpperCase();
+ if(!raw) return "";
+
+ // 1. Direct match full string, 4 digit, 3 digit
+ if(PRODUCT_MAP[raw]) return PRODUCT_MAP[raw];
+ const k4 = raw.slice(0, 4);
+ if(PRODUCT_MAP[k4]) return PRODUCT_MAP[k4];
+ const k3 = raw.slice(0, 3);
+ if(PRODUCT_MAP[k3]) return PRODUCT_MAP[k3];
+
+ // 2. Bersihkan karakter non-alphanumeric (spasi, tanda hubung, titik dua)
+ const alpha = raw.replace(/[^A-Z0-9]/g, "");
+ if(PRODUCT_MAP[alpha]) return PRODUCT_MAP[alpha];
+ if(alpha.length >= 4 && PRODUCT_MAP[alpha.slice(0, 4)]) {
+  return PRODUCT_MAP[alpha.slice(0, 4)];
+ }
+
+ // 3. Sliding scan untuk mendeteksi 4-karakter kode barcode di dalam string panjang (misal scanner ada prefix)
+ for(let i = 0; i <= alpha.length - 4; i++){
+  const sub = alpha.substr(i, 4);
+  if(PRODUCT_MAP[sub]) return PRODUCT_MAP[sub];
+ }
+
+ // 4. Pencocokan nama model / tipe jika user mengetik nama model
+ for(let code in PRODUCT_MAP){
+  const m = PRODUCT_MAP[code].toUpperCase();
+  if(m === raw || m.replace(/[^A-Z0-9]/g, "") === alpha){
+   return PRODUCT_MAP[code];
   }
  }
+
+ // 5. Alias Model EV (Motor Listrik)
+ if(raw.includes("FOX-R") || raw.includes("FOXR") || raw.includes("FOX R")) return "FOX-R";
+ if(raw.includes("FOX-S") || raw.includes("FOXS") || raw.includes("FOX S")) return "PS-FOXSAT";
+ if(raw.includes("FOX 350") || raw.includes("FOX350")) return "FOX 350";
+ if(raw.includes("PEV30M5") || raw.includes("PEV 30M5")) return "PS-PEV30M5AT";
+ if(raw.includes("PEV30M1") || raw.includes("PEV 30M1")) return "PS-PEV30M1AT";
+ if(raw.includes("PEV15R1") || raw.includes("PEV 15R1")) return "PS-PEV15R1AT";
+
+ return "";
 }
 
-// Fungsi Lookup Model / Tipe Unit dari No Seri (Kosongkan model jika seri kosong)
-function lookupModel(serial){
+// Auto-Lookup Model (Hening tanpa notifikasi/popup apapun)
+function lookupModel(val){
  const modelEl = document.querySelector('#f input[name="Model Unit"]');
- if(!serial || !serial.trim()){
-  if(modelEl) modelEl.value = "";
-  return;
- }
- const s = serial.trim().toUpperCase();
- const k4 = s.substring(0, 4);
- const k3 = s.substring(0, 3);
- 
- const matched = PRODUCT_MAP[s] || PRODUCT_MAP[k4] || PRODUCT_MAP[k3];
+ if(!modelEl || cur !== "IN") return;
+
+ const matched = findProductModel(val);
  if(matched){
-  if(modelEl){
-   modelEl.value = matched;
-   toast("Model terisi otomatis: " + matched, "#1b7f3b");
-  }
+  modelEl.value = matched;
  }
 }
 
-function render(){
- const F=FORMS[cur], ev=cat===CATS[0];
- const secs=F.sections[ev?"EV":"GEN"];
- const today=new Date().toISOString().slice(0,10);
- let h=`<fieldset><legend>Kategori Produk</legend><label class="f">Pilih kategori produk<select id="cat">${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}</select></label></fieldset>
- <form id="f" novalidate><fieldset><legend>${F.title} - ${F.no}</legend><div class="grid">
- <label class="f">${F.dateLabel}<input type="date" name="Tanggal" value="${today}" required></label>
- <label class="f">Site / Service Center<select name="Site Service Center" id="site" required><option value="">Pilih site...</option>${SITES.map(x=>`<option value="${x}"${x===currentSite?" selected":""}>${x}</option>`).join("")}</select></label>
- ${cur==="OUT"?`<label class="f">No. Work Order (WO) - dari PDI IN<select name="No WO" id="wo" required disabled><option value="">Pilih site dulu...</option></select></label>`:`<label class="f">No. Work Order (WO)<input type="text" name="No WO" required></label>`}
- <label class="f">Jenis Layanan<select name="Jenis Layanan" required><option value="">Pilih...</option>${LAYANAN.map(x=>`<option>${x}</option>`).join("")}</select></label>
- <label class="f">Model / Tipe Unit<input type="text" name="Model Unit" id="modelInput" required></label>
- <label class="f">${ev?"No. Rangka / VIN":"No. Seri (Serial Number)"}
-   <div class="input-with-btn">
-     <input type="text" name="VIN" id="seriInput" placeholder="Ketik atau scan seri..." required>
-     <button class="btn-scan" type="button" onclick="startScanner()" title="Scan Barcode / QR">
-       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-         <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-         <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-         <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-         <path d="M3 17v2a2 2 0 0 0 2 2h2"></path>
-         <line x1="7" y1="12" x2="17" y2="12"></line>
-       </svg>
-       <span>Scan</span>
-     </button>
-   </div>
- </label>
+const FORMS = {
+ IN:{ 
+  title:"PDI IN", 
+  no:"FR-SC-PDI-IN", 
+  dateLabel:"Tanggal Masuk", 
+  tech:"Teknisi Penerima", 
+  opts:S_IN, 
+  bad:"Rusak",
+  sections:{
+   EV:[
+    ["A. Kelengkapan Unit",["Kunci kontak / Smart key","Charger & kabel charger","Buku manual / kartu garansi","Aksesoris standar bawaan (jika ada)","Spion kiri & kanan","Jok / seat","Box / bagasi (jika ada)"]],
+    ["B. Kondisi Fisik / Bodi",["Body depan (lecet / retak / pecah)","Body belakang (lecet / retak / pecah)","Cat & stiker bodi","Lampu depan","Lampu belakang / rem","Lampu sein kiri & kanan","Spakbor depan & belakang","Standar samping & standar tengah"]],
+    ["C. Sistem Kelistrikan & Fitur",["Kunci kontak / tombol power ON/OFF","Display speedometer / panel meter","Klakson","Lampu utama & lampu jauh","Lampu sein & hazard","Lampu rem belakang","Soket charging & kabel utama"]],
+    ["D. Sistem Pengereman",["Handle rem depan & belakang","Kondisi kaliper & piringan rem (disc)","Kabel / selang rem","Fungsi pengereman saat didorong"]],
+    ["E. Roda, Ban & Suspensi",["Tekanan & kondisi ban depan","Tekanan & kondisi ban belakang","Velg depan & belakang (peyang / retak)","Suspensi depan & belakang"]],
+    ["F. Status Baterai & Motor",["Baterai terpasang aman & terkunci","Kabel & konektor baterai utuh","Motor penggerak (suara / putaran bebas)"]]
+   ],
+   GEN:[
+    ["A. Kelengkapan Unit",["Unit utama","Kabel power / adaptor","Remote / aksesoris standar (jika ada)","Buku manual / kartu garansi","Dus / packing (jika ada)"]],
+    ["B. Kondisi Fisik",["Casing / bodi depan","Casing / bodi belakang & samping","Layar / panel display (jika ada)","Tombol & kenop kontrol","Label / stiker nomor seri terbaca","Kaki / roda / penyangga (jika ada)"]],
+    ["C. Kelistrikan & Fungsi Dasar",["Kabel power / colokan aman","Indikator power / LED menyala","Fungsi tombol utama ON/OFF","Tidak ada bau terbakar / bunyi aneh"]]
+   ]
+  },
+  texts:["Keluhan Konsumen","Catatan Tambahan Teknisi"],
+  agree:"Konsumen menyetujui kondisi awal unit sesuai checklist ini" 
+ },
+ OUT:{ 
+  title:"PDI OUT", 
+  no:"", // Dihilangkan draft suffix
+  dateLabel:"Tanggal Keluar", 
+  tech:"Teknisi / QC Pemeriksa", 
+  opts:S_OUT, 
+  bad:"Tidak OK",
+  sections:{
+   EV:[
+    ["A. Verifikasi Pekerjaan",["Keluhan konsumen sudah teratasi","Pekerjaan sesuai Work Order","Part bekas dikembalikan / dicatat (jika diminta)","Tidak ada baut / komponen longgar"]],
+    ["B. Kondisi Fisik, Bodi & Kebersihan",["Tidak ada kerusakan baru dibanding PDI IN","Baut body / cover / fairing kencang, tidak ada yang kendor","Unit bersih (bodi, jok, velg)","Lampu depan, belakang & sein berfungsi","Spion kiri & kanan","Jok / box terpasang & terkunci baik"]],
+    ["C. Sistem Kelistrikan & Baterai",["Baterai terpasang & segel utuh","Dashboard menyala normal, tanpa kode error","Klakson","Port / konektor charging","Level baterai cukup untuk serah terima"]],
+    ["D. Sistem Pengereman",["Rem depan","Rem belakang","Lampu rem menyala","Baut kaliper, bracket & handle rem kencang, tidak ada yang kendor","Kabel / hose rem tidak kendor & tidak bocor"]],
+    ["E. Ban, Velg & Suspensi",["Kondisi & tekanan ban depan","Kondisi & tekanan ban belakang","Baut roda kencang","Suspensi depan & belakang"]],
+    ["F. Test Ride",["Suara motor normal","Respon throttle / gas halus","Pengereman pakem saat jalan","Handling lurus & seimbang"]]
+   ],
+   GEN:[
+    ["A. Verifikasi Pekerjaan",["Keluhan konsumen teratasi","Pekerjaan sesuai Work Order","Part bekas dikembalikan / dicatat"]],
+    ["B. Kondisi Fisik & Kebersihan",["Unit bersih luar dalam","Casing rapat & baut lengkap","Layar / panel bersih & tidak gores baru"]],
+    ["C. Uji Fungsi Akhir",["Fungsi utama bekerja normal","Semua port / tombol berfungsi normal","Uji nyala (burn-in / running test) lolos"]]
+   ]
+  },
+  texts:["Hasil Pemeriksaan Akhir","Catatan untuk Konsumen"],
+  agree:"Konsumen telah memeriksa dan menyetujui unit diterima kembali dalam kondisi baik" 
+ }
+};
 
- <label class="f">${F.tech}<div id="techBox"></div></label>
- </div></fieldset>`;
- secs.forEach((s,si)=>{
-  h+=`<fieldset><legend>${s[0]}</legend>`;
-  s[1].forEach((it,ii)=>{
-   const id=`${si}_${ii}`;
-   h+=`<div class="item" data-k="${esc(s[0].slice(0,1)+'. '+it)}"><div class="nm">${ii+1}. ${it}</div><div class="opts">`+
-   F.opts.map(o=>`<label class="${o===F.bad?'bad':''}"><input type="radio" name="r${id}" value="${o}">${o}</label>`).join("")+
-   `</div><input type="text" class="note" name="n${id}" placeholder="Catatan (opsional)"></div>`;
-  });
-  h+=`</fieldset>`;
- });
- F.texts.forEach((t,i)=>{h+=`<fieldset><legend>${String.fromCharCode(65+secs.length+i)}. ${t}</legend><textarea name="T${i}"></textarea></fieldset>`});
- h+=`<fieldset><label class="chk"><input type="checkbox" name="agree" required><span>${F.agree}</span></label>
- <div class="sig" data-p="k"><div class="bar"><span>Tanda tangan Konsumen</span><button type="button">Hapus</button></div><canvas width="600" height="225"></canvas></div>
- <div class="sig" data-p="t"><div class="bar"><span>Tanda tangan ${F.tech}</span><button type="button">Hapus</button></div><canvas width="600" height="225"></canvas></div></fieldset>
- <button class="send" type="submit">Kirim ${F.title}</button></form>`;
- $("#app").innerHTML=h;
- $("#cat").onchange=e=>{cat=e.target.value;render()};
+function showLoader(msg = "") {
+  const el = $("#globalLoader");
+  if (el) el.style.display = "flex";
+}
+
+function hideLoader() {
+  const el = $("#globalLoader");
+  if (el) el.style.display = "none";
+}
+
+function render(preserveSCL=""){
+ const F = FORMS[cur];
+ const ev = cat === CATS[0];
+ const secs = F.sections[ev ? "EV" : "GEN"];
+ const today = new Date().toISOString().slice(0, 10);
  
- $("#site").onchange=e=>{
-  currentSite=e.target.value;
-  if(currentSite){localStorage.setItem(SITE_STORAGE_KEY,currentSite)}
+ let h = "";
+
+ // ==========================================
+ // 1. HEADER SELECTION: 
+ // Jika PDI IN -> Kategori Produk di atas
+ // Jika PDI OUT -> No. SCL di atas (Pilih dari PDI IN)
+ // ==========================================
+ if(cur === "IN"){
+  h += `
+  <fieldset>
+    <legend>Kategori Produk</legend>
+    <label class="f">Pilih kategori produk
+      <select id="cat">
+        ${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}
+      </select>
+    </label>
+  </fieldset>`;
+ } else {
+  // PDI OUT: NO SCL DITUKAR KE ATAS (FILTER SESUAI KODE SITE AKTIF)
+  h += `
+  <fieldset class="wo-box">
+    <div style="margin-bottom:8px;">
+      <legend style="margin:0; padding:0 4px; font-weight:bold; color:var(--red);">NO. CASE - Pilih dari PDI IN (${currentSite || '-'})</legend>
+    </div>
+    <label class="f">Pilih NO. CASE yang siap PDI OUT:
+      <select id="sclSelect" name="No SCL" required>
+        <option value="">Memuat data...</option>
+      </select>
+    </label>
+    <div id="sclManualBox" style="display:none;margin-top:6px;">
+      <label class="f">Ketik NO. CASE Manual:
+        <input type="text" id="sclManualInput" placeholder="Masukan NO. CASE" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+      </label>
+    </div>
+  </fieldset>`;
+ }
+
+ // ==========================================
+ // 2. FORM GRID UTAMA
+ // ==========================================
+ h += `
+ <form id="f" novalidate>
+ <fieldset>
+   <legend>${F.title}${F.no ? ' - ' + F.no : ''}</legend>
+   <div class="grid">
+     <label class="f">${F.dateLabel}
+       <input type="date" name="Tanggal" value="${today}" required>
+     </label>
+
+     <label class="f">Site Service Center
+       <select name="Site Service Center" id="site" required>
+         <option value="">-- Pilih Site --</option>
+         ${SITE_CODES.map(code=>`<option value="${code}"${code===currentSite?" selected":""}>${code}</option>`).join("")}
+       </select>
+     </label>
+ `;
+
+ if(cur === "IN"){
+  // Di PDI IN: No. SCL di dalam grid dengan placeholder "Masukan No. SCL"
+  h += `
+     <label class="f">NO. CASE
+       <input type="text" name="No WO" id="sclInput" placeholder="Masukan NO. CASE" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+     </label>
+     <label class="f">Jenis Layanan
+       <select name="Jenis Layanan" required>
+         <option value="">Pilih layanan...</option>
+         ${LAYANAN.map(x=>`<option>${x}</option>`).join("")}
+       </select>
+     </label>
+     <label class="f">Model / Tipe Unit
+       <input type="text" name="Model Unit" id="modelInput" list="modelDatalist" placeholder="Otomatis dari 4 digit no. seri..." required>
+       <datalist id="modelDatalist"></datalist>
+     </label>
+     <label class="f">${ev ? "No. Rangka / VIN" : "No. Seri (Serial Number)"}
+       <div class="input-with-btn">
+         <input type="text" name="VIN" id="seriInput" placeholder="Ketik atau scan seri..." required>
+         <button class="btn-scan" type="button" onclick="startScanner()" title="Scan Barcode / QR">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+             <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+             <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+             <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+             <path d="M3 17v2a2 2 0 0 0 2 2h2"></path>
+             <line x1="7" y1="12" x2="17" y2="12"></line>
+           </svg>
+           <span>Scan</span>
+         </button>
+       </div>
+     </label>
+     <label class="f">${F.tech}
+       <div id="techBox"></div>
+     </label>
+  `;
+ } else {
+  // Di PDI OUT: Kategori Produk DITUKAR ke posisi No SCL!
+  // Semua kotak terisi otomatis dan BISA DIUBAH / DIEDIT (tidak readonly, tidak ada gembok)
+  h += `
+     <label class="f">Kategori Produk
+       <select id="catOut" name="Kategori Produk">
+         ${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}
+       </select>
+     </label>
+     <label class="f">Jenis Layanan
+       <select name="Jenis Layanan" id="layananInput" required>
+         <option value="">Pilih layanan...</option>
+         ${LAYANAN.map(x=>`<option>${x}</option>`).join("")}
+       </select>
+     </label>
+     <label class="f">Model / Tipe Unit
+       <input type="text" name="Model Unit" id="modelInput" placeholder="Model / Tipe Unit..." required>
+     </label>
+     <label class="f">${ev ? "No. Rangka / VIN" : "No. Seri (Serial Number)"}
+       <!-- Tanpa tombol scan di PDI OUT sesuai permintaan, tapi input tetap bisa diedit -->
+       <input type="text" name="VIN" id="seriInput" placeholder="No. Rangka / VIN / Seri..." required>
+     </label>
+     <label class="f">${F.tech}
+       <div id="techBox"></div>
+     </label>
+  `;
+ }
+
+ h += `</div></fieldset>`;
+
+ // ==========================================
+ // 3. CHECKLIST SECTIONS
+ // ==========================================
+ secs.forEach((s, si) => {
+  h += `<fieldset><legend>${s[0]}</legend>`;
+  s[1].forEach((it, ii) => {
+   const id = `${si}_${ii}`;
+   h += `
+   <div class="item" data-k="${esc(s[0].slice(0, 1) + '. ' + it)}">
+     <div class="nm">${ii + 1}. ${it}</div>
+     <div class="opts">` +
+     F.opts.map(o => `
+       <label class="${o === F.bad ? 'bad' : ''}">
+         <input type="radio" name="r${id}" value="${o}">
+         ${o}
+       </label>
+     `).join("") +
+     `</div>
+     <input type="text" class="note" name="n${id}" placeholder="Catatan (opsional)">
+   </div>`;
+  });
+  h += `</fieldset>`;
+ });
+
+ // Texts / Textareas
+ F.texts.forEach((t, i) => {
+  h += `<fieldset><legend>${String.fromCharCode(65 + secs.length + i)}. ${t}</legend><textarea name="T${i}"></textarea></fieldset>`;
+ });
+
+ // Pernyataan & Tanda Tangan
+ h += `
+ <fieldset>
+   <label class="chk">
+     <input type="checkbox" name="agree" required>
+     <span>${F.agree}</span>
+   </label>
+   <div class="sig" data-p="k">
+     <div class="bar"><span>Tanda tangan Konsumen</span><button type="button">Hapus</button></div>
+     <canvas width="600" height="225"></canvas>
+   </div>
+   <div class="sig" data-p="t">
+     <div class="bar"><span>Tanda tangan ${F.tech}</span><button type="button">Hapus</button></div>
+     <canvas width="600" height="225"></canvas>
+   </div>
+ </fieldset>
+ <button class="send" type="submit">Simpan ${F.title}</button>
+ </form>`;
+
+ $("#app").innerHTML = h;
+
+ // Event Listeners
+ if($("#cat")){
+  $("#cat").onchange = e => { cat = e.target.value; render(); };
+ }
+ if($("#catOut")){
+  $("#catOut").onchange = e => { 
+   cat = e.target.value; 
+   const sclVal = $("#sclSelect") ? $("#sclSelect").value : "";
+   render(sclVal); 
+  };
+ }
+
+ $("#site").onchange = e => {
+  currentSite = normalizeSite(e.target.value);
+  if(currentSite){ localStorage.setItem(SITE_STORAGE_KEY, currentSite); }
   updateSiteUI();
   renderTechField(currentSite);
-  if(cur==="OUT"){loadWO()}
+  if(cur === "OUT"){ loadSCL(); }
  };
- 
+
  const seriInput = $("#seriInput");
- if(seriInput){
-  seriInput.addEventListener("input", e=>{
-   lookupModel(e.target.value);
-  });
-  seriInput.addEventListener("change", e=>{
-   lookupModel(e.target.value);
+ if(seriInput && cur === "IN"){
+  seriInput.addEventListener("input", e => lookupModel(e.target.value));
+  seriInput.addEventListener("change", e => lookupModel(e.target.value));
+  seriInput.addEventListener("paste", e => {
+   setTimeout(() => lookupModel(e.target.value), 50);
   });
  }
+
+ const modelInput = $("#modelInput");
+ if(modelInput && cur === "IN"){
+  modelInput.addEventListener("change", e => {
+   const m = findProductModel(e.target.value);
+   if(m) e.target.value = m;
+  });
+  modelInput.addEventListener("blur", e => {
+   const m = findProductModel(e.target.value);
+   if(m) e.target.value = m;
+  });
+ }
+ updateModelDatalist();
 
  renderTechField(currentSite);
 
- if(cur==="OUT"){
-  $("#wo").onchange=fillFromWO;
-  if(currentSite){loadWO()}
+ if(cur === "OUT"){
+  loadSCL(preserveSCL);
  }
- $("#f").addEventListener("submit",submit);
+
+ $("#f").addEventListener("submit", submit);
  initPads();
 }
 
-let woItems=[];
-function jsonp(url,ms){return new Promise((res,rej)=>{
- const cb="cb"+Date.now()+Math.floor(Math.random()*1e4),sc=document.createElement("script");
- const done=()=>{clearTimeout(t);delete window[cb];sc.remove()};
- const t=setTimeout(()=>{done();rej(new Error("timeout"))},ms||20000);
- window[cb]=d=>{done();res(d)};
- sc.onerror=()=>{done();rej(new Error("network"))};
- sc.src=url+(url.includes("?")?"&":"?")+"callback="+cb;document.head.appendChild(sc)})}
-function setOpts(sel,first,list){sel.innerHTML="";const o0=document.createElement("option");o0.value="";o0.textContent=first;sel.appendChild(o0);
- list.forEach(w=>{const o=document.createElement("option");o.value=w.wo;o.textContent=w.wo+(w.model?" - "+w.model:"");sel.appendChild(o)})}
-async function loadWO(){
- const site=$("#site").value||currentSite,sel=$("#wo");woItems=[];if(!sel)return;sel.disabled=true;
- if(!site){setOpts(sel,"Pilih site dulu...",[]);return}
- setOpts(sel,"Memuat daftar WO...",[]);
- try{
-  const r=await jsonp(SCRIPT_URL+"?action=wo&site="+encodeURIComponent(site)+"&kategori="+encodeURIComponent(cat));
-  if(!r.ok)throw new Error(r.error||"error");
-  woItems=r.items;
-  setOpts(sel,woItems.length?"Pilih No. WO...":"Tidak ada WO PDI IN yang menunggu PDI OUT di site ini",woItems);
-  sel.disabled=!woItems.length;
- }catch(e){setOpts(sel,"Gagal memuat WO - pilih site lagi",[]);toast("Gagal memuat daftar WO. Cek koneksi dan deployment Apps Script.","#C8102E")}
+
+// ==============================================================================
+// FITUR CETAK DOKUMEN PDF (GABUNGAN PDI IN & PDI OUT)
+// ==============================================================================
+let printSclCache = [];
+
+function openPrintModal() {
+  const modal = $("#printModal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  
+  const siteCode = normalizeSite(currentSite || ($("#site") ? $("#site").value : ""));
+  $("#printSiteLabel").textContent = siteCode || "(Belum Pilih Site)";
+  
+  loadPrintSclList();
 }
-function fillFromWO(){
- const w=woItems.find(x=>x.wo===$("#wo").value);if(!w)return;
- const m={"Model Unit":w.model,"VIN":w.vin};
- Object.keys(m).forEach(k=>{const el=document.querySelector('#f [name="'+k+'"]');if(el&&m[k])el.value=m[k]});
- if(w.vin){lookupModel(w.vin)}
+
+function closePrintModal() {
+  const modal = $("#printModal");
+  if (modal) modal.style.display = "none";
 }
-const pads={};
-function initPads(){
- document.querySelectorAll(".sig").forEach(box=>{
-  const c=box.querySelector("canvas"),x=c.getContext("2d"),key=box.dataset.p;
-  x.lineWidth=3;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#111";
-  const st=pads[key]={c,dirty:false,box};
-  let on=false;
-  const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};
-  c.addEventListener("pointerdown",e=>{on=true;c.setPointerCapture(e.pointerId);const[a,b]=pt(e);x.beginPath();x.moveTo(a,b);x.lineTo(a+.1,b+.1);x.stroke();st.dirty=true;box.classList.remove("miss");e.preventDefault()});
-  c.addEventListener("pointermove",e=>{if(!on)return;const[a,b]=pt(e);x.lineTo(a,b);x.stroke();e.preventDefault()});
-  ["pointerup","pointercancel"].forEach(t=>c.addEventListener(t,()=>on=false));
-  box.querySelector("button").onclick=()=>{x.clearRect(0,0,c.width,c.height);st.dirty=false};
+
+async function loadPrintSclList() {
+  const sel = $("#printSclSelect");
+  const prevBox = $("#printPreviewBox");
+  const btnPrint = $("#btnDoPrint");
+  if (!sel) return;
+
+  sel.disabled = true;
+  sel.innerHTML = '<option value="">Memuat daftar NO. CASE...</option>';
+  if (prevBox) prevBox.style.display = "none";
+  if (btnPrint) btnPrint.disabled = true;
+
+  const siteCode = normalizeSite(currentSite || ($("#site") ? $("#site").value : ""));
+  let sclList = [];
+  const seenSCL = {};
+
+  // 1. Ambil dari pendingSCLItems yang sudah ada di memori
+  if (Array.isArray(pendingSCLItems)) {
+    pendingSCLItems.forEach(it => {
+      const s = String(it.scl || it.wo || "").trim();
+      if (!s || seenSCL[s.toUpperCase()]) return;
+      seenSCL[s.toUpperCase()] = true;
+      sclList.push({
+        scl: s,
+        model: it.model || "",
+        vin: it.vin || "",
+        tglIn: it.tgl || it.tglIn || "",
+        status: "PDI IN (Siap OUT)",
+        hasOut: false
+      });
+    });
+  }
+
+  // 2. Ambil dari riwayat lokal
+  const localHist = getLocalPdiInHistory();
+  localHist.forEach(it => {
+    if (normalizeSite(it.site) === siteCode) {
+      const s = String(it.scl || it.wo || "").trim();
+      if (!s || seenSCL[s.toUpperCase()]) return;
+      seenSCL[s.toUpperCase()] = true;
+      sclList.push({
+        scl: s,
+        model: it.model || "",
+        vin: it.vin || "",
+        tglIn: it.tgl || it.tglIn || "",
+        status: "PDI IN",
+        hasOut: false
+      });
+    }
+  });
+
+  // 3. Coba ambil daftar lengkap SCL untuk site ini dari Apps Script
+  try {
+    const res = await jsonp(SCRIPT_URL + "?action=get_print_list&site=" + encodeURIComponent(siteCode), 5000);
+    if (res && res.ok && Array.isArray(res.items)) {
+      res.items.forEach(it => {
+        const s = String(it.scl || it.wo || "").trim();
+        if (!s) return;
+        if (!seenSCL[s.toUpperCase()]) {
+          seenSCL[s.toUpperCase()] = true;
+          sclList.push(it);
+        } else {
+          // Update status if it has PDI OUT
+          const existing = sclList.find(x => x.scl.toUpperCase() === s.toUpperCase());
+          if (existing && it.isComplete) {
+            existing.hasOut = true;
+            existing.status = "Lengkap (PDI IN & OUT)";
+            existing.tglOut = it.tglOut;
+            existing.teknisiOut = it.teknisiOut;
+          }
+        }
+      });
+    }
+  } catch(e) {
+    console.log("Apps Script print list fetch:", e);
+  }
+
+  // Filter valid SCL
+  sclList = sclList.filter(it => isValidScl(it.scl || it.wo));
+
+  printSclCache = sclList;
+  sel.disabled = false;
+
+  // Jika di form PDI OUT saat ini sedang memilih SCL tertentu, jadikan default terpilih
+  const currentFormSCL = String($("#sclSelect") ? $("#sclSelect").value : "").trim();
+
+  if (sclList.length > 0) {
+    sel.innerHTML = '<option value="">-- Pilih NO. CASE untuk Dicetak --</option>' +
+      sclList.map(it => {
+        const badge = it.hasOut ? "✓ [Lengkap IN & OUT]" : "⏳ [PDI IN Saja]";
+        const isSel = (it.scl.toUpperCase() === currentFormSCL.toUpperCase());
+        return `<option value="${it.scl}"${isSel ? " selected" : ""}>${it.scl} - ${it.model || ''} (${it.vin || ''}) ${badge}</option>`;
+      }).join("");
+
+    if (currentFormSCL) {
+      sel.value = currentFormSCL;
+      onPrintSCLSelected();
+    }
+  } else {
+    sel.innerHTML = '<option value="">(Belum ada data NO. CASE untuk site ini)</option>';
+  }
+}
+
+function onPrintSCLSelected() {
+  const sel = $("#printSclSelect");
+  const prevBox = $("#printPreviewBox");
+  const btnPrint = $("#btnDoPrint");
+  if (!sel || !sel.value) {
+    if (prevBox) prevBox.style.display = "none";
+    if (btnPrint) btnPrint.disabled = true;
+    return;
+  }
+
+  const sclVal = sel.value.trim();
+  const item = printSclCache.find(x => x.scl.toUpperCase() === sclVal.toUpperCase()) || { scl: sclVal };
+
+  $("#prevSCLTitle").textContent = "NO. CASE: " + sclVal;
+  $("#prevModel").textContent = item.model || "-";
+  $("#prevVIN").textContent = item.vin || "-";
+  $("#prevStatusIn").textContent = "✓ Ada (Tgl: " + (item.tglIn || "-") + ")";
+  
+  if (item.hasOut || item.tglOut) {
+    $("#prevStatusOut").innerHTML = '<span style="color:#2E7D32; font-weight:bold;">✓ Selesai (Tgl: ' + (item.tglOut || "-") + ')</span>';
+  } else {
+    $("#prevStatusOut").innerHTML = '<span style="color:#F57C00; font-weight:bold;">⏳ Masih di PDI IN (Siap OUT)</span>';
+  }
+
+  if (prevBox) prevBox.style.display = "block";
+  if (btnPrint) btnPrint.disabled = false;
+}
+
+async function executePrintPDF() {
+  const sel = $("#printSclSelect");
+  if (!sel || !sel.value) {
+    alert("Silakan pilih NO. CASE yang ingin dicetak terlebih dahulu.");
+    return;
+  }
+
+  const targetSCL = String(sel.value).trim().toUpperCase();
+  const btn = $("#btnDoPrint");
+  const origBtnText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Menyiapkan Dokumen PDF...";
+
+  try {
+    let inData = {};
+    let outData = {};
+
+    // 1. Ambil salinan lokal jika pernah diisi di perangkat ini
+    try {
+      const locIn = localStorage.getItem("pdi_in_data_" + targetSCL);
+      if (locIn) Object.assign(inData, JSON.parse(locIn));
+      const locOut = localStorage.getItem("pdi_out_data_" + targetSCL);
+      if (locOut) Object.assign(outData, JSON.parse(locOut));
+    } catch(e) {}
+
+    // 2. Jika saat ini form PDI OUT sedang aktif untuk NO. CASE ini, ambil form terkini
+    if (cur === "OUT") {
+      const curFormSCL = String($("#sclSelect") ? $("#sclSelect").value : "").trim().toUpperCase();
+      if (curFormSCL === targetSCL) {
+        try {
+          const liveForm = serialize(document.forms.f);
+          Object.assign(outData, liveForm);
+        } catch(e) {}
+      }
+    }
+
+    // 3. Ambil data lengkap dari Google Sheets (PDIIN & PDOUT) via GViz
+    try {
+      const [resGvizIn, resGvizOut] = await Promise.all([
+        fetchGvizSheet(SHEET_NAME_IN).catch(() => null),
+        fetchGvizSheet(SHEET_NAME_OUT).catch(() => null)
+      ]);
+
+      if (resGvizIn && resGvizIn.rows) {
+        for (let i = resGvizIn.rows.length - 1; i >= 0; i--) {
+          const r = resGvizIn.rows[i];
+          const s = String(r["No CASE"] || r["NO. CASE"] || r["No SCL"] || r["No WO"] || "").trim().toUpperCase();
+          if (s === targetSCL) {
+            Object.keys(r).forEach(k => {
+              if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
+                inData[k] = r[k];
+              }
+            });
+            break;
+          }
+        }
+      }
+
+      if (resGvizOut && resGvizOut.rows) {
+        for (let j = resGvizOut.rows.length - 1; j >= 0; j--) {
+          const r = resGvizOut.rows[j];
+          const s = String(r["No CASE"] || r["NO. CASE"] || r["No SCL"] || r["No WO"] || "").trim().toUpperCase();
+          if (s === targetSCL) {
+            Object.keys(r).forEach(k => {
+              if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
+                outData[k] = r[k];
+              }
+            });
+            break;
+          }
+        }
+      }
+    } catch(errGviz) {
+      console.warn("Gviz sync in executePrintPDF:", errGviz);
+    }
+
+    // 4. Susun Dokumen Cetak ke dalam container #printReportArea
+    renderPrintDocument(targetSCL, inData, outData);
+
+    // 5. Beri jeda 350ms, sembunyikan #app dan #printModal di DOM, lalu panggil window.print()
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = origBtnText;
+
+      const appEl = document.getElementById("app");
+      const printModalEl = document.getElementById("printModal");
+      if (appEl) appEl.style.setProperty("display", "none", "important");
+      if (printModalEl) printModalEl.style.setProperty("display", "none", "important");
+      document.body.classList.add("is-printing");
+
+      const restorePrint = () => {
+        if (appEl) appEl.style.display = "";
+        if (printModalEl) printModalEl.style.display = "";
+        document.body.classList.remove("is-printing");
+        window.removeEventListener("afterprint", restorePrint);
+      };
+      window.addEventListener("afterprint", restorePrint);
+      setTimeout(restorePrint, 2500);
+
+      window.print();
+    }, 350);
+
+  } catch(err) {
+    alert("Gagal memproses cetak PDF: " + err.message);
+    btn.disabled = false;
+    btn.innerHTML = origBtnText;
+  }
+}
+
+function renderPrintDocument(scl, inData, outData) {
+  const area = $("#printReportArea");
+  if (!area) return;
+
+  const site = inData["Site Service Center"] || outData["Site Service Center"] || currentSite || "-";
+  const kat = inData["Kategori Produk"] || outData["Kategori Produk"] || "Motor Listrik (EV)";
+  const model = inData["Model Unit"] || outData["Model Unit"] || "-";
+  const vin = inData["VIN"] || outData["VIN"] || "-";
+  const layanan = inData["Jenis Layanan"] || outData["Jenis Layanan"] || "-";
+  const namaKonsumen = inData["Nama Konsumen"] || "-";
+  const noTelepon = inData["No Telepon"] || "";
+  const noPolisi = inData["No Polisi"] || "";
+  const warnaUnit = inData["Warna Unit"] || "";
+  const odo = inData["Odometer"] || "";
+  
+  const tglIn = inData["Tanggal"] || inData["Waktu Submit"] || "-";
+  const tglOut = outData["Tanggal"] || outData["Waktu Submit"] || "(Belum Selesai PDI OUT)";
+  const tekIn = inData["Teknisi"] || "-";
+  const tekOut = outData["Teknisi"] || "(Belum Ditentukan)";
+
+  const keluhanIn = inData["Keluhan Konsumen"] || inData["Catatan Tambahan Teknisi"] || "-";
+  const ringkasanOut = outData["Ringkasan Pekerjaan"] || outData["Catatan Tambahan Teknisi"] || outData["Hasil Pemeriksaan Akhir"] || "-";
+
+  // Ambil Tanda Tangan: Utamakan Base64 lokal, jika tidak ada baru gunakan Link Drive
+  const cleanSclKey = String(scl).trim().toUpperCase();
+  const rawSigKonsumen = localStorage.getItem("pdi_sig_konsumen_" + cleanSclKey) || outData["TTD Konsumen (link)"] || inData["TTD Konsumen (link)"] || "";
+  const rawSigTekIn = localStorage.getItem("pdi_sig_tek_in_" + cleanSclKey) || inData["TTD Teknisi (link)"] || "";
+  const rawSigTekOut = localStorage.getItem("pdi_sig_tek_out_" + cleanSclKey) || outData["TTD Teknisi (link)"] || "";
+
+  // Helper untuk mengubah Google Drive link atau Base64 menjadi URL Gambar asli
+  function resolveSigImage(sigVal) {
+    if (!sigVal || typeof sigVal !== "string") return { src: "", driveLink: "" };
+    const v = sigVal.trim();
+    if (v.indexOf("data:image") === 0) {
+      return { src: v, driveLink: "" };
+    }
+    if (v.indexOf("http") === 0) {
+      const m1 = v.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      const m2 = v.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      const fileId = (m1 && m1[1]) ? m1[1] : ((m2 && m2[1]) ? m2[1] : "");
+      if (fileId) {
+        return {
+          src: "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w600",
+          driveLink: v
+        };
+      }
+      return { src: v, driveLink: v };
+    }
+    return { src: "", driveLink: "" };
+  }
+
+  // Render Box TTD dengan Gambar TTD Asli
+  function renderSigBox(title, name, rawSig, dateVal) {
+    const { src, driveLink } = resolveSigImage(rawSig);
+    let imgHtml = "";
+
+    if (src) {
+      imgHtml = `<img src="${src}" style="max-height:48px; max-width:92%; object-fit:contain;" alt="TTD">`;
+      if (driveLink) {
+        imgHtml += `<div style="font-size:6.5pt; color:#666; margin-top:1px;"><a href="${driveLink}" target="_blank" style="color:#0D47A1; text-decoration:underline;">Link Drive ↗</a></div>`;
+      }
+    } else if (rawSig && (rawSig.indexOf("Tersimpan") !== -1 || rawSig.indexOf("Aplikasi") !== -1)) {
+      imgHtml = `<div style="font-size:8pt; color:#2E7D32; font-weight:bold; border:1px dashed #2E7D32; padding:3px 6px; border-radius:3px; display:inline-block;">✓ Terverifikasi Digital</div>`;
+    } else {
+      imgHtml = `<div style="font-size:7.5pt; color:#888; font-style:italic; padding-top:10px;">(Belum Ada Tanda Tangan)</div>`;
+    }
+
+    return `
+    <div class="sig-col">
+      <div class="sig-col-title">${title}</div>
+      <div class="sig-img-box">${imgHtml}</div>
+      <div class="sig-name">${name}</div>
+      <div class="sig-date">${dateVal}</div>
+    </div>`;
+  }
+
+  const isEV = !kat.includes("Elektronik") && !kat.includes("Non-EV");
+
+  // Helper render baris tabel checklist
+  function renderChecklistRows(groups, startNum = 1) {
+    let rowsHtml = "";
+    let counter = startNum;
+    groups.forEach(grp => {
+      rowsHtml += `<tr><td colspan="5" style="background:#eef3f8; font-weight:bold; color:#0D47A1; padding:2px 5px; font-size:8pt;">${grp.cat}</td></tr>`;
+      grp.items.forEach(it => {
+        let valIn = inData[it.inKey] || "";
+        if (!valIn) {
+          for (const k in inData) {
+            if (k.indexOf(it.name) !== -1 || (it.inKey && k.indexOf(it.inKey.replace(/^[A-Z]\.\s*/, "")) !== -1)) {
+              valIn = inData[k]; break;
+            }
+          }
+        }
+        if (!valIn) valIn = "-";
+
+        let valOut = outData[it.outKey] || "";
+        if (!valOut) {
+          for (const k in outData) {
+            if (k.indexOf(it.name) !== -1 || (it.outKey && k.indexOf(it.outKey.replace(/^[A-Z]\.\s*/, "")) !== -1)) {
+              valOut = outData[k]; break;
+            }
+          }
+        }
+        if (!valOut) valOut = "-";
+
+        let badgeIn = valIn;
+        if (valIn === "Baik" || valIn === "Ada") badgeIn = `<span class="badge-ok">✓ ${valIn}</span>`;
+        else if (valIn === "Rusak" || valIn === "Tidak Ada") badgeIn = `<span class="badge-ng">✕ ${valIn}</span>`;
+
+        let badgeOut = valOut;
+        if (valOut === "OK" || valOut === "Ada" || valOut === "Baik") badgeOut = `<span class="badge-ok">✓ ${valOut}</span>`;
+        else if (valOut === "Tidak OK" || valOut === "Tidak Ada") badgeOut = `<span class="badge-ng">✕ ${valOut}</span>`;
+        else if (valOut === "N/A") badgeOut = `<span class="badge-na">- N/A -</span>`;
+
+        rowsHtml += `
+        <tr>
+          <td style="text-align:center; width:5%;">${counter++}</td>
+          <td style="width:47%; font-weight:600;">${it.name}</td>
+          <td style="text-align:center; width:21%;">${badgeIn}</td>
+          <td style="text-align:center; width:21%;">${badgeOut}</td>
+          <td style="width:6%; text-align:center; color:#2E7D32; font-weight:bold;">✓</td>
+        </tr>`;
+      });
+    });
+    return { html: rowsHtml, nextCounter: counter };
+  }
+
+  const nowStr = new Date().toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
+
+  const konsDisp = (namaKonsumen && namaKonsumen !== "-") 
+    ? (namaKonsumen + (noTelepon ? ` (${noTelepon})` : "")) 
+    : "-";
+  const platWarna = [noPolisi, warnaUnit].filter(x => x && x !== "-").join(" / ") || "-";
+
+  let htmlDoc = "";
+
+  if (!isEV) {
+    // ==========================================
+    // NON-EV / ELEKTRONIK -> 1 HALAMAN PAS (A4)
+    // ==========================================
+    const nonEvGroups = [
+      { cat: "A. Kelengkapan Unit & Aksesoris", items: [
+        { name: "Unit utama", inKey: "A. Unit utama", outKey: "D. Remote / aksesoris standar" },
+        { name: "Kabel power / adaptor", inKey: "A. Kabel power / adaptor", outKey: "D. Kabel power / adaptor" },
+        { name: "Remote / aksesoris standar", inKey: "A. Remote / aksesoris standar (jika ada)", outKey: "D. Remote / aksesoris standar" },
+        { name: "Buku manual / kartu garansi", inKey: "A. Buku manual / kartu garansi", outKey: "D. Buku manual / kartu garansi" },
+        { name: "Dus / kemasan packing", inKey: "A. Dus / packing (jika ada)", outKey: "D. Buku manual / kartu garansi" }
+      ]},
+      { cat: "B. Kondisi Fisik & Komponen", items: [
+        { name: "Casing / bodi depan", inKey: "B. Casing / bodi depan", outKey: "B. Unit bersih luar dalam" },
+        { name: "Casing / bodi belakang & samping", inKey: "B. Casing / bodi belakang & samping", outKey: "B. Casing rapat & baut lengkap" },
+        { name: "Layar / panel display", inKey: "B. Layar / panel display (jika ada)", outKey: "B. Layar / panel bersih & tidak gores baru" },
+        { name: "Tombol & kenop kontrol", inKey: "B. Tombol & kenop kontrol", outKey: "C. Semua port / tombol berfungsi normal" },
+        { name: "Label / stiker nomor seri", inKey: "B. Label / stiker nomor seri terbaca", outKey: "C. Semua port / tombol berfungsi normal" },
+        { name: "Kaki / roda / penyangga", inKey: "B. Kaki / roda / penyangga (jika ada)", outKey: "B. Casing rapat & baut lengkap" }
+      ]},
+      { cat: "C. Verifikasi Uji Fungsi & Serah Terima", items: [
+        { name: "Keluhan konsumen teratasi", inKey: "Keluhan Konsumen", outKey: "A. Keluhan konsumen teratasi" },
+        { name: "Pekerjaan sesuai Work Order", inKey: "Jenis Layanan", outKey: "A. Pekerjaan sesuai Work Order" },
+        { name: "Part bekas dikembalikan / dicatat", inKey: "Catatan Tambahan Teknisi", outKey: "A. Part bekas dikembalikan / dicatat" },
+        { name: "Fungsi utama bekerja normal", inKey: "Catatan Tambahan Teknisi", outKey: "C. Fungsi utama bekerja normal" },
+        { name: "Uji nyala (running test) lolos", inKey: "Catatan Tambahan Teknisi", outKey: "C. Uji nyala (burn-in / running test) lolos" }
+      ]}
+    ];
+
+    const { html: nonEvTableRows } = renderChecklistRows(nonEvGroups);
+
+    htmlDoc = `
+    <div class="print-page">
+      <div class="print-header">
+        <div>
+          <div class="print-brand-title">POLYTRON SERVICE CENTER</div>
+          <div class="print-brand-sub">PT. HARTONO ISTANA TEKNOLOGI - SITE ${site}</div>
+        </div>
+        <div class="print-doc-meta">
+          <div class="print-doc-title">LEMBAR PEMERIKSAAN PERANGKAT (PDI)</div>
+          <div class="print-doc-sub">PRE-DELIVERY INSPECTION (IN & OUT)</div>
+          <div class="print-doc-no">NO. CASE: <strong>${scl}</strong></div>
+        </div>
+      </div>
+
+      <table class="print-table">
+        <tr>
+          <th width="16%">NO. CASE</th>
+          <td width="34%"><strong>${scl}</strong></td>
+          <th width="16%">Site Service Center</th>
+          <td width="34%"><strong>${site}</strong></td>
+        </tr>
+        <tr>
+          <th>Kategori Produk</th>
+          <td>${kat}</td>
+          <th>Model / Tipe Unit</th>
+          <td><strong>${model}</strong></td>
+        </tr>
+        <tr>
+          <th>No. Seri / VIN</th>
+          <td><span class="mono"><strong>${vin}</strong></span></td>
+          <th>Jenis Layanan</th>
+          <td><strong>${layanan}</strong></td>
+        </tr>
+        <tr>
+          <th>Nama Konsumen</th>
+          <td>${konsDisp}</td>
+          <th>Warna / Keterangan</th>
+          <td>${platWarna}</td>
+        </tr>
+        <tr>
+          <th>Tanggal PDI IN</th>
+          <td>${tglIn} (Teknisi: <strong>${tekIn}</strong>)</td>
+          <th>Tanggal PDI OUT</th>
+          <td>${tglOut} (Teknisi: <strong>${tekOut}</strong>)</td>
+        </tr>
+      </table>
+
+      <table class="print-table">
+        <tr>
+          <th width="50%">Keluhan Konsumen / Catatan Masuk (PDI IN):</th>
+          <th width="50%">Ringkasan Pekerjaan / Catatan Keluar (PDI OUT):</th>
+        </tr>
+        <tr>
+          <td style="min-height:28px; vertical-align:top; font-size:8pt;">${keluhanIn}</td>
+          <td style="min-height:28px; vertical-align:top; font-size:8pt;">${ringkasanOut}</td>
+        </tr>
+      </table>
+
+      <div class="print-section-hdr">DAFTAR PEMERIKSAAN KONDISI & UJI FUNGSI (PDI IN vs PDI OUT)</div>
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th style="text-align:center;">No</th>
+            <th>Item / Komponen Pemeriksaan</th>
+            <th style="text-align:center;">Hasil PDI IN (Masuk)</th>
+            <th style="text-align:center;">Hasil PDI OUT (Keluar)</th>
+            <th style="text-align:center;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${nonEvTableRows}
+        </tbody>
+      </table>
+
+      <div class="print-signatures">
+        ${renderSigBox("Konsumen / Penerima", namaKonsumen !== "-" ? namaKonsumen : "( .................................. )", rawSigKonsumen, tglOut !== "(Belum Selesai PDI OUT)" ? tglOut : tglIn)}
+        ${renderSigBox("Teknisi Penerima (PDI IN)", tekIn, rawSigTekIn, tglIn)}
+        ${renderSigBox("Teknisi / QC (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
+      </div>
+
+      <div class="print-footer">
+        <div>Dokumen digital resmi diterbitkan oleh Sistem PDI Polytron Service Center | ID: PDI-${scl}</div>
+        <div>Halaman 1 dari 1 | Waktu Cetak: ${nowStr}</div>
+      </div>
+    </div>`;
+
+  } else {
+    // ==========================================
+    // MOTOR LISTRIK (EV) -> 2 HALAMAN PRESISI
+    // ==========================================
+    const evPart1 = [
+      { cat: "A. Kelengkapan Unit & Dokumen", items: [
+        { name: "Kunci kontak / Smart key", inKey: "A. Kunci kontak / Smart key", outKey: "C. Fitur remote / smart key aktif" },
+        { name: "Charger & kabel charger", inKey: "A. Charger & kabel charger", outKey: "C. Port / konektor charging bersih & tertutup" },
+        { name: "Buku manual / kartu garansi", inKey: "A. Buku manual / kartu garansi", outKey: "D. Buku manual / buku servis diserahkan" },
+        { name: "Aksesoris standar bawaan", inKey: "A. Aksesoris standar bawaan (jika ada)", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
+        { name: "Spion kiri & kanan", inKey: "A. Spion kiri & kanan", outKey: "B. Spion kiri & kanan terpasang kencang" },
+        { name: "Jok / seat", inKey: "A. Jok / seat", outKey: "B. Jok / box terpasang & terkunci baik" },
+        { name: "Box / bagasi (jika ada)", inKey: "A. Box / bagasi (jika ada)", outKey: "B. Jok / box terpasang & terkunci baik" }
+      ]},
+      { cat: "B. Kondisi Fisik, Bodi & Cat", items: [
+        { name: "Body depan (lecet / retak / pecah)", inKey: "B. Body depan (lecet / retak / pecah)", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
+        { name: "Body belakang (lecet / retak / pecah)", inKey: "B. Body belakang (lecet / retak / pecah)", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
+        { name: "Cat & stiker bodi", inKey: "B. Cat & stiker bodi", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
+        { name: "Lampu depan", inKey: "B. Lampu depan", outKey: "B. Lampu depan, belakang & sein berfungsi" },
+        { name: "Lampu belakang / rem", inKey: "B. Lampu belakang / rem", outKey: "B. Lampu depan, belakang & sein berfungsi" },
+        { name: "Lampu sein kiri & kanan", inKey: "B. Lampu sein kiri & kanan", outKey: "B. Lampu depan, belakang & sein berfungsi" },
+        { name: "Spakbor depan & belakang", inKey: "B. Spakbor depan & belakang", outKey: "B. Baut body / cover / fairing kencang, tidak ada yang kendor" },
+        { name: "Standar samping & standar tengah", inKey: "B. Standar samping & standar tengah", outKey: "B. Unit bersih (bodi, jok, velg)" }
+      ]}
+    ];
+
+    const evPart2 = [
+      { cat: "C. Sistem Kelistrikan & Fitur", items: [
+        { name: "Kondisi fisik baterai & segel", inKey: "C. Kondisi fisik baterai & segel", outKey: "C. Baterai terpasang & segel utuh" },
+        { name: "Panel instrumen / dashboard", inKey: "C. Panel instrumen / dashboard menyala normal", outKey: "C. Dashboard menyala normal, tanpa kode error" },
+        { name: "Klakson", inKey: "C. Klakson", outKey: "C. Klakson berfungsi normal" },
+        { name: "Speedometer / indikator kecepatan", inKey: "C. Speedometer / indikator kecepatan", outKey: "C. Dashboard menyala normal, tanpa kode error" },
+        { name: "Port / konektor charging", inKey: "C. Port / konektor charging", outKey: "C. Port / konektor charging bersih & tertutup" }
+      ]},
+      { cat: "D. Sistem Pengereman & Roda", items: [
+        { name: "Rem depan", inKey: "D. Rem depan", outKey: "D. Rem depan & belakang berfungsi pakem" },
+        { name: "Rem belakang", inKey: "D. Rem belakang", outKey: "D. Rem depan & belakang berfungsi pakem" },
+        { name: "Kabel / hose rem", inKey: "D. Kabel / hose rem", outKey: "D. Lampu rem menyala saat tuas ditarik" },
+        { name: "Kondisi & tekanan ban depan", inKey: "E. Ban depan", outKey: "E. Tekanan angin ban depan & belakang sesuai standar" },
+        { name: "Kondisi & tekanan ban belakang", inKey: "E. Ban belakang", outKey: "E. Tekanan angin ban depan & belakang sesuai standar" },
+        { name: "Suspensi depan & belakang", inKey: "E. Suspensi depan", outKey: "E. Suspensi bekerja normal tanpa kebocoran oli" }
+      ]},
+      { cat: "E. Verifikasi Akhir & Test Ride", items: [
+        { name: "Keluhan konsumen teratasi", inKey: "Keluhan Konsumen", outKey: "A. Keluhan konsumen sudah teratasi" },
+        { name: "Pekerjaan sesuai Work Order", inKey: "Jenis Layanan", outKey: "A. Pekerjaan sesuai Work Order" },
+        { name: "Part bekas dikembalikan / dicatat", inKey: "Catatan Tambahan Teknisi", outKey: "A. Part bekas dikembalikan / dicatat (jika diminta)" },
+        { name: "Suara motor saat akselerasi", inKey: "F. Suara motor saat dihidupkan", outKey: "F. Suara motor halus saat akselerasi" },
+        { name: "Respon throttle / gas halus", inKey: "F. Respon handle gas / throttle", outKey: "F. Respon throttle / gas halus & responsif" },
+        { name: "Pengereman & handling seimbang", inKey: "F. Getaran tidak normal saat berjalan", outKey: "F. Handling stabil & lurus" }
+      ]}
+    ];
+
+    const { html: evRows1, nextCounter } = renderChecklistRows(evPart1, 1);
+    const { html: evRows2 } = renderChecklistRows(evPart2, nextCounter);
+
+    htmlDoc = `
+    <!-- HALAMAN 1 DARI 2 -->
+    <div class="print-page">
+      <div class="print-header">
+        <div>
+          <div class="print-brand-title">POLYTRON SERVICE CENTER</div>
+          <div class="print-brand-sub">PT. HARTONO ISTANA TEKNOLOGI - SITE ${site}</div>
+        </div>
+        <div class="print-doc-meta">
+          <div class="print-doc-title">LEMBAR PEMERIKSAAN KENDARAAN (PDI)</div>
+          <div class="print-doc-sub">PRE-DELIVERY INSPECTION (IN & OUT)</div>
+          <div class="print-doc-no">NO. CASE: <strong>${scl}</strong></div>
+        </div>
+      </div>
+
+      <table class="print-table">
+        <tr>
+          <th width="16%">NO. CASE</th>
+          <td width="34%"><strong>${scl}</strong></td>
+          <th width="16%">Site Service Center</th>
+          <td width="34%"><strong>${site}</strong></td>
+        </tr>
+        <tr>
+          <th>Kategori Produk</th>
+          <td>${kat}</td>
+          <th>Model / Tipe Unit</th>
+          <td><strong>${model}</strong></td>
+        </tr>
+        <tr>
+          <th>No. Rangka / VIN</th>
+          <td><span class="mono"><strong>${vin}</strong></span></td>
+          <th>Jenis Layanan</th>
+          <td><strong>${layanan}</strong></td>
+        </tr>
+        <tr>
+          <th>Nama Konsumen</th>
+          <td>${konsDisp}</td>
+          <th>No. Polisi / Warna</th>
+          <td>${platWarna}</td>
+        </tr>
+        <tr>
+          <th>Odometer</th>
+          <td>${odo ? odo + " km" : "-"}</td>
+          <th>Tanggal Cetak</th>
+          <td>${nowStr}</td>
+        </tr>
+        <tr>
+          <th>Tanggal PDI IN</th>
+          <td>${tglIn} (Teknisi: <strong>${tekIn}</strong>)</td>
+          <th>Tanggal PDI OUT</th>
+          <td>${tglOut} (Teknisi: <strong>${tekOut}</strong>)</td>
+        </tr>
+      </table>
+
+      <table class="print-table">
+        <tr>
+          <th width="50%">Keluhan Konsumen / Catatan Masuk (PDI IN):</th>
+          <th width="50%">Ringkasan Pekerjaan / Catatan Keluar (PDI OUT):</th>
+        </tr>
+        <tr>
+          <td style="min-height:28px; vertical-align:top; font-size:8pt;">${keluhanIn}</td>
+          <td style="min-height:28px; vertical-align:top; font-size:8pt;">${ringkasanOut}</td>
+        </tr>
+      </table>
+
+      <div class="print-section-hdr">DAFTAR PEMERIKSAAN FISIK & KELENGKAPAN (BAGIAN 1)</div>
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th style="text-align:center;">No</th>
+            <th>Item / Komponen Pemeriksaan</th>
+            <th style="text-align:center;">Hasil PDI IN (Masuk)</th>
+            <th style="text-align:center;">Hasil PDI OUT (Keluar)</th>
+            <th style="text-align:center;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${evRows1}
+        </tbody>
+      </table>
+
+      <div class="print-footer">
+        <div>Dokumen digital resmi diterbitkan oleh Sistem PDI Polytron Service Center | ID: PDI-${scl}</div>
+        <div>Halaman 1 dari 2</div>
+      </div>
+    </div>
+
+    <!-- PEMISAH HALAMAN PRESISI -->
+    <div class="print-page-break"></div>
+
+    <!-- HALAMAN 2 DARI 2 -->
+    <div class="print-page">
+      <div class="print-header-mini">
+        <span>POLYTRON SERVICE CENTER - LEMBAR PEMERIKSAAN KENDARAAN (PDI LANJUTAN)</span>
+        <span>NO. CASE: <strong>${scl}</strong></span>
+      </div>
+
+      <div class="print-section-hdr">DAFTAR PEMERIKSAAN SISTEM, FITUR & UJI JALAN (BAGIAN 2)</div>
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th style="text-align:center;">No</th>
+            <th>Item / Komponen Pemeriksaan</th>
+            <th style="text-align:center;">Hasil PDI IN (Masuk)</th>
+            <th style="text-align:center;">Hasil PDI OUT (Keluar)</th>
+            <th style="text-align:center;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${evRows2}
+        </tbody>
+      </table>
+
+      <div class="print-signatures">
+        ${renderSigBox("Konsumen / Penerima", namaKonsumen !== "-" ? namaKonsumen : "( .................................. )", rawSigKonsumen, tglOut !== "(Belum Selesai PDI OUT)" ? tglOut : tglIn)}
+        ${renderSigBox("Teknisi Penerima (PDI IN)", tekIn, rawSigTekIn, tglIn)}
+        ${renderSigBox("Teknisi / QC (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
+      </div>
+
+      <div class="print-footer">
+        <div>Dokumen digital resmi diterbitkan oleh Sistem PDI Polytron Service Center | ID: PDI-${scl}</div>
+        <div>Halaman 2 dari 2 | Waktu Cetak: ${nowStr}</div>
+      </div>
+    </div>`;
+  }
+
+  area.innerHTML = htmlDoc;
+}
+// ==========================================
+// PDI OUT SCL PAIRING & STRICT FILTER BY SITE
+// ==========================================
+function isValidScl(val){
+ const s = String(val || "").toLowerCase().trim();
+ return !!(s && s.length >= 8 && !s.endsWith("/") && !s.includes("xxxx") && !s.includes("test") && !s.includes("pldtes") && s !== "123");
+}
+
+function getLocalPdiInHistory(){
+ try {
+  let hist = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "[]");
+  return hist
+   .filter(x => isValidScl(x.scl || x.wo))
+   .map(x => {
+    const s = String(x.scl || x.wo || "").trim().toUpperCase();
+    x.scl = s;
+    x.wo = s;
+    return x;
+   });
+ } catch(e){
+  return [];
+ }
+}
+
+function savePdiInRecord(record){
+ try {
+  let hist = getLocalPdiInHistory();
+  hist = hist.filter(x => x.scl !== record.scl && x.wo !== record.scl);
+  hist.unshift(record);
+  if(hist.length > 100) hist = hist.slice(0, 100);
+  localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(hist));
+ } catch(e){}
+}
+
+// Menghapus SCL dari lokal history saat PDI OUT berhasil disimpan
+function markSclCompletedLocally(sclVal){
+ try {
+  let hist = getLocalPdiInHistory();
+  hist = hist.filter(x => x.scl !== sclVal && x.wo !== sclVal);
+  localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(hist));
+ } catch(e){}
+}
+
+// Memuat daftar No SCL Pending (dari PDI IN yang belum selesai di PDI OUT)
+async function loadSCL(preselectSCL=""){
+ const sel = $("#sclSelect");
+ if(!sel) return;
+ sel.disabled = true;
+
+ const siteCode = normalizeSite(currentSite || ($("#site") ? $("#site").value : ""));
+ if(!siteCode){
+  sel.innerHTML = '<option value="">-- Pilih Site Dulu --</option>';
+  sel.disabled = false;
+  return;
+ }
+
+ sel.innerHTML = `<option value="">Memuat data...</option>`;
+ showLoader("");
+
+ let items = [];
+ let loadedFromServer = false;
+
+ // 1. Coba ambil dari Google Apps Script API (Single Source of Truth)
+ try {
+  const r = await jsonp(SCRIPT_URL + "?action=get_pending_scl&site=" + encodeURIComponent(siteCode), 6000);
+  if(r && r.ok && Array.isArray(r.items)){
+   items = r.items;
+   loadedFromServer = true;
+  }
+ } catch(e){
+  console.log("Apps Script SCL query fallback to GViz:", e);
+ }
+
+ // 2. Jika Apps Script belum merespon, ambil langsung dari Google Visualization API (PDIIN & PDOUT)
+ if(!loadedFromServer){
+  try {
+   const [resIn, resOut] = await Promise.all([
+     fetchGvizSheet(SHEET_NAME_IN),
+     fetchGvizSheet(SHEET_NAME_OUT)
+   ]);
+
+   if(resIn && resIn.table && Array.isArray(resIn.table.rows)){
+    const completedSet = {};
+    const rowsOut = resOut?.table?.rows || [];
+    let startRowOut = 0;
+    if(rowsOut.length > 0 && String(rowsOut[0]?.c?.[3]?.v || "").toUpperCase() === "NO SCL"){
+     startRowOut = 1;
+    }
+
+    for(let o = startRowOut; o < rowsOut.length; o++){
+     const rO = rowsOut[o];
+     if(!rO || !rO.c || rO.c.length <= 3) continue;
+     const outWO = String(rO.c[3]?.v || "").trim().toUpperCase();
+     if(outWO) completedSet[outWO] = true;
+    }
+
+    const rowsIn = resIn.table.rows;
+    let startRowIn = 0;
+    if(rowsIn.length > 0 && String(rowsIn[0]?.c?.[2]?.v || "").toUpperCase() === "NO SCL"){
+     startRowIn = 1;
+    }
+
+    for(let i = startRowIn; i < rowsIn.length; i++){
+     const r = rowsIn[i];
+     if(!r || !r.c || r.c.length <= 2) continue;
+     const scl = String(r.c[2]?.v || "").trim();
+     if(!scl) continue;
+
+     const rawSite = String(r.c[12]?.v || "").trim();
+     if(normalizeSite(rawSite) !== siteCode) continue;
+
+     // Abaikan jika sudah pernah PDI OUT di Google Sheets
+     if(completedSet[scl.toUpperCase()]) continue;
+
+     const model = String(r.c[5]?.v || "").trim();
+     const vin = String(r.c[7]?.v || "").trim();
+     const layanan = String(r.c[3]?.v || "").trim();
+     const teknisi = String(r.c[13]?.v || "").trim();
+     const rawCat = (r.c.length > 52 && r.c[52]?.v) ? String(r.c[52].v).trim() : "";
+
+     let normCat = "Motor Listrik (EV)";
+     if(rawCat && !rawCat.includes("EV") && !rawCat.includes("Motor")){
+      normCat = "Non-EV / Elektronik";
+     }
+
+     const cleanSCL = scl.toUpperCase();
+     items.push({
+      scl: cleanSCL,
+      wo: cleanSCL,
+      model: model,
+      vin: vin,
+      cat: normCat,
+      layanan: layanan,
+      teknisi: teknisi,
+      site: rawSite
+     });
+    }
+
+    items.reverse();
+    loadedFromServer = true;
+   }
+  } catch(errGviz){
+   console.log("Direct GViz check error:", errGviz);
+  }
+ }
+
+ // 3. HAPUS CACHE / LOCAL STORAGE JIKA TIDAK ADA DI GOOGLE SHEETS
+ if(loadedFromServer){
+  const serverSclSet = new Set(items.map(it => String(it.scl || it.wo || "").trim().toUpperCase()));
+  try {
+   let hist = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "[]");
+   let filteredHist = hist.filter(loc => {
+    const k = String(loc.scl || loc.wo || "").trim().toUpperCase();
+    return serverSclSet.has(k);
+   });
+   localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(filteredHist));
+  } catch(e){}
+ }
+
+ // Filter test data & invalid SCL
+ items = items.filter(it => isValidScl(it.scl || it.wo));
+ pendingSCLItems = items;
+
+ if(items.length > 0){
+  sel.innerHTML = `<option value="">-- Pilih NO. CASE --</option>` +
+   items.map(w => {
+    const s = String(w.scl || w.wo || "").trim().toUpperCase();
+    const isSel = (s === String(preselectSCL).trim().toUpperCase());
+    return `<option value="${s}"${isSel ? " selected" : ""}>${s}</option>`;
+   }).join("") +
+   '<option value="__MANUAL__">+ Ketik Manual NO. CASE Lain...</option>';
+ } else {
+  sel.innerHTML = `<option value="">-- Tidak ada data NO. CASE pending (${siteCode}) --</option>` +
+   '<option value="__MANUAL__">+ Ketik Manual NO. CASE Lain...</option>';
+ }
+
+ sel.disabled = false;
+ sel.onchange = () => onSCLChange();
+
+ if(preselectSCL){
+  sel.value = String(preselectSCL).trim().toUpperCase();
+  onSCLChange();
+ }
+ hideLoader();
+}
+
+function onSCLChange(){
+ const sel = $("#sclSelect");
+ if(!sel) return;
+ const rawVal = sel.value;
+
+ if(rawVal === "__MANUAL__"){
+  $("#sclManualBox").style.display = "block";
+  return;
+ } else if($("#sclManualBox")){
+  $("#sclManualBox").style.display = "none";
+ }
+
+ if(!rawVal) return;
+ const sclVal = String(rawVal).trim().toUpperCase();
+
+ const item = pendingSCLItems.find(x => String(x.scl || x.wo || "").trim().toUpperCase() === sclVal);
+ if(!item) return;
+
+ // Jika kategori unit berbeda dengan kategori checklist saat ini, render ulang dengan kategori baru
+ if(item.cat && item.cat !== cat){
+  cat = item.cat;
+  render(sclVal);
+  return;
+ }
+
+ fillFieldsFromItem(item);
+}
+
+// Mengisi data header di PDI OUT dari data PDI IN (SEMUA FIELD BISA DIUBAH / DIEDIT)
+function fillFieldsFromItem(item){
+ const f = $("#f");
+ if(!f) return;
+
+ // 1. Model Unit (Terisi otomatis dari PDI IN, readonly)
+ const modelEl = f.querySelector('[name="Model Unit"]');
+ if(modelEl){
+  modelEl.value = item.model || "";
+  modelEl.readOnly = true;
+  modelEl.style.backgroundColor = "#e9ecef";
+ }
+
+ // 2. VIN / No Seri (Terisi otomatis dari PDI IN, readonly)
+ const seriEl = f.querySelector('[name="VIN"]');
+ if(seriEl){
+  seriEl.value = item.vin || "";
+  seriEl.readOnly = true;
+  seriEl.style.backgroundColor = "#e9ecef";
+ }
+
+ // 3. Jenis Layanan (Terisi otomatis dari PDI IN, terkunci)
+ const layananEl = f.querySelector('[name="Jenis Layanan"]');
+ if(layananEl){
+  layananEl.value = item.layanan || "";
+  layananEl.style.pointerEvents = "none";
+  layananEl.style.backgroundColor = "#e9ecef";
+ }
+
+ // 4. Site Service Center (Terisi otomatis, terkunci)
+ const siteEl = f.querySelector('[name="Site Service Center"]');
+ if(siteEl){
+  siteEl.value = normalizeSite(item.site || currentSite);
+  siteEl.style.pointerEvents = "none";
+  siteEl.style.backgroundColor = "#e9ecef";
+ }
+
+ // 5. Kategori Produk (Terisi otomatis, terkunci)
+ const catOut = document.querySelector("#catOut");
+ if(catOut && item.cat){
+  catOut.value = item.cat;
+  catOut.style.pointerEvents = "none";
+  catOut.style.backgroundColor = "#e9ecef";
+ }
+
+ // 6. Teknisi (TERISI OTOMATIS TAPI BISA DIRUBAH / DIEDIT SESUAI INSTRUKSI USER)
+ if(item.teknisi){
+  const techSel = f.querySelector("#techSelect");
+  if(techSel){
+   techSel.readOnly = false;
+   techSel.disabled = false;
+   techSel.style.pointerEvents = "auto";
+   techSel.style.backgroundColor = "#ffffff";
+   let found = false;
+   for(let i=0; i < techSel.options.length; i++){
+    if(techSel.options[i].value.toLowerCase() === item.teknisi.toLowerCase()){
+     techSel.selectedIndex = i;
+     found = true;
+     break;
+    }
+   }
+   if(!found){
+    const opt = document.createElement("option");
+    opt.value = item.teknisi;
+    opt.textContent = item.teknisi;
+    opt.selected = true;
+    techSel.appendChild(opt);
+   }
+  }
+  const techIn = f.querySelector("#techInput");
+  if(techIn){
+   techIn.value = item.teknisi;
+   techIn.readOnly = false;
+   techIn.disabled = false;
+   techIn.style.backgroundColor = "#ffffff";
+  }
+ }
+}
+
+function jsonp(url, ms){
+ return new Promise((res, rej) => {
+  const cb = "cb" + Date.now() + Math.floor(Math.random() * 1e4);
+  const sc = document.createElement("script");
+  const done = () => { clearTimeout(t); delete window[cb]; sc.remove(); };
+  const t = setTimeout(() => { done(); rej(new Error("timeout")); }, ms || 10000);
+  window[cb] = d => { done(); res(d); };
+  sc.onerror = () => { done(); rej(new Error("network")); };
+  sc.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
+  document.head.appendChild(sc);
  });
 }
 
-function toast(t,c){const m=$("#msg");m.textContent=t;m.style.background=c;m.style.display="block";clearTimeout(m._t);m._t=setTimeout(()=>m.style.display="none",4000)}
+// Canvas Tanda Tangan
+const pads = {};
+function initPads(){
+ document.querySelectorAll(".sig").forEach(box => {
+  const c = box.querySelector("canvas"), x = c.getContext("2d"), key = box.dataset.p;
+  x.lineWidth = 3; x.lineCap = "round"; x.lineJoin = "round"; x.strokeStyle = "#111";
+  const st = pads[key] = { c, dirty: false, box };
+  let on = false;
+  const pt = e => {
+   const r = c.getBoundingClientRect();
+   return [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height];
+  };
+  c.addEventListener("pointerdown", e => {
+   on = true; c.setPointerCapture(e.pointerId);
+   const [a, b] = pt(e); x.beginPath(); x.moveTo(a, b); st.dirty = true;
+   box.classList.remove("miss");
+  });
+  c.addEventListener("pointermove", e => { if(!on) return; const [a, b] = pt(e); x.lineTo(a, b); x.stroke(); });
+  const up = () => { on = false; };
+  c.addEventListener("pointerup", up);
+  c.addEventListener("pointercancel", up);
+  box.querySelector("button").onclick = () => {
+   x.clearRect(0, 0, c.width, c.height); st.dirty = false;
+  };
+ });
+}
 
-async function submit(ev){
- ev.preventDefault();
- const f=ev.target,F=FORMS[cur];
+// ==========================================
+// BACKGROUND SYNC QUEUE DENGAN 10x RETRY BERBEDA
+// ==========================================
+const SYNC_QUEUE_KEY = "pdi_sync_queue";
+const SYNC_FAILED_KEY = "pdi_failed_queue";
+
+// 10 kali percobaan dengan interval waktu yang berbeda (meningkat secara eksponensial)
+const RETRY_DELAYS_MS = [
+  5 * 1000,        // Percobaan 1: 5 detik
+  15 * 1000,       // Percobaan 2: 15 detik
+  30 * 1000,       // Percobaan 3: 30 detik
+  60 * 1000,       // Percobaan 4: 1 menit
+  2 * 60 * 1000,   // Percobaan 5: 2 menit
+  5 * 60 * 1000,   // Percobaan 6: 5 menit
+  10 * 60 * 1000,  // Percobaan 7: 10 menit
+  15 * 60 * 1000,  // Percobaan 8: 15 menit
+  30 * 60 * 1000,  // Percobaan 9: 30 menit
+  60 * 60 * 1000   // Percobaan 10: 1 jam (60 menit)
+];
+
+let isProcessingQueue = false;
+
+function getSyncQueue() {
+  try {
+    return JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || "[]");
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveSyncQueue(queue) {
+  try {
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
+  } catch(e) {}
+}
+
+function enqueueSyncItem(item) {
+  const q = getSyncQueue();
+  q.push(item);
+  saveSyncQueue(q);
+}
+
+// Pemrosesan antrian berurutan (FIFO) agar tidak saling bentrok
+async function processSyncQueue() {
+  if (isProcessingQueue) return; // Mutex lock: Hanya 1 pengiriman aktif pada satu waktu
+  if (!navigator.onLine) return; // Tunda jika perangkat offline
+
+  const q = getSyncQueue();
+  if (!q || !q.length) return;
+
+  const now = Date.now();
+  const item = q[0];
+
+  // Periksa apakah item terdepan sudah mencapai waktu jadwal retry berikutnya
+  if (item.nextRetryTime && now < item.nextRetryTime) {
+    return;
+  }
+
+  isProcessingQueue = true;
+
+  try {
+    const payload = {
+      form: item.form,
+      fields: item.fields,
+      signatures: item.signatures
+    };
+
+    if (SCRIPT_URL && !SCRIPT_URL.startsWith("PASTE")) {
+      const response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      if (response && response.type !== "opaque" && response.status >= 400) {
+        throw new Error("HTTP " + response.status);
+      }
+    }
+
+    // Pengiriman BERHASIL! Keluarkan item dari antrian
+    const curQ = getSyncQueue();
+    curQ.shift();
+    saveSyncQueue(curQ);
+    console.log("Pengiriman latar belakang berhasil untuk NO. CASE:", item.caseNo || item.id);
+
+    // Buka kunci dan proses antrian berikutnya jika ada
+    isProcessingQueue = false;
+    if (curQ.length > 0) {
+      setTimeout(processSyncQueue, 800);
+    }
+  } catch (err) {
+    console.warn("Pengiriman latar belakang gagal, menjadwalkan ulang:", err);
+    const curQ = getSyncQueue();
+    if (curQ.length > 0) {
+      const currentItem = curQ[0];
+      currentItem.retryCount = (currentItem.retryCount || 0) + 1;
+
+      if (currentItem.retryCount <= RETRY_DELAYS_MS.length) {
+        const delay = RETRY_DELAYS_MS[currentItem.retryCount - 1];
+        currentItem.nextRetryTime = Date.now() + delay;
+        console.log(`Percobaan ke-${currentItem.retryCount}/10 untuk ${currentItem.caseNo} gagal. Dicoba lagi dalam ${delay / 1000} detik.`);
+      } else {
+        // Sudah 10x gagal pengiriman, arsipkan ke failed queue agar tidak memblokir antrian baru
+        console.error(`10x percobaan pengiriman gagal untuk ${currentItem.caseNo}. Dipindahkan ke arsip failed queue.`);
+        try {
+          const failedQ = JSON.parse(localStorage.getItem(SYNC_FAILED_KEY) || "[]");
+          failedQ.push(currentItem);
+          localStorage.setItem(SYNC_FAILED_KEY, JSON.stringify(failedQ));
+        } catch(e) {}
+        curQ.shift();
+      }
+      saveSyncQueue(curQ);
+    }
+  } finally {
+    isProcessingQueue = false;
+  }
+}
+
+// Runner background: Cek antrian setiap 10 detik dan saat internet kembali online
+setInterval(processSyncQueue, 10000);
+window.addEventListener("online", () => {
+  setTimeout(processSyncQueue, 500);
+});
+setTimeout(processSyncQueue, 2500);
+
+// Submit Form: LANGSUNG SELESAI & PENGIRIMAN DI LATAR BELAKANG
+async function submit(e){
+ e.preventDefault();
+ const f = $("#f");
+ const F = FORMS[cur];
  
- // Reset peringatan sebelumnya
- f.querySelectorAll(".field-warn").forEach(el=>el.classList.remove("field-warn"));
- f.querySelectorAll(".warn-msg").forEach(el=>el.remove());
+ // Reset styling warning
+ f.querySelectorAll(".field-warn").forEach(el => el.classList.remove("field-warn"));
+ f.querySelectorAll(".warn-msg").forEach(el => el.remove());
+ f.querySelectorAll(".miss").forEach(el => el.classList.remove("miss"));
  
  let firstBad = null;
- 
- // 1. Validasi Kolom Wajib (Input, Select, Textarea, Checkbox)
- const requiredEls = f.querySelectorAll("input[required], select[required], textarea[required]");
- requiredEls.forEach(el => {
-  let isBlank = false;
-  if(el.type === "checkbox") {
-   isBlank = !el.checked;
-  } else {
-   isBlank = !el.value || !el.value.trim();
-  }
-  
-  if(isBlank) {
+
+ // 1. Validasi Input Standar
+ const reqInputs = f.querySelectorAll("input[required], select[required]");
+ reqInputs.forEach(el => {
+  if(el.type === "radio" || el.type === "checkbox") return;
+  const val = (el.value || "").trim();
+  if(!val){
    el.classList.add("field-warn");
-   
-   // Tambahkan icon peringatan di bawah input
-   const warn = document.createElement("div");
-   warn.className = "warn-msg";
-   warn.innerHTML = `
-     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+   const warnDiv = document.createElement("div");
+   warnDiv.className = "warn-msg";
+   warnDiv.innerHTML = `
+     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
        <circle cx="12" cy="12" r="10"></circle>
        <line x1="12" y1="8" x2="12" y2="12"></line>
        <line x1="12" y1="16" x2="12.01" y2="16"></line>
      </svg>
-     <span>⚠️ Wajib diisi / dipilih</span>
+     <span>Wajib diisi / dipilih</span>
    `;
-   
-   const parent = el.closest(".input-with-btn") || el;
-   if(parent && parent.parentNode) {
-    parent.parentNode.insertBefore(warn, parent.nextSibling);
-   }
+   if(el.parentNode) el.parentNode.appendChild(warnDiv);
    
    const removeWarn = () => {
     el.classList.remove("field-warn");
-    warn.remove();
+    warnDiv.remove();
     el.removeEventListener("input", removeWarn);
     el.removeEventListener("change", removeWarn);
    };
@@ -580,95 +2667,203 @@ async function submit(ev){
   }
  });
 
- // 2. Validasi Item Checklist Radio
- const items=[...f.querySelectorAll(".item")];
- items.forEach(it=>{
-  const ok=it.querySelector("input[type=radio]:checked");
-  it.classList.toggle("miss",!ok);
-  if(!ok && !firstBad) firstBad=it;
- });
- 
- // 3. Validasi Tanda Tangan
- ["k","t"].forEach(k=>{
-  const p=pads[k];
-  p.box.classList.toggle("miss",!p.dirty);
-  if(!p.dirty && !firstBad) firstBad=p.box;
- });
- 
+ // 2. Validasi Checklist Radio
+ const items = [...f.querySelectorAll(".item")];
+ for(let it of items){
+  if(!it.querySelector("input:checked")){
+   it.classList.add("miss");
+   if(!firstBad) firstBad = it;
+  }
+ }
+
+ // 3. Validasi Checklist Persetujuan
+ const agreeChk = f.querySelector("input[name=agree]");
+ if(!agreeChk.checked){
+  agreeChk.closest(".chk").classList.add("miss");
+  if(!firstBad) firstBad = agreeChk;
+ }
+
+ // 4. Validasi Tanda Tangan
+ if(pads.k.empty){
+  pads.k.c.closest(".sig").classList.add("miss");
+  if(!firstBad) firstBad = pads.k.c;
+ }
+ if(pads.t.empty){
+  pads.t.c.closest(".sig").classList.add("miss");
+  if(!firstBad) firstBad = pads.t.c;
+ }
+
  if(firstBad){
-  firstBad.scrollIntoView({block:"center",behavior:"smooth"});
-  toast("Lengkapi data yang kosong bertanda ⚠️","#C8102E");
+  firstBad.scrollIntoView({behavior:"smooth", block:"center"});
+  toast("Harap lengkapi semua kolom bertanda merah & tanda tangan", "#C8102E");
   return;
  }
- 
- if(SCRIPT_URL.startsWith("PASTE")){toast("SCRIPT_URL belum diisi. Ikuti panduan deploy Apps Script.","#C8102E");return}
 
- const d=new FormData(f), fields={"Kategori Produk":cat};
- ["Tanggal","No WO","Jenis Layanan","Model Unit","VIN","Site Service Center","Teknisi"]
-  .forEach(k=>fields[k]=d.get(k)||"");
- const notes=[];
- items.forEach((it,i)=>{
-  const k=it.dataset.k, v=it.querySelector("input[type=radio]:checked").value, n=it.querySelector(".note").value.trim();
-  fields[k]=v; if(n)notes.push(k+": "+n);
- });
- fields["Catatan Per Item"]=notes.join(" | ");
- F.texts.forEach((t,i)=>fields[t]=d.get("T"+i)||"");
- fields["Konsumen Setuju"]="Ya";
- const signatures={konsumen:pads.k.c.toDataURL("image/png"),teknisi:pads.t.c.toDataURL("image/png")};
- const total=items.length, issues=items.filter(it=>it.querySelector("input:checked").value===F.bad).length;
- fields["Jumlah Item Bermasalah"]=issues;
-
- const btn=f.querySelector(".send");btn.disabled=true;btn.textContent="Mengirim...";
- try{
-  const r=await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({form:"PDI_"+cur,fields,signatures})});
-  if(r&&r.type!=="opaque"&&r.status>=400)throw new Error("HTTP "+r.status);
-  
-  // Notif berhasil
-  toast("Data PDI berhasil dikirim","#1b7f3b");
-  
-  // Kosongkan kolom type dan seri otomatis saat berhasil
-  const modelEl = document.querySelector('#f input[name="Model Unit"]');
-  if(modelEl) modelEl.value = "";
-  const seriEl = document.querySelector('#f input[name="VIN"]');
-  if(seriEl) seriEl.value = "";
-  
-  render();
-  window.scrollTo({top:0,behavior:"smooth"});
- }catch(e){
-  toast("Gagal mengirim. Cek koneksi internet lalu coba lagi.","#C8102E");
-  btn.disabled=false;btn.textContent="Kirim "+F.title;
+ // Ekstraksi Form Data
+ const d = serialize(f);
+ let noSCL = "";
+ if(cur === "OUT"){
+  const sclSel = $("#sclSelect");
+  if(sclSel && sclSel.value === "__MANUAL__"){
+   noSCL = ($("#sclManualInput") ? $("#sclManualInput").value : "").trim();
+  } else if(sclSel){
+   noSCL = sclSel.value.trim();
+  }
+ } else {
+  noSCL = (f.querySelector('[name="No WO"]') ? f.querySelector('[name="No WO"]').value : "").trim();
  }
+ noSCL = String(noSCL || "").trim().toUpperCase();
+
+ // Penanganan Teknisi
+ let teknisiVal = "";
+ const techSel = f.querySelector("#techSelect");
+ if(techSel && techSel.value === "__OTHER__"){
+  teknisiVal = ($("#customTechInput") ? $("#customTechInput").value : "").trim();
+ } else if(techSel){
+  teknisiVal = techSel.value.trim();
+ } else {
+  teknisiVal = (d.get("Teknisi") || "").trim();
+ }
+
+ const activeSiteCode = normalizeSite(currentSite || (f.querySelector('[name="Site Service Center"]') ? f.querySelector('[name="Site Service Center"]').value : ""));
+
+ // Mengirim No CASE, NO. CASE, No SCL, No WO agar kompatibel 100% dengan Google Sheets
+ const fields = {
+  "Kategori Produk": cat,
+  "Tanggal": d.get("Tanggal") || (f.querySelector('[name="Tanggal"]') ? f.querySelector('[name="Tanggal"]').value : ""),
+  "No CASE": noSCL,
+  "NO. CASE": noSCL,
+  "No WO": noSCL,
+  "No SCL": noSCL,
+  "Jenis Layanan": d.get("Jenis Layanan") || (f.querySelector('[name="Jenis Layanan"]') ? f.querySelector('[name="Jenis Layanan"]').value : ""),
+  "Model Unit": d.get("Model Unit") || (f.querySelector('[name="Model Unit"]') ? f.querySelector('[name="Model Unit"]').value : ""),
+  "VIN": d.get("VIN") || (f.querySelector('[name="VIN"]') ? f.querySelector('[name="VIN"]').value : ""),
+  "Site Service Center": activeSiteCode,
+  "Teknisi": teknisiVal
+ };
+
+ const notes = [];
+ items.forEach(it => {
+  const k = it.dataset.k, v = it.querySelector("input[type=radio]:checked").value, n = it.querySelector(".note").value.trim();
+  fields[k] = v; if(n) notes.push(k + ": " + n);
+ });
+ fields["Catatan Per Item"] = notes.join(" | ");
+ F.texts.forEach((t, i) => fields[t] = d.get("T" + i) || "");
+ fields["Konsumen Setuju"] = "Ya";
+ const signatures = { konsumen: pads.k.c.toDataURL("image/png"), teknisi: pads.t.c.toDataURL("image/png") };
+ const total = items.length, issues = items.filter(it => it.querySelector("input:checked").value === F.bad).length;
+ fields["Jumlah Item Bermasalah"] = issues;
+
+ // SIMPAN LOKAL SECARA INSTAN (Tanda tangan & form snapshot untuk cetak PDF)
+ const cleanSclKey = String(noSCL || "").trim().toUpperCase();
+ if (signatures && signatures.konsumen) {
+   try { localStorage.setItem("pdi_sig_konsumen_" + cleanSclKey, signatures.konsumen); } catch(e){}
+ }
+ if (signatures && signatures.teknisi) {
+   if (cur === "IN") {
+     try { localStorage.setItem("pdi_sig_tek_in_" + cleanSclKey, signatures.teknisi); } catch(e){}
+   } else {
+     try { localStorage.setItem("pdi_sig_tek_out_" + cleanSclKey, signatures.teknisi); } catch(e){}
+   }
+ }
+
+ try {
+   const fullFormSnapshot = Object.assign({}, fields);
+   if (cur === "IN") {
+     localStorage.setItem("pdi_in_data_" + cleanSclKey, JSON.stringify(fullFormSnapshot));
+   } else {
+     localStorage.setItem("pdi_out_data_" + cleanSclKey, JSON.stringify(fullFormSnapshot));
+   }
+ } catch(e){}
+
+ // Perbarui history lokal langsung agar seketika tersedia di PDI OUT & Cetak
+ if(cur === "IN"){
+  savePdiInRecord({
+   scl: noSCL,
+   wo: noSCL,
+   caseNo: noSCL,
+   model: fields["Model Unit"],
+   vin: fields["VIN"],
+   cat: cat,
+   site: activeSiteCode,
+   layanan: fields["Jenis Layanan"],
+   teknisi: fields["Teknisi"],
+   date: fields["Tanggal"],
+   timestamp: Date.now()
+  });
+ } else if(cur === "OUT"){
+  markSclCompletedLocally(noSCL);
+ }
+
+ // ENQUEUE KE ANTRIAN PENGIRIMAN LATAR BELAKANG (FIFO DENGAN 10x RETRY)
+ enqueueSyncItem({
+   id: "pdi_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6),
+   form: cur === "OUT" ? "PDOUT" : "PDIIN",
+   fields: fields,
+   signatures: signatures,
+   caseNo: noSCL,
+   retryCount: 0,
+   createdAt: Date.now(),
+   nextRetryTime: 0
+ });
+
+ // PROSES TAMPILAN SELESAI INSTAN: Notifikasi sukses langsung muncul & form direset
+ toast("Data PDI berhasil disimpan! (Mengirim di latar belakang)", "#15803d");
+
+ // Kosongkan kolom input
+ const modelEl = document.querySelector('#f input[name="Model Unit"]');
+ if(modelEl) modelEl.value = "";
+ const seriEl = document.querySelector('#f input[name="VIN"]');
+ if(seriEl) seriEl.value = "";
+
+ render();
+ window.scrollTo({top:0, behavior:"smooth"});
+
+ // Mulai pemrosesan antrian di latar belakang secara asinkron
+ setTimeout(processSyncQueue, 100);
 }
 
-// Navigasi & Integrasi Tombol Back HP
-history.replaceState({tab:"IN"},"","#pdi-in");
+// Navigasi Tabs & Integrasi Tombol Back HP
+history.replaceState({tab:"IN"}, "", "#pdi-in");
 
 function tab(w, push=true){
- if(cur===w)return;
- cur=w;
- $("#t-in").classList.toggle("on",w==="IN");
- $("#t-out").classList.toggle("on",w==="OUT");
+ if(cur === w) return;
+ cur = w;
+ $("#t-in").classList.toggle("on", w === "IN");
+ $("#t-out").classList.toggle("on", w === "OUT");
  if(push){
-  if(w==="OUT"){
-   history.pushState({tab:"OUT"},"","#pdi-out");
+  if(w === "OUT"){
+   history.pushState({tab:"OUT"}, "", "#pdi-out");
   } else {
-   history.pushState({tab:"IN"},"","#pdi-in");
+   history.pushState({tab:"IN"}, "", "#pdi-in");
   }
  }
  render();
- window.scrollTo(0,0);
+ window.scrollTo(0, 0);
 }
 
-// Tangani tombol Back HP/Browser: Jika di PDI OUT -> Kembali ke PDI IN
-window.addEventListener("popstate", e=>{
- const target=(e.state&&e.state.tab)||(location.hash==="#pdi-out"?"OUT":"IN");
- if(target!==cur){
+// Tangani tombol Back HP: Jika di PDI OUT -> Kembali ke PDI IN
+window.addEventListener("popstate", e => {
+ const target = (e.state && e.state.tab) || (location.hash === "#pdi-out" ? "OUT" : "IN");
+ if(target !== cur){
   tab(target, false);
  }
 });
 
-$("#t-in").onclick=()=>tab("IN");
-$("#t-out").onclick=()=>tab("OUT");
+$("#t-in").onclick = () => tab("IN");
+$("#t-out").onclick = () => tab("OUT");
+
+// Toggle class .sel pada opsi radio agar kotak tombol terpilih langsung berwarna HIJAU
+document.addEventListener("change", e => {
+ if(e.target && e.target.type === "radio" && e.target.name && e.target.name.startsWith("r")){
+  const optsBox = e.target.closest(".opts");
+  if(optsBox){
+   optsBox.querySelectorAll("label").forEach(l => l.classList.remove("sel"));
+   const lbl = e.target.closest("label");
+   if(lbl) lbl.classList.add("sel");
+  }
+ }
+});
 
 // Logic Barcode Scanner
 let html5QrScanner = null;
@@ -696,9 +2891,7 @@ function startScanner(){
  html5QrScanner.start(
   { facingMode: "environment" },
   config,
-  (decodedText) => {
-   onScanSuccess(decodedText);
-  },
+  (decodedText) => onScanSuccess(decodedText),
   () => {}
  ).catch(err => {
   console.error("Camera start error:", err);
@@ -731,6 +2924,13 @@ function onScanSuccess(code){
  }
  lookupModel(cleanCode);
 }
+
+// Bersihkan riwayat lokal yang kotor / data uji coba lama pada startup
+try {
+  let hist = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "[]");
+  hist = hist.filter(x => isValidScl(x.scl || x.wo));
+  localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(hist));
+} catch(e){}
 
 render();
 updateSiteUI();
