@@ -477,6 +477,17 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   display: none;
 }
 
+body.is-printing > *:not(#printReportArea) {
+  display: none !important;
+}
+body.is-printing main,
+body.is-printing #app,
+body.is-printing #f,
+body.is-printing .wo-box,
+body.is-printing fieldset {
+  display: none !important;
+}
+
 @media print {
   @page {
     size: A4 portrait;
@@ -507,18 +518,6 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
     position: absolute !important;
     top: -99999px !important;
     left: -99999px !important;
-  }
-
-body.is-printing > *:not(#printReportArea) {
-  display: none !important;
-}
-body.is-printing main,
-body.is-printing #app,
-body.is-printing #f,
-body.is-printing .wo-box,
-body.is-printing fieldset {
-  display: none !important;
-}
   }
 
   /* Area Dokumen Cetak Utama */
@@ -572,13 +571,13 @@ body.is-printing fieldset {
     margin-bottom: 6px;
   }
   .print-brand-title {
-    font-size: 14pt;
-    font-weight: 800;
-    color: #C8102E !important;
+    font-size: 13pt;
+    font-weight: 900;
+    color: #C8102E;
     letter-spacing: 0.5px;
   }
   .print-brand-sub {
-    font-size: 8pt;
+    font-size: 7.5pt;
     color: #555;
     font-weight: 600;
   }
@@ -586,98 +585,109 @@ body.is-printing fieldset {
     text-align: right;
   }
   .print-doc-title {
-    font-size: 10.5pt;
-    font-weight: 700;
+    font-size: 10pt;
+    font-weight: 800;
     color: #111;
   }
   .print-doc-sub {
     font-size: 7.5pt;
     color: #555;
+    font-weight: 600;
   }
   .print-doc-no {
-    font-size: 9.5pt;
+    font-size: 8pt;
+    color: #0D47A1;
     font-weight: 700;
-    color: #C8102E;
     margin-top: 1px;
   }
-
-  table.print-table {
+  .print-section-hdr {
+    background: #f0f0f0;
+    border-left: 3px solid #C8102E;
+    padding: 2.5px 6px;
+    font-weight: 700;
+    font-size: 7.5pt;
+    color: #222;
+    margin-top: 4px;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+  }
+  .print-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 5px;
-    font-size: 8.5pt;
-    page-break-inside: auto;
+    margin-bottom: 4px;
+    font-size: 7.5pt;
   }
-  table.print-table th, table.print-table td {
-    border: 1px solid #777;
-    padding: 2.5px 5px;
+  .print-table th, .print-table td {
+    border: 1px solid #aaa;
+    padding: 2.5px 4px;
     text-align: left;
-    vertical-align: top;
+    vertical-align: middle;
   }
-  table.print-table th {
-    background-color: #f2f2f2 !important;
-    color: #111;
+  .print-table th {
+    background: #f7f7f7;
     font-weight: 700;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+    color: #222;
   }
-  table.print-table tr {
-    page-break-inside: avoid;
-    break-inside: avoid;
+  .print-table td.center, .print-table th.center {
+    text-align: center;
   }
-
-  .print-section-hdr {
-    background: #C8102E !important;
-    color: #fff !important;
-    font-weight: 700;
-    font-size: 8.5pt;
-    padding: 2.5px 5px;
-    margin-top: 5px;
-    margin-bottom: 2px;
-    border-radius: 2px;
-    page-break-after: avoid;
-    break-after: avoid;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
   .badge-ok {
     font-weight: 700;
-    color: #2E7D32 !important;
+    color: #1b5e20;
+    background: #e8f5e9;
+    padding: 1px 4px;
+    border-radius: 2px;
+    display: inline-block;
   }
   .badge-ng {
     font-weight: 700;
-    color: #C8102E !important;
+    color: #b71c1c;
+    background: #ffebee;
+    padding: 1px 4px;
+    border-radius: 2px;
+    display: inline-block;
   }
   .badge-na {
-    color: #777 !important;
+    color: #777;
+    font-style: italic;
   }
-
+  .mono {
+    font-family: Consolas, monospace;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
   .print-signatures {
     display: flex;
     justify-content: space-between;
+    gap: 8px;
     margin-top: 6px;
+    margin-bottom: 4px;
     page-break-inside: avoid;
-    break-inside: avoid;
   }
   .sig-col {
-    width: 31%;
-    border: 1px solid #777;
-    border-radius: 4px;
-    padding: 4px;
+    flex: 1;
     text-align: center;
-    box-sizing: border-box;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    padding: 3px;
+    border-radius: 3px;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   .sig-col-title {
-    font-size: 8pt;
+    font-size: 7.5pt;
     font-weight: 700;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 2px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1px;
     margin-bottom: 2px;
   }
   .sig-img-box {
-    height: 48px;
+    min-height: 44px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     margin-bottom: 2px;
@@ -707,7 +717,6 @@ body.is-printing fieldset {
   }
 }
 
-
 /* Animasi Sederhana Loading di Tengah Layar (Presisi Tengah, Tanpa Kotak) */
 #globalLoader {
   position: fixed;
@@ -718,7 +727,7 @@ body.is-printing fieldset {
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.18);
-  display: none;
+  display: none !important;
   z-index: 999999;
   pointer-events: auto;
 }
@@ -740,7 +749,6 @@ body.is-printing fieldset {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
 </style>
 </head>
 <body>
@@ -793,7 +801,7 @@ body.is-printing fieldset {
 
 
 <!-- Animasi Sederhana Loading di Tengah Layar (Tanpa Kotak) -->
-<div id="globalLoader">
+<div id="globalLoader" style="display:none !important;">
   <div class="loader-spinner"></div>
 </div>
 
@@ -1246,15 +1254,14 @@ const FORMS = {
 let loaderTimeout = null;
 function showLoader(msg = "") {
   const el = $("#globalLoader");
-  if (el) el.style.display = "block";
+  if (el) el.style.setProperty("display", "block", "important");
   if (loaderTimeout) clearTimeout(loaderTimeout);
-  // Keamanan maksimal: otomatis tertutup setelah 3 detik agar tidak pernah macet
   loaderTimeout = setTimeout(hideLoader, 3000);
 }
 
 function hideLoader() {
   const el = $("#globalLoader");
-  if (el) el.style.display = "none";
+  if (el) el.style.setProperty("display", "none", "important");
   if (loaderTimeout) {
     clearTimeout(loaderTimeout);
     loaderTimeout = null;
@@ -2956,6 +2963,7 @@ try {
   localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(hist));
 } catch(e){}
 
+hideLoader();
 render();
 updateSiteUI();
 if(!currentSite){
