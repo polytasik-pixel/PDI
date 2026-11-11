@@ -8,14 +8,28 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Form PDI">
 <title>Form PDI - Service Center</title>
-<!-- Library Barcode / QR Code Scanner -->
-<script src="html5-qrcode.min.js"></script>
+<!-- Library Barcode / QR Code Scanner (Auto-detect Offline APK vs Online CDN) -->
 <script>
-if (typeof Html5Qrcode === "undefined") {
-  const s = document.createElement("script");
-  s.src = "https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";
-  document.head.appendChild(s);
-}
+(function() {
+  const isLocalFile = (window.location.protocol === "file:");
+  const script = document.createElement("script");
+  if (isLocalFile) {
+    script.src = "html5-qrcode.min.js";
+    script.onerror = function() {
+      const cdn = document.createElement("script");
+      cdn.src = "https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";
+      document.head.appendChild(cdn);
+    };
+  } else {
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";
+    script.onerror = function() {
+      const local = document.createElement("script");
+      local.src = "html5-qrcode.min.js";
+      document.head.appendChild(local);
+    };
+  }
+  document.head.appendChild(script);
+})();
 </script>
 <style>
 :root{
@@ -912,6 +926,20 @@ let pendingSCLItems = [];
 
 const $ = s => document.querySelector(s);
 const esc = s => (s||"").replace(/"/g,"&quot;");
+
+// Helper serialize form ke Object & FormData accessor
+function serialize(form) {
+  if (!form) return { get: () => "" };
+  const fd = new FormData(form);
+  const data = {};
+  for (const [k, v] of fd.entries()) {
+    data[k] = v;
+  }
+  data.get = function(k) {
+    return this[k] !== undefined && this[k] !== null ? this[k] : "";
+  };
+  return data;
+}
 
 function toast(t, bg="#15803d", ms=3000){
  const m=$("#msg");
@@ -2611,7 +2639,7 @@ async function processSyncQueue() {
     const curQ = getSyncQueue();
     curQ.shift();
     saveSyncQueue(curQ);
-    console.log("Pengiriman latar belakang berhasil untuk NO. CASE:", item.caseNo || item.id);
+    console.log("Pengiriman berhasil untuk NO. CASE:", item.caseNo || item.id);
 
     // Buka kunci dan proses antrian berikutnya jika ada
     isProcessingQueue = false;
@@ -2619,7 +2647,7 @@ async function processSyncQueue() {
       setTimeout(processSyncQueue, 800);
     }
   } catch (err) {
-    console.warn("Pengiriman latar belakang gagal, menjadwalkan ulang:", err);
+    console.warn("Pengiriman gagal, menjadwalkan ulang:", err);
     const curQ = getSyncQueue();
     if (curQ.length > 0) {
       const currentItem = curQ[0];
