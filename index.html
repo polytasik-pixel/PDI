@@ -8,66 +8,92 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Form PDI">
 <title>Form PDI - Service Center</title>
+<!-- Library Barcode / QR Code Scanner -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <style>
 :root{--red:#C8102E;--ink:#1a1a1a;--bg:#f4f4f2;--card:#fff;--line:#d9d9d4;--mute:#666}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
-header{background:var(--ink);color:#fff;padding:12px 16px;border-bottom:4px solid var(--red)}
-.header-wrap{display:flex;justify-content:space-between;align-items:center;max-width:860px;margin:0 auto}
-header b{font-size:19px;letter-spacing:.5px;color:#fff}
+body{margin:0;padding:1mm;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;-webkit-text-size-adjust:100%;padding-bottom:max(1mm,env(safe-area-inset-bottom))}
+header{background:var(--ink);color:#fff;padding:8px 1mm;border-bottom:3px solid var(--red);margin:-1mm -1mm 0 -1mm;padding-top:max(8px,env(safe-area-inset-top))}
+.header-wrap{display:flex;justify-content:space-between;align-items:center;max-width:100%;margin:0 auto;padding:0 1mm}
+header b{font-size:18px;letter-spacing:.3px;color:#fff}
 header b span{color:var(--red)}
-header small{display:block;color:#bbb;margin-top:2px;font-size:12px}
-.header-site{display:flex;align-items:center;gap:6px;background:#2a2a2a;padding:5px 10px;border-radius:20px;border:1px solid #444;font-size:13px}
-.header-site b{font-size:13px;color:#ff4d64}
+header small{display:block;color:#bbb;margin-top:1px;font-size:11px}
+.header-site{display:flex;align-items:center;gap:4px;background:#2a2a2a;padding:4px 8px;border-radius:16px;border:1px solid #444;font-size:12px}
+.header-site b{font-size:12px;color:#ff4d64}
 .btn-change-site{background:transparent;color:#aaa;border:0;padding:2px 4px;font-size:11px;text-decoration:underline;cursor:pointer}
 .btn-change-site:hover{color:#fff}
-.tabs{display:flex;position:sticky;top:0;z-index:5;background:var(--ink)}
-.tabs button{flex:1;padding:13px;border:0;background:#333;color:#ddd;font-size:15px;font-weight:600;cursor:pointer}
+.tabs{display:flex;position:sticky;top:0;z-index:5;background:var(--ink);margin:0 -1mm 6px -1mm}
+.tabs button{flex:1;padding:11px 4px;border:0;background:#333;color:#ddd;font-size:14px;font-weight:600;cursor:pointer}
 .tabs button.on{background:var(--red);color:#fff}
-main{max-width:860px;margin:0 auto;padding:12px}
-fieldset{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--red);margin:0 0 14px;padding:12px 14px}
-legend{font-weight:700;padding:0 6px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+main{max-width:100%;margin:0 auto;padding:1mm 0}
+fieldset{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--red);margin:0 0 8px;padding:8px 1mm}
+legend{font-weight:700;font-size:13px;padding:0 4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
-label.f{display:block;font-size:13px;color:var(--mute)}
-input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{width:100%;padding:9px;border:1px solid #bbb;border-radius:4px;font:inherit;margin-top:3px;background:#fff;color:var(--ink)}
-textarea{min-height:70px}
-.item{padding:9px 0;border-top:1px solid #eee}
+label.f{display:block;font-size:12px;color:var(--mute);margin-bottom:2px}
+input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{width:100%;padding:8px;border:1px solid #bbb;border-radius:4px;font:inherit;margin-top:2px;background:#fff;color:var(--ink);font-size:15px;min-height:42px}
+textarea{min-height:65px}
+
+/* Input Group dengan Tombol Scan */
+.input-with-btn{display:flex;gap:4px;margin-top:2px}
+.input-with-btn input{margin-top:0 !important;flex:1}
+.btn-scan{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--ink);color:#fff;border:1px solid #444;border-radius:4px;padding:0 10px;cursor:pointer;font-weight:600;font-size:13px;min-height:42px}
+.btn-scan:hover,.btn-scan:active{background:var(--red);border-color:var(--red)}
+.btn-scan svg{stroke:#fff}
+
+#techBox{margin-top:2px}
+#techBox select,#techBox input{margin-top:0 !important}
+
+/* Tampilan Warning Validasi Field Kosong */
+.field-warn{border:2px solid var(--red) !important;background:#fff5f5 !important;box-shadow:0 0 0 3px rgba(200,16,46,.18) !important}
+.warn-msg{display:flex;align-items:center;gap:4px;color:var(--red);font-size:11px;font-weight:700;margin-top:3px}
+.warn-msg svg{flex:0 0 auto;stroke:var(--red)}
+
+.item{padding:7px 0;border-top:1px solid #eee}
 .item:first-of-type{border-top:0}
-.nm{margin-bottom:6px}
-.opts{display:flex;gap:6px;flex-wrap:wrap}
-.opts label{flex:0 0 auto;border:1px solid #bbb;border-radius:4px;padding:6px 12px;cursor:pointer;font-size:14px;user-select:none}
+.nm{margin-bottom:5px;font-size:13px}
+.opts{display:flex;gap:4px;flex-wrap:wrap}
+.opts label{flex:0 0 auto;border:1px solid #bbb;border-radius:4px;padding:5px 10px;cursor:pointer;font-size:13px;user-select:none;min-height:40px;display:flex;align-items:center}
 .opts input{position:absolute;opacity:0}
 .opts label:has(input:checked){background:var(--ink);color:#fff;border-color:var(--ink)}
 .opts label.bad:has(input:checked){background:var(--red);border-color:var(--red)}
 .opts label:has(input:focus-visible){outline:3px solid #0a6cff}
-.note{margin-top:6px;padding:6px 8px;font-size:13px}
-.item.miss{background:#fff1f1;outline:2px solid var(--red)}
-button.send{width:100%;padding:15px;background:var(--red);color:#fff;border:0;border-radius:4px;font-size:17px;font-weight:700;cursor:pointer}
+.note{margin-top:5px;padding:5px 7px;font-size:12px;min-height:36px}
+.item.miss{background:#fff1f1;outline:2px solid var(--red);border-radius:4px;padding:7px 6px}
+.item.miss::after{content:"⚠️ Wajib diperiksa & dipilih";color:var(--red);font-weight:700;font-size:11px;display:block;margin-top:4px}
+button.send{width:100%;padding:14px;background:var(--red);color:#fff;border:0;border-radius:4px;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px}
 button.send:disabled{opacity:.6}
-#msg{position:fixed;left:12px;right:12px;bottom:12px;padding:14px;border-radius:6px;color:#fff;display:none;z-index:999;text-align:center;font-weight:600}
-.sig{margin-top:12px}
-.sig canvas{display:block;width:100%;height:150px;border:1px dashed #888;border-radius:4px;background:#fff;touch-action:none;cursor:crosshair}
+#msg{position:fixed;left:1mm;right:1mm;bottom:1mm;padding:12px;border-radius:6px;color:#fff;display:none;z-index:999;text-align:center;font-weight:600;font-size:13px}
+.sig{margin-top:8px}
+.sig canvas{display:block;width:100%;height:130px;border:1px dashed #888;border-radius:4px;background:#fff;touch-action:none;cursor:crosshair}
 .sig.miss canvas{border:2px solid var(--red);background:#fff1f1}
-.sig .bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mute);margin-bottom:3px}
-.sig button{border:1px solid #bbb;background:#fff;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:13px}
-.chk{display:flex;gap:8px;align-items:flex-start}
-.chk input{margin-top:4px;width:18px;height:18px}
-.opts label{min-height:44px;display:flex;align-items:center;padding:6px 16px}
-input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{font-size:16px;min-height:44px}
-body{-webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom)}
-header{padding-top:max(12px,env(safe-area-inset-top))}
-.chk input{min-width:22px;height:22px}
-@media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}main{max-width:1000px}}
+.sig.miss::after{content:"⚠️ Tanda tangan wajib diisi";color:var(--red);font-weight:700;font-size:11px;display:block;margin-top:4px}
+.sig .bar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mute);margin-bottom:2px}
+.sig button{border:1px solid #bbb;background:#fff;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:12px}
+.chk{display:flex;gap:6px;align-items:flex-start}
+.chk input{margin-top:3px;min-width:20px;height:20px}
+@media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}main{max-width:960px}}
 
 /* Modal Login Site Popup */
 #siteModal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px;backdrop-filter:blur(4px)}
-.modal-box{background:#fff;border-radius:8px;max-width:440px;width:100%;padding:22px 20px;box-shadow:0 12px 30px rgba(0,0,0,.35);border-top:5px solid var(--red)}
-.modal-box h2{margin:0 0 6px;font-size:20px;color:var(--ink)}
-.modal-box p{margin:0 0 16px;font-size:13px;color:var(--mute);line-height:1.45}
-.modal-box select{width:100%;padding:12px;font-size:16px;border:1px solid #bbb;border-radius:4px;margin-bottom:16px;background:#fff}
-.modal-box button.btn-save{width:100%;padding:14px;background:var(--red);color:#fff;border:0;border-radius:4px;font-size:16px;font-weight:700;cursor:pointer}
+.modal-box{background:#fff;border-radius:8px;max-width:440px;width:100%;padding:20px 16px;box-shadow:0 12px 30px rgba(0,0,0,.35);border-top:5px solid var(--red)}
+.modal-box h2{margin:0 0 6px;font-size:19px;color:var(--ink)}
+.modal-box p{margin:0 0 14px;font-size:13px;color:var(--mute);line-height:1.4}
+.modal-box select{width:100%;padding:11px;font-size:15px;border:1px solid #bbb;border-radius:4px;margin-bottom:14px;background:#fff}
+.modal-box button.btn-save{width:100%;padding:13px;background:var(--red);color:#fff;border:0;border-radius:4px;font-size:15px;font-weight:700;cursor:pointer}
 .modal-box button.btn-save:disabled{opacity:.5;cursor:not-allowed}
+
+/* Modal Barcode Scanner */
+#scannerModal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:10000;padding:12px;backdrop-filter:blur(3px)}
+.scanner-box{background:#1e1e1e;color:#fff;border-radius:8px;max-width:480px;width:100%;padding:16px;box-shadow:0 12px 35px rgba(0,0,0,.5);border:2px solid var(--red)}
+.scanner-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.scanner-top h3{margin:0;font-size:16px;color:#fff}
+.btn-close-scanner{background:#333;color:#fff;border:1px solid #666;border-radius:4px;padding:6px 12px;cursor:pointer;font-size:13px}
+.btn-close-scanner:hover{background:var(--red);border-color:var(--red)}
+#readerContainer{width:100%;min-height:260px;background:#000;border-radius:6px;overflow:hidden;position:relative}
+#reader{width:100%}
+.scanner-tip{font-size:12px;color:#aaa;text-align:center;margin-top:10px}
 </style>
 </head>
 <body>
@@ -98,10 +124,130 @@ header{padding-top:max(12px,env(safe-area-inset-top))}
   </div>
 </div>
 
+<!-- Modal Scanner Barcode / QR -->
+<div id="scannerModal">
+  <div class="scanner-box">
+    <div class="scanner-top">
+      <h3>Scan Barcode / QR Seri</h3>
+      <button class="btn-close-scanner" type="button" onclick="stopScanner()">Tutup / Batal</button>
+    </div>
+    <div id="readerContainer">
+      <div id="reader"></div>
+    </div>
+    <div class="scanner-tip">Arahkan kamera ke kode batang pada unit / dus. Scanner akan tertutup otomatis saat terbaca.</div>
+  </div>
+</div>
+
 <script>
 // ====== ISI SETELAH DEPLOY GOOGLE APPS SCRIPT (lihat panduan) ======
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrFrAKjTjaGvblJsA4_HBaGOZlzV7DPbzOb-cghSMb3R2oRChr4LFf-aw64iIcVLNW/exec";
 // ===================================================================
+
+// ID Spreadsheet Google
+const SHEET_DOC_ID = "1zV-Oc6YyVbfMb_N-TvsBW9_A8XFOwLS5n5EXnWxDvUs";
+const GID_BARANG = "1919416964";
+const GID_TEKNISI = "1832751733";
+
+const PRODUCT_STORAGE_KEY = "pdi_product_map_cache";
+const TEKNISI_STORAGE_KEY = "pdi_teknisi_map_cache";
+
+// Initial embedded map Barang (923 items dari sheet)
+const INITIAL_PRODUCT_MAP = {"A10P":"PS-PRB175R","A01E":"PS-PAS10D28","A0V3":"PS-PRA16DMY","A106":"PS-PRG190S","A0ZV":"PS-PWC615X","A0RR":"PS-PLD43TAG5959","A03Z":"PS-PLD50B8750W","A0JV":"PS-PWM8073B","A0MY":"PS-PRB217PR","A0DY":"PS-PRC1201Y","A02F":"PS-PRB179R","A0QH":"PS-PRB217LB","A0TE":"PS-PRA18DRX","A0O8":"PS-PLD50UG5959","A109":"PS-PLD40CV8969","8905":"PS-PAW90517WM","A0H5":"PS-PCF118","A12Z":"PS-PRB217TY","A0MC":"PS-PWM8076G","3019":"PS-PWC777","A112":"PS-PLD32AG5759","A0BQ":"PS-PLD40BV8958","8556":"PS-PLD32T1850","A0MX":"PS-PRB157PR","6636":"PS-PLD40TS156","5853":"PS-PLD24D8511","A0PU":"PS-PLD24V1853","A0DR":"PS-PLD24D1850M","8899":"PS-PAW80517WB","A0AL":"PS-PLD24V123","A0Z2":"PS-PLD24V1853Y","A0DS":"PS-PLD32V1853","A0AP":"PS-PLD24TV1855","SCL/":"PS-PR225SMX","A0AM":"PS-PLD24V223","A0XI":"PS-PASPRO12F6","A0Z3":"PS-PLD24TV1855Y","A034":"PS-PRA18MNX","A14Q":"PS-PRA17DRD","A0MW":"PS-PRB177PR","8575":"PS-PLD24D123NV","A0ZW":"PS-PWC500X","A0RE":"PS-PLD43BAG9953E","A094":"PS-PLD32V0753","A0M8":"PS-PLD24MV1859","8725":"PS-PWC776","9921":"PS-PLD32D1852","5841":"PS-PLD32D7511","6787":"PS-PRM28BNB","A0V7":"PS-PRA18DMY","A0O4":"PS-PLD43BAG5959","A0ZC":"PS-PLD32BAG9858","9829":"PS-PAW90518B","A07F":"PS-SCN148X","A0DG":"PS-PAW9527X","8898":"PS-PLD43B150","A0KR":"PS-PASPRO15F3","A0M9":"PS-PLD32MV1859","7782":"PS-PLD24T8511S","3456":"PS-PRG24KCP","A0TG":"PS-PRA16DRX","A0NE":"PS-PAW9028Y","A0IA":"PS-PRA18ALR","A0AC":"PS-PLD32BV1558G2","A0MD":"PS-PWM9076G","5667":"PS-PRM28QS","A092":"PS-PLD32V1852","7191":"PS-PLD32T7511S","A0AG":"PS-PLD50V8753","A0PW":"PS-PLD32TV1755","A10F":"PS-PLD32CV1869S","A14J":"PS-PLD43BG9058","A03Y":"PS-PLD43B1550W","8555":"PS-PLD32D1850","A0ZQ":"PS-PAS10DF28","7197":"PS-PAW85511WS","A077":"PS-PWM851R","A022":"PS-PRW29MNX","6689":"PS-PAS2A15BA","A0ZD":"PS-PLD32TAG9855","6920":"PS-PLD40D150","A0JW":"PS-PWM8073P","8900":"PS-PAW80517WM","A0UW":"PS-PAW7029Y","A0AD":"PS-PLD32BV1558","4380":"PS-PAW8513M","9853":"PS-PRX180Y","A0SM":"PS-PAW7028WL","3717":"PS-PAW7511WM","A0TA":"PS-PRA18CRX","A0MK":"PS-PRW23MTR","A0NF":"PS-PAW1028Y","6586":"PS-PLD24D123","A02G":"PS-PRB189B","A14B":"PS-PLD43RG9059","A0VV":"PS-PWM1203X","8511":"PS-PWM8363B","A07G":"PS-SCN188X","8574":"PS-PLD24T1850","A0QX":"PS-PEV30M1AT","A10E":"PS-PLD24CV1869S","8829":"PS-PAS8B28","8576":"PS-PAS69GA","9938":"PS-PWC778X","9877":"PS-PLD43T150","A07H":"PS-SCN238X","858":"PS-PRS460B","A00N":"PS-PLD32B1550W","4029":"PS-PWM8567WGS","A0LT":"PS-PRA18MOW","5844":"PS-PLD32D9505","A0GH":"PS-PWM9072B","4816":"PS-PRM23STR","A0DF":"PS-PAW8527X","A07B":"PS-PRM490X","3835":"PS-PLD32T100","A020":"PS-PRW23MNX","9976":"PS-SCN187","A08C":"PS-PWM951B","4800":"PS-PRD18LYS","6284":"PS-SCN141X","6917":"PS-PLD40TS153U","A0JT":"PS-PWM7073B","A08A":"PS-PWM801B","A047":"PS-PLD43BAG9953","A071":"PS-PWM701R","A0TC":"PS-PRA16CRX","A0C3":"PS-PAW9527R","A0GG":"PS-PWM9072N","A01M":"PS-PLD32B1551","A0ZX":"PS-PAS8BF28","8896":"PS-PLD32B1550","A0NB":"PS-PAW1028W","A0RA":"PS-PLD32BAG9953E","A0RV":"PS-PWM1076Y","A0JU":"PS-PWM7073P","A0KO":"PS-PAS8FF22","7783":"PS-PLD32TS1503S","A0AN":"PS-PWC600","3411":"PS-PLD32T710","A01N":"PS-PLD32B8951","2958":"PS-PLD32T700","A0RG":"PS-PLD43AG9953E","A141":"PS-PLD32RG9059","A02J":"PS-PRB219R","A0UY":"PS-PAW9029Y","A149":"PS-PLD32BG9058","A0B4":"PS-PLD43BV1558","A03H":"PS-PRW23MNR","3726":"PS-PAW8512M","A0BZ":"PS-PAW7527R","A0SC":"PS-PLD50BUG9959","A0DE":"PS-PAW7527X","5699":"PS-PRM28QB","A0LS":"PS-PRA17MOB","4330":"PS-SCN231L","A0O9":"PS-PLD50BUG5959","9886":"PS-PRB238R","A01O":"PS-PLD43B8951","A0TF":"PS-PRA17DRX","A0HR":"PS-PWC778XUV","A0GD":"PS-PWM7072B","A0B3":"PS-PLD43V1553","A0XS":"PS-PLD32CV1869","9902":"PS-PLD24B8550","652":"PS-PRH47W","A0MJ":"PS-PRA18MTR","3235":"PS-PWM7056GG","A0TD":"PS-PRA15CRX","A02A":"PS-PLD43AG9953","6850":"PS-PRM21BNR","A144":"PS-PLD32TG9055","A0KZ":"PS-PMA9525B","A02H":"PS-PRB189R","A145":"PS-PPSPRO7M22","A0L7":"PS-PLD43V8853","A0T5":"PS-PRM21DRX","8505":"PS-PWM8363P","6895":"PS-PWM8366P","A0LW":"PS-PRW23MOB","1216":"PS-PR210SMI","A0ND":"PS-PAW8028Y","3501":"PS-PRN211S","3376":"PS-PWM1401R","8449":"PS-PLD50TS883G","A03X":"PS-PLD40B8850W","4329":"PS-SCN230L","9828":"PS-PAW80518B","A0RQ":"PS-PLD32TAG5959","3377":"PS-PWM1401G","A0RU":"PS-PWM9076Y","3683":"PS-SCN232","A03W":"PS-PLD32BAG9953","A00X":"PS-PLD55BU8850W","A0SN":"PS-PAW7028Y","A07I":"PS-PWC778LX","A0T4":"PS-PRM21CRX","1053":"PS-PWC103C","A0XY":"PS-PLD43CV8869","A04C":"PS-PWM7366HP","A0QJ":"PS-PRB237LB","7188":"PS-PLD32T1550S","A093":"PS-PLD32TV1855","A0GC":"PS-PWM7072N","A0AF":"PS-PLD50AV8759","A0XX":"PS-PLD43CV1569","3446":"PS-PRG21KCG","6638":"PS-PMA9502BA","A00G":"PS-PLD32AD1508G","A0MB":"PS-PWM7076G","9930":"PS-PLD40AS8858","A0AS":"PS-PLD40V8953","3682":"PS-SCN182","6631":"PS-PLD43TS153","A0M1":"PS-PMA9526B","A07A":"PS-PRM430X","1945":"PS-PWM9569C","A0FW":"PS-PAW8527M","6635":"PS-PLD40TS153","A06A":"PS-PLD40B8951","A0XR":"PS-PLD24CV1869","3718":"PS-PAW7511WS","A0PV":"PS-PLD32V1753","A02I":"PS-PRB219B","A0LU":"PS-PRA18MOB","6633":"PS-PLD43S153","9873":"PS-PAS8E28","6264":"PS-PLD32T1550","A0XW":"PS-PCF329","A0KU":"PS-PMA9522B","A130":"PS-PRB237TY","A0VS":"PS-PWM1203B","A0ZY":"PS-PAS8CF28","3216":"PS-PRG21BGR","A186":"PS-PWM1081Y","A0ZT":"PS-PLD43BAG9500","A111":"PS-PPS8L22","A0V5":"PS-PRA17DMY","A0O1":"PS-PLD32AG5959","A00I":"PS-PLD43AS1558G","A07J":"PS-PWC778LV","A0M0":"PS-PRW29MOB","A0N9":"PS-PAW8028W","3217":"PS-PRG21BGV","7793":"PS-PLD32S1503S","9884":"PS-PLD32AD1508","6903":"PS-PMA9501BGA","8920":"PS-PRX212R","9894":"PS-PLD24D1852","A0O5":"PS-PLD43BUG5959","5849":"PS-PLD32T7511","A0AU":"PS-PAC05VH","A04D":"PS-PWM7366HB","A0P8":"PS-PRM21PLX","A0SL":"PS-PLD43TAG9959","3410":"PS-PLD32D710","4766":"PS-PRM21QX","A0BA":"PS-PWM1402X","A006":"PS-PAS8F28","4764":"PS-PRM28QX","A0KQ":"PS-PASPRO12F3","3719":"PS-PAW7512B","8083":"PS-PRA18BNR","A0RS":"PS-PWM7076Y","A0ZU":"PS-PLD50UG5500","4973":"PS-PLD32T100TV","4484":"PS-SCN233D","A0QB":"PS-PRB187LB","3753":"PS-SCN230","A0VU":"PS-PWM1403X","A079":"PS-PWM951R","A02C":"PS-PRB159B","A0RP":"PS-PWM1082B","3816":"PS-PWC777WR","8897":"PS-PLD40B150","9455":"PS-PLD43AS1558","3724":"PS-PAW8511WS","A02B":"PS-PLD50AG9953","A04H":"PS-PWM9366HB","A0LQ":"PS-PRA15MOB","A0O2":"PS-PLD32BAG5959","A02T":"PS-PRA16BNB","A023":"PS-PRW23VX","4547":"PS-PAS79(BU)","A0A6":"PS-PLD24V0853","A07N":"PS-PWM752R","A04S":"PS-PLD50BUA8859W","A089":"PS-PWM751B","A162":"PS-PRA18DMR","A14P":"PS-PRA18DRD","A0DK":"PS-PLD40AG9953NT","A0XV":"PS-PCF229","8495":"PS-PWM7363B","7185":"PS-PAW75511WM","A0FG":"PS-PAW9527M","A0EB":"PS-PLD40V6153","A06F":"PS-PLD40BS8953","A04G":"PS-PWM9366HP","A0VT":"PS-PWM1403B","9830":"PS-PAW10518B","4765":"PS-PRM23QX","A119":"PS-DG32C103","8551":"PS-PLD32T1506E","A0DV":"PS-PLD43V7153","A0ZS":"PS-PMA9527B","880":"PS-PRS480X","A0FA":"PS-PMA9506BGNF","A0RT":"PS-PWM8076Y","A18S":"PS-PLD24CV1869Y","A132":"PS-PRB186RS","A095":"PS-PLD32TV0755","6701":"PS-PMA9501WA","A0AQ":"PS-PLD24TV0855","A09G":"PS-PLD43TV1556","A0VC":"PS-PRM21DMY","A0UC":"PS-PRA15DRX","A0YT":"PS-PRW29HB","5847":"PS-PLD32T1500","A0XQ":"PS-PASPRO10F6","A0MT":"PS-PWM1076G","958":"PS-PAW70501WB","A02D":"PS-PRB159R","5804":"PS-PRM21QV","9899":"PS-PLD43BS153","A0KN":"PS-PAS10DF22","A021":"PS-PRW25MNX","A150":"PS-PLD43TA5055","A02E":"PS-PRB179B","A0HT":"PS-PWC778WUV","A0GF":"PS-PWM8072B","A024":"PS-PRW25VX","3280":"PS-PRG22LTR","7094":"PS-PLD55US8850","6710":"PS-PMA9503BA","7861":"PS-PLD32D1500S","3599":"PS-PWM8567WB","A025":"PS-PRW29VX","A0ET":"PS-PMA9502BNF","6756":"PS-PRX171W","A0FV":"PS-PAW7527M","3278":"PS-PRG21LTV","A0QD":"PS-PRB177LB","5843":"PS-PLD32D7520","5794":"PS-PLD43S863","A07X":"PS-PLD40AD8959","A0YR":"PS-PAS8E20B","A0TY":"PS-PRA17CMS","4231":"PS-PAW7513N","A07C":"PS-PRM431X","A0C1":"PS-PAW8527R","1840":"PS-PAS78","A0SB":"PS-PLD50UG9959","4821":"PS-PRM28STV","A0KV":"PS-PAS8BF22","7216":"PS-PAW95512S","A0I1":"PS-PRA15ALR","7187":"PS-PAW85511WB","A0AW":"PS-PAC09VH","A12P":"PS-FOXSAT","A0SA":"PS-PAW75518B","7222":"PS-PAW75513M","1254":"PS-SCP1170LE","A0KX":"PS-PMA9320B","A0GE":"PS-PWM8072N","A07D":"PS-PRM491X","0A1M":"PS-PFL7051","A0TB":"PS-PRA17CRX","6282":"PS-SCN140X","A183":"PS-PWM7081Y","3729":"PS-PAW9511WM","A18Y":"PS-PRB200R","6600":"PS-PLD43S883","9928":"PS-PLD40B880","9730":"PS-PWC103BL","4810":"PS-PRM21SLX","A0N0":"PS-PRB287PR","4235":"PS-SCN180L","A0UZ":"PS-PAW1029Y","6769":"PS-PRM21HORF","6580":"PS-PRB183G","9978":"PS-SCN237","A0CP":"PS-PMA9310BG","3661":"PS-PLD24D901","A029":"PS-PLD32AG9953","9810":"PS-SCH51","A0O6":"PS-PLD43UG5959","A0AE":"PS-PLD50BV8758","5715":"PS-SCN186B","3406":"PS-PLD24D810","0A2P":"PS-PRS455S","3720":"PS-PAW7512M","3817":"PS-PWC777WB","866":"PS-PRS560X","874":"PS-PFL8101","3722":"PS-PAW8511WB","A04E":"PS-PWM8366HP","4382":"PS-PAW9513M","5769":"PS-PRM23QN","4739":"PS-PRO18LLX","A0H2":"PS-PMA9507BA","873":"PS-PFL7101","A0QF":"PS-PRB157LB","4733":"PS-PRO18BGVIN","3723":"PS-PAW8511WM","3162":"PS-PRG16KMB","3601":"PS-PWM9567WB","3732":"PS-PAW9512M","A096":"PS-PLD32TV1555","6897":"PS-PRO16ANB","A0UX":"PS-PAW8029Y","A003":"PS-PRH51X","A0U4":"PS-PRM21CMS","8915":"PS-PAW90517WB","6163":"PS-PLD32D1550","1581":"PS-PR22BGB","6891":"PS-PWM9366B","3198":"PS-PRG24KMB","A0DH":"PS-PLD40AG9953","0A35":"PS-PRS451Y","A0MI":"PS-PRA17MTR","5768":"PS-PRM21QN","6784":"PS-PWM8366B","9900":"PS-PLD50BS873","6925":"PS-PLD43D150","A0XU":"PS-PCF129","A185":"PS-PWM9081Y","A0R1":"PS-PRC1202G","4713":"PS-PRO15KTR","A0H7":"PS-PCF318","599":"PS-PCF115","A048":"PS-PLD50BAG9953","4381":"PS-PAW7513M","8573":"PS-PLD24D1850","A0S5":"PS-PWM1082X","A0P1":"PS-PRA18ORX","3218":"PS-PRG21BGB","A104":"PS-PLD50UV8959","4383":"PS-PAW9513B","3679":"PS-SCN181","4485":"PS-SCN143D","4516":"PS-BB5510(U)","0A0F":"PS-PFL7050","A0V1":"PS-PRA15DMY","5338":"PS-PMA9502","4833":"PS-PAS59(BUM)","A14T":"PS-PRA16DRD","1650":"PS-PAS21B","4102":"PS-PRN160GC","3731":"PS-PAW9512B","3633":"PS-PRG21KTR","A0A8":"PS-PLD55BUA8859","6579":"PS-PRB183B","3730":"PS-PAW9511WS","4730":"PS-PRO18AGVIN","A0NA":"PS-PAW9028W","4232":"PS-PAW8513B","A03J":"PS-PRW29MNR","7749":"PS-PAW95513M","6896":"PS-PWM9366P","3214":"PS-PRG16BGRN","5712":"PS-SCN146B","7578":"PS-PAW85513N","A0L4":"PS-PDV620T2","A07P":"PS-PWM802R","4132":"PS-PWM8070R","A0I6":"PS-PRA17ALR","5855":"PS-PLD24D9501","8922":"PS-PAS8C28","A0OD":"PS-PRA15ORX","3919":"PS-PRG24LTG","8082":"PS-PRA18ANB","6654":"PS-PAC05VX-M","A0MH":"PS-PRA15MTR","1646":"PS-SCP1181","A0IF":"PS-PRM21BLB","6632":"PS-PLD43TS156","A0EM":"PS-PTS2K25NFO","9847":"PS-PRB288B","6584":"PS-PRB173G","7215":"PS-PAW95512M","A075":"PS-PWM801R","3211":"PS-PRG16AGRN","5695":"PS-PRM21QB","A02L":"PS-PRB239R","A0ZP":"PS-PAS8EF28","A0OZ":"PS-PRA18PLX","A18X":"PS-PRB200Y","A0AZ":"PS-PAC05VZ","5792":"PS-PLD40TS853","6659":"PS-PLD32V7510S","A184":"PS-PWM8081Y","5969":"PS-PRM21FLR","A15D":"PS-PLD43UG5059","4010":"PS-PAC05VX","7196":"PS-PAW85511WM","A0QL":"PS-PRB287LB","A0MZ":"PS-PRB237PR","A14V":"PS-PLD40RG9059","5968":"PS-PRM21FLBL","9875":"PS-PAS8E12","A07T":"PS-PWM952R","A0LV":"PS-PRW23MOW","4236":"PS-SCN181L","A0L5":"PS-PDV700T2","A0L1":"PS-PAS8EF22","A0UE":"PS-PRA15DMS","A0OG":"PS-PRM21OLX","A15M":"PS-PLD55QG9059","A14R":"PS-PRA15DRD","5856":"PS-PLD24T8511","A004":"PS-PAS8F12","A18U":"PS-PLD32CV2269","6864":"PS-PRM23BNB","5850":"PS-PLD20D9501","3027":"PS-PLD24T800W","A02R":"PS-PRA16ANB","A0B0":"PS-PAC09VZ","9874":"PS-PAS8E22","9838":"PS-PAS8B22","A02S":"PS-PRA16BNR","6927":"PS-PWM8357XG","A0GI":"PS-PWM9572N","A0KW":"PS-PMA9321B","6717":"PS-PMA9506BA","8448":"PS-PLD50S883G","A0T8":"PS-PRM28CRX","3197":"PS-PRG24KMV","A0FB":"PS-PAS8F22NF","A10K":"PS-PRB186R","4732":"PS-PRO18BGRIN","9462":"PS-PLD50AS8858","4230":"PS-PAW7513B","9460":"PS-PLD40AS1558","9878":"PS-PLD50S873","959":"PS-PAW70501WX","7186":"PS-PAW75511WS","A068":"PS-PLD43BS1553W","1577":"PS-PR21BGR","5851":"PS-PLD22D9500","A0OB":"PS-PRA15OLX","5805":"PS-PRM23QV","A0S9":"PS-PAW75517WM","7223":"PS-PAW75513N","A0PA":"PS-PRM21PRX","1214":"PS-PR227VB","0A1N":"PS-PFL8051","3733":"PS-PAW9512S","6642":"PS-PMA9505WA","A0F0":"PS-PMA9501WNF","A110":"PS-PPS8L12","1054":"PS-PWC107G","A0M2":"PS-SCN187R","A0T7":"PS-PRM23DRX","A0DQ":"PS-PAC09VZS","A0PX":"PS-PRW23ZX","4571":"PS-PAS28(B)","A0LY":"PS-PRW25MOB","A0BB":"PS-PWM1402R","A0SH":"PS-PASPRO15F5","A125":"PS-PRB157TY","0A28":"PS-PRS510X","3497":"PS-PLD40D100","4574":"PS-PAS68(B)","A0I3":"PS-PRA16ALB","5845":"PS-PLD32D1500","A15O":"PS-PLD50UG5059","A16W":"PS-PAS10DF38","3905":"PS-PRG18LTC","A0Q6":"PS-PLD55UG5959","5601":"PS-PLD32T711TY","A0VE":"PS-PRM23DMY","7523":"PS-PAW85513B","4057":"PS-PRG22LTPN","A164":"PS-PAS8FF28R","A0H6":"PS-PCF218","A10J":"PS-PRB186B","A06B":"PS-PLD40T8950","A07E":"PS-PRM495X","A18I":"PS-PLD40CV8969V","A08B":"PS-PWM851B","4729":"PS-PRO18AGRIN","A0MV":"PS-PRB187PR","A0RC":"PS-PLD32AG9953E","A0F8":"PS-PMA9505BGNF","A0DJ":"PS-PLD55UV5920","A0KE":"PS-PLD43V8953","6716":"PS-PMA9503WA","A04F":"PS-PWM8366HB","A0U1":"PS-PRA16DMS","6918":"PS-PLD40S153U","A178":"PS-PAW8029TY","A0IC":"PS-PRA18BLR","8315":"PS-PAS29GA","7199":"PS-PAW95511WM","2951":"PS-PLD24T800","3030":"PS-SCP151C","6699":"PS-PMA9505BA","A0EW":"PS-PAS8E22NF","6815":"PS-PRO16BNB","4728":"PS-PRO16LLW","A0CW":"PS-PAS8E10","A0EO":"PS-PAS2A15BNFO","8075":"PS-PRA18ANR","1583":"PS-PR24BGR","4717":"PS-PRO16BGRN","9883":"PS-PLD50B870","6852":"PS-PRM21BNB","A19I":"PS-PWM7081V","A18H":"PS-PLD43CV8869V","1099":"PS-SCP123","A0DD":"PS-SCN236WX","6602":"PS-PLD50TS883","A0L6":"PS-PAS12AF15","3716":"PS-PAW7511WB","A0U9":"PS-PRM28DMS","A182":"PS-PRM21DRD","9757":"PS-SCP151","5665":"PS-PRM21QS","8092":"PS-PRA18BNB","A11T":"PS-PLD65UG5959","A15Q":"PS-PLD55UG5059","4684":"PS-PWC778","A0LP":"PS-PRA15MOW","A15L":"PS-PLD50QG9059","A0F9":"PS-PMA9505RSNF","8748":"PS-PRM28QXI","4705":"PS-PRM21BGV","A0ZA":"PS-PLD43TCV8865","A073":"PS-PWM751R","A06C":"PS-PLD40D8950","4105":"PS-PRN180GC","3200":"PS-PRG24LMR","4032":"PS-PWM9567WGS","9777":"PS-PLD50B880","A14Y":"PS-PLD32BV2258","A0GJ":"PS-PWM9572B","6906":"PS-PRM23HOV","4720":"PS-PRO16KTR","1579":"PS-PR21BGV","7189":"PS-PLD32T1500S","A15V":"PS-PASPRO12F7","A0U2":"PS-PRA17DMS","7198":"PS-PAW95511WB","A18F":"PS-PAW9029TS","0A0N":"PS-PFL1105H","9845":"PS-PRB218R","A031":"PS-PRA17MNX","A1AH":"PS-PLD32RG5059","A08O":"PS-PRX180T","6905":"PS-PRM23HORF","5316":"PS-PLD24D901Y","A061":"PS-PLD24D9050","3635":"PS-PRG21KTV","A18E":"PS-PAW8029TS","A179":"PS-PAW1029TY","A15U":"PS-PASPRO10F7","A19P":"PS-PRM20CRD","A02O":"PS-PRA15ANR","6572":"PS-PRM23FLR","5770":"PS-PRM28QN","8404":"PS-PLD32T1506S","4927":"PS-PMA9501","A0LR":"PS-PRA17MOW","A15P":"PS-PLD50BUG5058","A0S8":"PS-PAW75517WB","8464":"PS-PWM7363P","6865":"PS-PRO15ANR","3208":"PS-PRG18BGRIN","A17E":"PS-PAW9029TY","A19K":"PS-PWM9081V","4004":"PS-PAC09LE","6949":"PS-PWM7367WGS","8065":"PS-PRA17BNR","A1AM":"PS-SCN228","6711":"PS-PMA9300BA","1702":"PS-PAS68","A0C5":"PS-PRW296Y","A10Q":"PS-PRA18JS","A143":"PS-PASPRO15F7","6810":"PS-PRO16BNR","7182":"PS-PAW75511WB","9979":"PS-SCN288","A0OL":"PS-PRA16ORX","A19J":"PS-PWM8081V","2344":"PS-PAS08I","8074":"PS-PRA17BNB","A00H":"PS-PLD40AS8858G","3477":"PS-PLD32D715","3688":"PS-PLD32D100","3205":"PS-PRG18AGRIN","3806":"PS-PRN181RC","9296":"PS-PRB188B","A15E":"PS-PLD43BUG5058","A0EN":"PS-PMA9300WNF","A1AI":"PS-PLD32TG5055","A0ER":"PS-PASPRO12F2NF","A16R":"PS-PWM8073DB","1211":"PS-PR189SB","A1AL":"PS-SCN287","3203":"PS-PRG24LMX","2890":"PS-PR24KMB","A0NY":"PS-PRM495MOW","A0ZB":"PS-PLD43BCV8868","A0U7":"PS-PRM23DMS","A088":"PS-PWM701B","6934":"PS-PWM7358RS","5852":"PS-PLD22D1150","A177":"PS-PAW7029TY","3241":"PS-PWM7056WB","A1AF":"PS-SCN280","7907":"PS-PRA17GORF","A1AV":"PS-PRM20CLD","4808":"PS-PRM21STR","7219":"PS-PAW75513B","1681":"PS-DTIB2367C","4483":"PS-SCN183D","5931":"PS-PRZ211SP","3047":"PS-PLD32D905","4711":"PS-PRY211SV","0A0G":"PS-PFL8050","A10H":"PS-PRA18JR","A0ZR":"PS-PAS8FF28","4557":"PS-PAS78(BU)","9281":"PS-PRB178B","5964":"PS-PWM9058GS","A0T6":"PS-PRM23CRX","A00L":"PS-PLD43S883B","871":"PS-PRC1901R","7209":"PS-PAW75512S","A167":"PS-PAC09VZI","4756":"PS-PRY181GC","5930":"PS-PRZ211GS","3032":"PS-SCP1171C","9855":"PS-PRX212S","6634":"PS-PLD40S153","3033":"PS-PAS79","A1AJ":"PS-PLD32BG5058","A1AE":"PS-SCN220","5902":"PS-PCF217","2872":"PS-PR18KMR","3277":"PS-PRG21LTR","9695":"PS-PWM1368B","7781":"PS-PAW95513N","A0XN":"PS-PEC8410","0A1O":"PS-PFL8105H","A0OX":"PS-PRA18OLX","3210":"PS-PRG18BGBIN","4384":"PS-PAW9513N","A0AY":"PS-PAC18VH","1703":"PS-PAS67","4033":"PS-PWM9567WRS","A124":"PS-PRB177TY","A09X":"PS-PAC18VX-1","A00K":"PS-PLD50AS8858G","8815":"PS-PWM9368B","A0BH":"PS-PRW252T","1589":"PS-PLD32D700","A16P":"PS-PWM7073DB","A142":"PS-PTS12KF25N","9924":"PS-PRH51R","3680":"PS-SCN231","A0J0":"PS-PRB187R","A0VG":"PS-PRM28DMY","A0DP":"PS-PAC05VZS","8544":"PS-PASPRO15F2","2287":"PS-PR18KHG","4524":"PS-PHT925L(U)","A0OW":"PS-PRA17PRX","876":"PS-PFL7103","A122":"PS-PRB187TY","9802":"PS-PR245SMX","8543":"PS-PASPRO12F2","5785":"PS-PAC18VG","A0OF":"PS-PRA16OLX","A09A":"PS-PLD32TV1056","A1AK":"PS-PLD43TG5055","A0KJ":"PS-PTS12KF25","5718":"PS-SCN236B","A0KK":"PS-PTS12KF15","A1AD":"PS-SCN190","4815":"PS-PRM21KTV","6639":"PS-PMA9503GA","5854":"PS-PLD24D8520","A100":"PS-PMD22VF9930","4735":"PS-PRO18KTR","A0U5":"PS-PRM21DMS","6648":"PS-PMA9310BA","8798":"PS-PWM7368B","8109":"PS-PRM21HHW","A16O":"PS-PWM7073DG","955":"PS-PCF217-1","1257":"PS-SCP1171LE","872":"PS-PRC1901DG","A1AG":"PS-SCN227","A16Q":"PS-PWM8073DG","5967":"PS-PWM1058GS","A19L":"PS-PWM1081V","637":"PS-PAC10NK","A0YC":"PS-PRA17ZS","4278":"PS-PWM9070Y","2720":"PS-PWM9569PW","A17G":"PS-PLD100QV5925","5966":"PS-PWM1058RS","5689":"PS-PWM7057BS","3209":"PS-PRG18BGVIN","A19S":"PS-PLD32TV1755S","A129":"PS-PPS4PH12","A1AZ":"PS-PLD43RG5059","6006":"PS-PWM9567CC","A1C1":"PS-PLD32TC1865","954":"PS-PCF117-1","4233":"PS-PAW8513N","5903":"PS-PCF317","1937":"PS-PWM7569C","2393":"PS-BB3501","8024":"PS-PRA18HOB","5899":"PS-SCN186W","5690":"PS-PWM8057BS","A0YD":"PS-PRW23ZS","3274":"PS-PRG24BGR","6863":"PS-PRM23BNR","A0OR":"PS-PRA17PLX","A1A2":"PS-PEV15R1AT","A0ES":"PS-PMA9311NF","5954":"PS-PRZ181GC","3173":"PS-PRG21KMX","3481":"PS-PCF315","5848":"PS-PLD32T1506","4704":"PS-PRM21BGB","7549":"PS-PAW85513M","6519":"PS-PRO17HOR","4031":"PS-PWM9567WBS","A0U3":"PS-PRA18DMS","A0TZ":"PS-PRA18CMS","A02M":"PS-PRB289B","3634":"PS-PRG21KTB","A1AA":"PS-PPS10L22","3056":"PS-PLD22D900","9315":"PS-PRB218B","A0IE":"PS-PRM21BLR","A1AP":"PS-PEV30M5AT","A0LZ":"PS-PRW29MOW","3283":"PS-PRG24LTR","A18D":"PS-PAW7029TS","A194":"PS-PWC888YUV","A1CC":"PS-PLD32CV1869C","A1C3":"PS-PCF218-3","6640":"PS-PMA9300WA","2271":"PS-PR18BGRIN","6948":"PS-PWM7367WBS","A0O7":"PS-PLD40AG5959","A11X":"PS-PRD18JY","815":"PS-PRS450B","9922":"PS-PLD65UV5902","3171":"PS-PRG21KMV","4809":"PS-PRM21STV","2662":"PS-PLM32M55","A0I7":"PS-PRA17ALB","8569":"PS-PWC777BX","1029":"PS-PAS28","4709":"PS-PRM28BGR","9375":"PS-PR2M51F1","3281":"PS-PRG22LTV","A1C2":"PS-PCF118-3","3223":"PS-PRG16BGVN","3236":"PS-PWM7056WR","A0NS":"PS-PRM490MOW","4814":"PS-PRM21KTR","A03I":"PS-PRW25MNR","4327":"PS-SCN141L","A0YA":"PS-PRA18ZS","A0OP":"PS-PRA17OLX","2978":"PS-PR21KMR1","A02Q":"PS-PRA16ANR","A1DU":"PS-PRA18MNSH","0A0A":"PS-SCN1020","A165":"PS-PAC05VZI","1853":"PS-PR16BGBN","A1A5":"PS-PASPRO8F3","4104":"PS-PRN180RC","A1B0":"PS-PLD43BG5058","A0FC":"PS-PASPRO15F2NF","2947":"PS-PLD24D552","8438":"PS-PWM8358XSL","6745":"PS-PRO18HORF","865":"PS-PRS550T","814":"PS-PRS450W","8669":"PS-PTS2K25","2649":"PS-PR16BGY","3282":"PS-PRG22LTB","A03T":"PS-PCF317-1","3546":"PS-PRG15KTR","3668":"PS-PRN180B","A1DC":"PS-PRM21CRX3","A0C4":"PS-PRW256Y","A19B":"PS-PLD43UG3059","A0I8":"PS-PRA17BLR","8058":"PS-PRA17ANR","A1EG":"PS-PRM21DRD3","A1DJ":"PS-PRW23MOB3","A1D7":"PS-PRB219R3","6700":"PS-PMA9501BA","A1DI":"PS-PRW23MNX3","A1DD":"PS-PRM21DMY3","1241":"PS-SCP122LE","A1DN":"PS-PRW29MNX3","940":"PS-PAC09VX-1","3229":"PS-PWM8556WR","A1DR":"PS-PRB179Y","3725":"PS-PAW8512B","A0F4":"PS-PMA9300BGNF","6641":"PS-PMA9300GA","A0EL":"PS-PAS12SA15NFO","5666":"PS-PRM23QS","A166":"PS-PAC05VZSI","7858":"PS-PLD32D1520S","4731":"PS-PRO18AGBIN","6591":"PS-PWM1057B1","4326":"PS-SCN140L","3220":"PS-PRG22BGV","7875":"PS-PRF17QN","0A3U":"PS-PCA200D","A1DE":"PS-PRM21DRX3"};
+let PRODUCT_MAP = Object.assign({}, INITIAL_PRODUCT_MAP);
+
+// Muat cache barang dari localStorage
+try {
+ const cached = localStorage.getItem(PRODUCT_STORAGE_KEY);
+ if(cached) {
+  const parsed = JSON.parse(cached);
+  if(Object.keys(parsed).length > 50) PRODUCT_MAP = Object.assign({}, INITIAL_PRODUCT_MAP, parsed);
+ }
+} catch(e) {}
+
+// Muat cache teknisi dari localStorage
+let TEKNISI_MAP = {};
+try {
+ const cachedTek = localStorage.getItem(TEKNISI_STORAGE_KEY);
+ if(cachedTek) TEKNISI_MAP = JSON.parse(cachedTek);
+} catch(e) {}
+
+// Google Visualization JSONP Loader (Bebas CORS, jalan di file:/// maupun web)
+function loadGviz(gid, cbName, timeoutMs = 15000) {
+ return new Promise((resolve, reject) => {
+  const sc = document.createElement("script");
+  const cleanup = () => {
+   clearTimeout(timer);
+   delete window[cbName];
+   sc.remove();
+  };
+  const timer = setTimeout(() => {
+   cleanup();
+   reject(new Error("Timeout load gviz"));
+  }, timeoutMs);
+
+  window[cbName] = (res) => {
+   cleanup();
+   resolve(res);
+  };
+
+  sc.onerror = () => {
+   cleanup();
+   reject(new Error("Network error gviz"));
+  };
+
+  sc.src = "https://docs.google.com/spreadsheets/d/" + SHEET_DOC_ID + "/gviz/tq?tqx=responseHandler:" + cbName + "&gid=" + gid;
+  document.head.appendChild(sc);
+ });
+}
+
+// Background sync data Barang dari Google Sheet via GViz JSONP
+async function syncProductMap() {
+ const cb = "gvizBarang_" + Date.now();
+ try {
+  const res = await loadGviz(GID_BARANG, cb);
+  if(!res || !res.table || !res.table.rows) return;
+  const newMap = {};
+  res.table.rows.forEach(r => {
+   if(!r || !r.c || r.c.length < 2) return;
+   const k = r.c[0] && r.c[0].v != null ? String(r.c[0].v).trim().toUpperCase() : "";
+   const v = r.c[1] && r.c[1].v != null ? String(r.c[1].v).trim() : "";
+   if(k && v && k !== "KODE") {
+    newMap[k] = v;
+   }
+  });
+  if(Object.keys(newMap).length > 50) {
+   PRODUCT_MAP = Object.assign({}, PRODUCT_MAP, newMap);
+   localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(PRODUCT_MAP));
+  }
+ } catch(e) {}
+}
+
+// Background sync data Teknisi dari Google Sheet via GViz JSONP
+async function syncTeknisiMap() {
+ const cb = "gvizTeknisi_" + Date.now();
+ try {
+  const res = await loadGviz(GID_TEKNISI, cb);
+  if(!res || !res.table || !res.table.rows) return;
+  const newTekMap = {};
+  res.table.rows.forEach(r => {
+   if(!r || !r.c || r.c.length < 2) return;
+   const pds = r.c[0] && r.c[0].v != null ? String(r.c[0].v).trim().toUpperCase() : "";
+   const tech = r.c[1] && r.c[1].v != null ? String(r.c[1].v).trim() : "";
+   if(pds && tech && pds !== "PDS" && !tech.toUpperCase().includes("TEKNISI")) {
+    if(!newTekMap[pds]) newTekMap[pds] = [];
+    if(!newTekMap[pds].includes(tech)) newTekMap[pds].push(tech);
+   }
+  });
+  if(Object.keys(newTekMap).length > 0) {
+   TEKNISI_MAP = newTekMap;
+   localStorage.setItem(TEKNISI_STORAGE_KEY, JSON.stringify(TEKNISI_MAP));
+   renderTechField(currentSite);
+  }
+ } catch(e) {}
+}
+
+syncProductMap();
+syncTeknisiMap();
 
 const SITES=["ABN", "ACH", "BDG", "BDU", "BGR", "BJN", "BKL", "BKS", "BNJ", "BWI", "CDG", "CGN", "CKR", "CRB", "DPK", "DPS", "GTO", "JBI", "JBR", "JBS", "JKT", "JSL", "JTR", "KDI", "KDR", "KDS", "KLT", "KPG", "LPG", "MAK", "MAN", "MDN", "MDU", "MGL", "MLG", "MTJ", "MTR", "PDG", "PKB", "PKL", "PLB", "PLU", "PNP", "PPS", "PRK", "PTK", "PWT", "RTP", "SBN", "SBU", "SBY", "SKB", "SLO", "SMD", "SMG", "TGR", "TSM", "YOG", "Cileungsi", "Indramayu/jatibarang", "Tegal PKL", "Probolinggo JBR", "Pamekasan SBU", "Cibubur", "Ciledug JSL", "PSR CILACAP PWT", "PSR + BALIKPN SMD", "PSR BUKITTGG PDG", "PSR + BATAM PKB", "PSR + BIMA MTR", "PSR+ LABUAN", "PSR LUBUK PPS", "PSR+ KAYUAGUNG PPS", "PSR MUARA BUNGO JBI", "PSR METRO LPG", "PSR LAHAT PPS", "PSR BATURJ PPS", "PSR FL0RES KPG", "PSR TRNATE MAN", "PSR Bau2 KDI", "PSR Tarakan SMD", "PSR Berau SMD", "PSR Bontang SMD"];
 const LAYANAN = ["Home","Walk-in","Dealer","Out of Town"];
@@ -161,6 +307,7 @@ function updateSiteUI(){
   sel.value=currentSite;
   if(cur==="OUT"){loadWO()}
  }
+ renderTechField(currentSite);
 }
 
 function openSiteModal(){
@@ -180,6 +327,86 @@ function openSiteModal(){
  modal.style.display="flex";
 }
 
+// Fungsi mencari teknisi berdasarkan Site/PDS
+function getTeknisiForSite(site){
+ if(!site) return [];
+ const s = site.trim().toUpperCase();
+ if(TEKNISI_MAP[s] && TEKNISI_MAP[s].length) return TEKNISI_MAP[s];
+ for(const k in TEKNISI_MAP){
+  const ku = k.trim().toUpperCase();
+  if(ku === s || ku.includes(s) || s.includes(ku)){
+   if(TEKNISI_MAP[k] && TEKNISI_MAP[k].length) return TEKNISI_MAP[k];
+  }
+ }
+ return [];
+}
+
+// Render Dropdown / Input Teknisi secara dinamis sesuai site
+function renderTechField(site){
+ const box = $("#techBox");
+ if(!box) return;
+ const activeSite = site || currentSite || ($("#site") ? $("#site").value : "");
+ const list = getTeknisiForSite(activeSite);
+ 
+ if(list.length > 0){
+  box.innerHTML = `
+   <select name="Teknisi" id="techSelect" required onchange="onTechChange(this)">
+    <option value="">Pilih teknisi (${activeSite})...</option>
+    ${list.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join("")}
+    <option value="__manual__">+ Ketik Nama Lain...</option>
+   </select>
+   <input type="text" id="techManual" placeholder="Ketik nama teknisi..." style="display:none;margin-top:5px">
+  `;
+ } else {
+  box.innerHTML = `
+   <input type="text" name="Teknisi" id="techInput" placeholder="${activeSite ? 'Ketik nama teknisi (' + activeSite + ')...' : 'Pilih site dulu atau ketik nama teknisi...'}" required>
+  `;
+ }
+}
+
+function onTechChange(sel){
+ const manual = $("#techManual");
+ if(sel.value === "__manual__"){
+  sel.removeAttribute("name");
+  sel.required = false;
+  if(manual){
+   manual.style.display = "block";
+   manual.required = true;
+   manual.name = "Teknisi";
+   manual.focus();
+  }
+ } else {
+  sel.name = "Teknisi";
+  sel.required = true;
+  if(manual){
+   manual.style.display = "none";
+   manual.required = false;
+   manual.removeAttribute("name");
+   manual.value = "";
+  }
+ }
+}
+
+// Fungsi Lookup Model / Tipe Unit dari No Seri (Kosongkan model jika seri kosong)
+function lookupModel(serial){
+ const modelEl = document.querySelector('#f input[name="Model Unit"]');
+ if(!serial || !serial.trim()){
+  if(modelEl) modelEl.value = "";
+  return;
+ }
+ const s = serial.trim().toUpperCase();
+ const k4 = s.substring(0, 4);
+ const k3 = s.substring(0, 3);
+ 
+ const matched = PRODUCT_MAP[s] || PRODUCT_MAP[k4] || PRODUCT_MAP[k3];
+ if(matched){
+  if(modelEl){
+   modelEl.value = matched;
+   toast("Model terisi otomatis: " + matched, "#1b7f3b");
+  }
+ }
+}
+
 function render(){
  const F=FORMS[cur], ev=cat===CATS[0];
  const secs=F.sections[ev?"EV":"GEN"];
@@ -190,10 +417,24 @@ function render(){
  <label class="f">Site / Service Center<select name="Site Service Center" id="site" required><option value="">Pilih site...</option>${SITES.map(x=>`<option value="${x}"${x===currentSite?" selected":""}>${x}</option>`).join("")}</select></label>
  ${cur==="OUT"?`<label class="f">No. Work Order (WO) - dari PDI IN<select name="No WO" id="wo" required disabled><option value="">Pilih site dulu...</option></select></label>`:`<label class="f">No. Work Order (WO)<input type="text" name="No WO" required></label>`}
  <label class="f">Jenis Layanan<select name="Jenis Layanan" required><option value="">Pilih...</option>${LAYANAN.map(x=>`<option>${x}</option>`).join("")}</select></label>
- <label class="f">Model / Tipe Unit<input type="text" name="Model Unit" required></label>
- ${ev?"":`<label class="f">No. Seri (Serial Number)<input type="text" name="VIN" required></label>`}
+ <label class="f">Model / Tipe Unit<input type="text" name="Model Unit" id="modelInput" required></label>
+ <label class="f">${ev?"No. Rangka / VIN":"No. Seri (Serial Number)"}
+   <div class="input-with-btn">
+     <input type="text" name="VIN" id="seriInput" placeholder="Ketik atau scan seri..." required>
+     <button class="btn-scan" type="button" onclick="startScanner()" title="Scan Barcode / QR">
+       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+         <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+         <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+         <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+         <path d="M3 17v2a2 2 0 0 0 2 2h2"></path>
+         <line x1="7" y1="12" x2="17" y2="12"></line>
+       </svg>
+       <span>Scan</span>
+     </button>
+   </div>
+ </label>
 
- <label class="f">${F.tech}<input type="text" name="Teknisi" required></label>
+ <label class="f">${F.tech}<div id="techBox"></div></label>
  </div></fieldset>`;
  secs.forEach((s,si)=>{
   h+=`<fieldset><legend>${s[0]}</legend>`;
@@ -217,9 +458,22 @@ function render(){
   currentSite=e.target.value;
   if(currentSite){localStorage.setItem(SITE_STORAGE_KEY,currentSite)}
   updateSiteUI();
+  renderTechField(currentSite);
   if(cur==="OUT"){loadWO()}
  };
  
+ const seriInput = $("#seriInput");
+ if(seriInput){
+  seriInput.addEventListener("input", e=>{
+   lookupModel(e.target.value);
+  });
+  seriInput.addEventListener("change", e=>{
+   lookupModel(e.target.value);
+  });
+ }
+
+ renderTechField(currentSite);
+
  if(cur==="OUT"){
   $("#wo").onchange=fillFromWO;
   if(currentSite){loadWO()}
@@ -254,6 +508,7 @@ function fillFromWO(){
  const w=woItems.find(x=>x.wo===$("#wo").value);if(!w)return;
  const m={"Model Unit":w.model,"VIN":w.vin};
  Object.keys(m).forEach(k=>{const el=document.querySelector('#f [name="'+k+'"]');if(el&&m[k])el.value=m[k]});
+ if(w.vin){lookupModel(w.vin)}
 }
 const pads={};
 function initPads(){
@@ -275,12 +530,77 @@ function toast(t,c){const m=$("#msg");m.textContent=t;m.style.background=c;m.sty
 async function submit(ev){
  ev.preventDefault();
  const f=ev.target,F=FORMS[cur];
- let bad=null;
- f.querySelectorAll("[required]").forEach(el=>{if(!bad&&(el.type==="checkbox"?!el.checked:!el.value.trim()))bad=el});
+ 
+ // Reset peringatan sebelumnya
+ f.querySelectorAll(".field-warn").forEach(el=>el.classList.remove("field-warn"));
+ f.querySelectorAll(".warn-msg").forEach(el=>el.remove());
+ 
+ let firstBad = null;
+ 
+ // 1. Validasi Kolom Wajib (Input, Select, Textarea, Checkbox)
+ const requiredEls = f.querySelectorAll("input[required], select[required], textarea[required]");
+ requiredEls.forEach(el => {
+  let isBlank = false;
+  if(el.type === "checkbox") {
+   isBlank = !el.checked;
+  } else {
+   isBlank = !el.value || !el.value.trim();
+  }
+  
+  if(isBlank) {
+   el.classList.add("field-warn");
+   
+   // Tambahkan icon peringatan di bawah input
+   const warn = document.createElement("div");
+   warn.className = "warn-msg";
+   warn.innerHTML = `
+     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+       <circle cx="12" cy="12" r="10"></circle>
+       <line x1="12" y1="8" x2="12" y2="12"></line>
+       <line x1="12" y1="16" x2="12.01" y2="16"></line>
+     </svg>
+     <span>⚠️ Wajib diisi / dipilih</span>
+   `;
+   
+   const parent = el.closest(".input-with-btn") || el;
+   if(parent && parent.parentNode) {
+    parent.parentNode.insertBefore(warn, parent.nextSibling);
+   }
+   
+   const removeWarn = () => {
+    el.classList.remove("field-warn");
+    warn.remove();
+    el.removeEventListener("input", removeWarn);
+    el.removeEventListener("change", removeWarn);
+   };
+   el.addEventListener("input", removeWarn);
+   el.addEventListener("change", removeWarn);
+   
+   if(!firstBad) firstBad = el;
+  }
+ });
+
+ // 2. Validasi Item Checklist Radio
  const items=[...f.querySelectorAll(".item")];
- items.forEach(it=>{const ok=it.querySelector("input[type=radio]:checked");it.classList.toggle("miss",!ok);if(!ok&&!bad)bad=it});
- ["k","t"].forEach(k=>{const p=pads[k];p.box.classList.toggle("miss",!p.dirty);if(!p.dirty&&!bad)bad=p.box});
- if(bad){bad.scrollIntoView({block:"center",behavior:"smooth"});toast("Lengkapi kolom wajib dan semua item pemeriksaan","#C8102E");return}
+ items.forEach(it=>{
+  const ok=it.querySelector("input[type=radio]:checked");
+  it.classList.toggle("miss",!ok);
+  if(!ok && !firstBad) firstBad=it;
+ });
+ 
+ // 3. Validasi Tanda Tangan
+ ["k","t"].forEach(k=>{
+  const p=pads[k];
+  p.box.classList.toggle("miss",!p.dirty);
+  if(!p.dirty && !firstBad) firstBad=p.box;
+ });
+ 
+ if(firstBad){
+  firstBad.scrollIntoView({block:"center",behavior:"smooth"});
+  toast("Lengkapi data yang kosong bertanda ⚠️","#C8102E");
+  return;
+ }
+ 
  if(SCRIPT_URL.startsWith("PASTE")){toast("SCRIPT_URL belum diisi. Ikuti panduan deploy Apps Script.","#C8102E");return}
 
  const d=new FormData(f), fields={"Kategori Produk":cat};
@@ -302,8 +622,18 @@ async function submit(ev){
  try{
   const r=await fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({form:"PDI_"+cur,fields,signatures})});
   if(r&&r.type!=="opaque"&&r.status>=400)throw new Error("HTTP "+r.status);
-  toast("Data "+F.title+" terkirim ke Google Spreadsheet","#1b7f3b");
-  render();window.scrollTo({top:0,behavior:"smooth"});
+  
+  // Notif berhasil
+  toast("Data PDI berhasil dikirim","#1b7f3b");
+  
+  // Kosongkan kolom type dan seri otomatis saat berhasil
+  const modelEl = document.querySelector('#f input[name="Model Unit"]');
+  if(modelEl) modelEl.value = "";
+  const seriEl = document.querySelector('#f input[name="VIN"]');
+  if(seriEl) seriEl.value = "";
+  
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
  }catch(e){
   toast("Gagal mengirim. Cek koneksi internet lalu coba lagi.","#C8102E");
   btn.disabled=false;btn.textContent="Kirim "+F.title;
@@ -339,6 +669,68 @@ window.addEventListener("popstate", e=>{
 
 $("#t-in").onclick=()=>tab("IN");
 $("#t-out").onclick=()=>tab("OUT");
+
+// Logic Barcode Scanner
+let html5QrScanner = null;
+
+function startScanner(){
+ const modal = $("#scannerModal");
+ modal.style.display = "flex";
+
+ if(typeof Html5Qrcode === "undefined"){
+  toast("Library scanner sedang dimuat, pastikan terhubung internet...", "#C8102E");
+  return;
+ }
+
+ if(html5QrScanner){
+  try{ html5QrScanner.stop().catch(()=>{}); }catch(e){}
+ }
+
+ html5QrScanner = new Html5Qrcode("reader");
+ const config = {
+  fps: 15,
+  qrbox: (w, h) => ({ width: Math.min(w * 0.85, 300), height: Math.min(h * 0.55, 180) }),
+  aspectRatio: 1.333
+ };
+
+ html5QrScanner.start(
+  { facingMode: "environment" },
+  config,
+  (decodedText) => {
+   onScanSuccess(decodedText);
+  },
+  () => {}
+ ).catch(err => {
+  console.error("Camera start error:", err);
+  toast("Kamera tidak dapat diakses atau izin ditolak", "#C8102E");
+  stopScanner();
+ });
+}
+
+function stopScanner(){
+ const modal = $("#scannerModal");
+ modal.style.display = "none";
+ if(html5QrScanner){
+  html5QrScanner.stop().then(()=>{
+   html5QrScanner.clear();
+  }).catch(()=>{
+   try{ html5QrScanner.clear(); }catch(e){}
+  });
+ }
+}
+
+function onScanSuccess(code){
+ if(!code) return;
+ const cleanCode = code.trim();
+ if(navigator.vibrate) navigator.vibrate(100);
+ stopScanner();
+
+ const seriEl = document.querySelector('#f input[name="VIN"]');
+ if(seriEl){
+  seriEl.value = cleanCode;
+ }
+ lookupModel(cleanCode);
+}
 
 render();
 updateSiteUI();
