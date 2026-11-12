@@ -1155,7 +1155,7 @@ function fetchGvizSheet(sheetName, timeoutMs = 15000) {
    reject(new Error("Network error loading sheet " + sheetName));
   };
 
-  sc.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=responseHandler:${cbName}`;
+  sc.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&headers=1&tqx=responseHandler:${cbName}&_t=${Date.now()}`;
   document.head.appendChild(sc);
  });
 }
@@ -1165,9 +1165,18 @@ function parseGvizToDictList(resGviz) {
   if (!resGviz || !resGviz.table || !Array.isArray(resGviz.table.rows) || !Array.isArray(resGviz.table.cols)) {
     return [];
   }
-  const cols = resGviz.table.cols.map(c => (c && c.label) ? String(c.label).trim() : "");
+  let cols = resGviz.table.cols.map(c => (c && c.label) ? String(c.label).trim() : "");
+  let rawRows = resGviz.table.rows;
+
+  // Fallback jika label cols kosong tetapi baris data pertama berisi nama header
+  const hasLabels = cols.some(l => l && l.length > 0);
+  if (!hasLabels && rawRows.length > 0 && rawRows[0] && Array.isArray(rawRows[0].c)) {
+    cols = rawRows[0].c.map(cell => (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v).trim() : "");
+    rawRows = rawRows.slice(1);
+  }
+
   const rows = [];
-  resGviz.table.rows.forEach(r => {
+  rawRows.forEach(r => {
     if (!r || !Array.isArray(r.c)) return;
     const rowObj = {};
     r.c.forEach((cell, idx) => {
@@ -1521,9 +1530,12 @@ function render(preserveSCL=""){
  } else {
   // PDI OUT: NO SCL DITUKAR KE ATAS (FILTER SESUAI KODE SITE AKTIF)
   h += `
-  <fieldset class="wo-box">
-    <div style="margin-bottom:8px;">
+  <fieldset class="wo-box" id="sclBox">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
       <legend style="margin:0; padding:0 4px; font-weight:bold; color:var(--red);">NO. CASE - Pilih dari PDI IN (${currentSite || '-'})</legend>
+      <button type="button" id="btnRefreshScl" onclick="loadSCL()" title="Segarkan Data PDI IN" style="background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:3px 8px; font-size:11px; font-weight:600; color:#1e293b; display:inline-flex; align-items:center; gap:4px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+        <span id="refreshSclIcon" style="display:inline-block;">🔄</span> Refresh
+      </button>
     </div>
     <label class="f">Pilih NO. CASE yang siap PDI OUT:
       <select id="sclSelect" name="No SCL" required>
@@ -2001,13 +2013,22 @@ async function executePrintPDF() {
     } catch(e) {}
 
     // 4. Susun Dokumen Cetak ke dalam container #printReportArea
-    renderPrintDocument(targetSCL, inData, outData);
+    const fullHtml = renderPrintDocument(targetSCL, inData, outData);
 
-    // 5. Beri jeda 350ms, sembunyikan #app dan #printModal di DOM, lalu panggil window.print()
+    btn.disabled = false;
+    btn.innerHTML = origBtnText;
+
+    // A. JIKA BERADA DI DALAM APLIKASI ANDROID (APK) -> Gunakan Android PrintManager Native
+    if (window.AndroidPrint && typeof window.AndroidPrint.printHtml === "function") {
+      closePrintModal();
+      window.AndroidPrint.printHtml(fullHtml, "PDI_" + targetSCL);
+      toast("✓ Membuka dialog Cetak / Simpan PDF...", "#15803d", 3500);
+      return;
+    }
+
+    // B. JIKA BERADA DI BROWSER (Chrome / PC) -> Gunakan dialog cetak browser
+    toast("✓ Menyiapkan cetak PDF...", "#15803d", 2500);
     setTimeout(() => {
-      btn.disabled = false;
-      btn.innerHTML = origBtnText;
-
       const appEl = document.getElementById("app");
       const printModalEl = document.getElementById("printModal");
       if (appEl) appEl.style.setProperty("display", "none", "important");
@@ -2489,6 +2510,116 @@ function renderPrintDocument(scl, inData, outData) {
   }
 
   area.innerHTML = htmlDoc;
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDI - ${scl}</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111; background: #fff;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .print-page {
+    width: 100%; max-width: 210mm;
+    margin: 0 auto;
+    padding: 8mm 10mm 6mm 10mm;
+    background: #fff;
+    box-sizing: border-box;
+    page-break-after: always;
+  }
+  .print-page:last-child {
+    page-break-after: auto;
+  }
+  .print-page-break {
+    page-break-before: always;
+    break-before: page;
+    height: 0; display: block; visibility: hidden;
+  }
+  .print-header {
+    border-bottom: 2px solid #C8102E;
+    padding-bottom: 4px; margin-bottom: 6px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .print-header-mini {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 8pt; font-weight: 700; color: #444;
+    border-bottom: 1.5px solid #C8102E; padding-bottom: 3px; margin-bottom: 6px;
+  }
+  .print-brand-title {
+    font-size: 13pt; font-weight: 900; color: #C8102E; letter-spacing: 0.5px;
+  }
+  .print-brand-sub {
+    font-size: 7.5pt; color: #555; font-weight: 600;
+  }
+  .print-doc-meta { text-align: right; }
+  .print-doc-title { font-size: 10pt; font-weight: 800; color: #111; }
+  .print-doc-sub { font-size: 7.5pt; color: #555; font-weight: 600; }
+  .print-doc-no { font-size: 8pt; color: #0D47A1; margin-top: 2px; }
+  .print-table {
+    width: 100%; border-collapse: collapse; margin-bottom: 5px;
+    font-size: 7.5pt; table-layout: fixed;
+  }
+  .print-table th, .print-table td {
+    border: 1px solid #777; padding: 2.5px 4px;
+    vertical-align: middle; word-wrap: break-word;
+  }
+  .print-table th {
+    background-color: #f2f2f2 !important; font-weight: 700; color: #222; text-align: left;
+  }
+  .print-section-hdr {
+    background-color: #C8102E !important; color: #fff !important;
+    font-weight: 800; font-size: 8pt; padding: 3px 6px;
+    margin-top: 5px; margin-bottom: 3px; border-radius: 2px;
+  }
+  .badge-ok {
+    font-weight: 700; color: #1b5e20; background: #e8f5e9 !important;
+    padding: 1px 4px; border-radius: 2px; display: inline-block;
+  }
+  .badge-ng {
+    font-weight: 700; color: #b71c1c; background: #ffebee !important;
+    padding: 1px 4px; border-radius: 2px; display: inline-block;
+  }
+  .badge-na { color: #777; font-style: italic; }
+  .mono { font-family: Consolas, monospace; font-weight: 700; letter-spacing: 0.3px; }
+  .print-signatures {
+    display: flex; justify-content: space-between; gap: 8px;
+    margin-top: 6px; margin-bottom: 4px; page-break-inside: avoid;
+  }
+  .sig-col {
+    flex: 1; text-align: center; border: 1px solid #ccc;
+    background: #fafafa !important; padding: 3px; border-radius: 3px;
+    min-height: 72px; display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .sig-col-title {
+    font-size: 7.5pt; font-weight: 700; color: #333;
+    border-bottom: 1px solid #eee; padding-bottom: 1px; margin-bottom: 2px;
+  }
+  .sig-img-box {
+    min-height: 44px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; margin-bottom: 2px;
+  }
+  .sig-img-box img { max-height: 44px; max-width: 90%; object-fit: contain; }
+  .sig-name { font-size: 8.5pt; font-weight: 700; margin-top: 1px; }
+  .sig-date { font-size: 7pt; color: #555; }
+  .print-footer {
+    margin-top: 6px; padding-top: 3px; border-top: 1px dashed #999;
+    font-size: 7pt; color: #666; display: flex; justify-content: space-between;
+  }
+  @media print {
+    @page { size: A4 portrait; margin: 8mm 6mm; }
+  }
+</style>
+</head>
+<body>
+${htmlDoc}
+</body>
+</html>`;
 }
 // ==========================================
 // PDI OUT SCL PAIRING & STRICT FILTER BY SITE
@@ -2568,40 +2699,11 @@ function markSclCompletedLocally(sclVal){
 }
 
 function showSclLoadingNotification(isLoading, loadedFromServer = true, count = 0){
-  let statusEl = $("#sclLoadingStatus");
-  if(!statusEl){
-    const sclBox = $("#sclBox");
-    if(sclBox){
-      statusEl = document.createElement("div");
-      statusEl.id = "sclLoadingStatus";
-      statusEl.style.cssText = "font-size:12px; margin-top:5px; font-weight:600; display:flex; align-items:center; gap:6px; transition:opacity 0.3s;";
-      sclBox.appendChild(statusEl);
-    }
-  }
-  if(!statusEl) return;
-
+  const btnSpin = $("#refreshSclIcon");
   if(isLoading){
-    statusEl.style.display = "flex";
-    statusEl.style.opacity = "1";
-    statusEl.style.color = "#2563eb";
-    statusEl.innerHTML = `
-      <span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span>
-      <span>Memperbarui data No Case PDI IN dari server...</span>
-    `;
+    if(btnSpin) btnSpin.style.animation = "spin 1s linear infinite";
   } else {
-    if(loadedFromServer){
-      statusEl.style.color = "#16a34a";
-      statusEl.innerHTML = `<span>✓ Data server diperbarui (${count} No Case siap)</span>`;
-    } else {
-      statusEl.style.color = "#d97706";
-      statusEl.innerHTML = `<span>⚡ Menggunakan data lokal offline (${count} No Case)</span>`;
-    }
-    setTimeout(() => {
-      if(statusEl) {
-        statusEl.style.opacity = "0";
-        setTimeout(() => { if(statusEl && statusEl.style.opacity === "0") statusEl.style.display = "none"; }, 300);
-      }
-    }, 2500);
+    if(btnSpin) btnSpin.style.animation = "";
   }
 }
 
@@ -2674,80 +2776,80 @@ async function loadSCL(preselectSCL=""){
   let completedSet = {};
   let loadedFromServer = false;
 
-  // 3. AMBIL DATA TERBARU DARI SERVER
+  // 3. AMBIL DATA TERBARU DARI GOOGLE SHEETS SECARA REAL-TIME (GViz PDIIN & PDOUT)
   try {
-    try {
-      const r = await jsonp(SCRIPT_URL + "?action=get_pending_scl&site=" + encodeURIComponent(siteCode), 6000);
-      if(r && r.ok && Array.isArray(r.items)){
-        serverItems = r.items;
-        loadedFromServer = true;
-      }
-    } catch(e){
-      console.log("Apps Script SCL fallback to GViz:", e);
+    const [resIn, resOut] = await Promise.all([
+      fetchGvizSheet(SHEET_NAME_IN, 8000).catch(() => null),
+      fetchGvizSheet(SHEET_NAME_OUT, 8000).catch(() => null)
+    ]);
+
+    // Daftarkan semua NO. CASE yang sudah selesai di PDOUT
+    if(resOut){
+      const rowsOut = parseGvizToDictList(resOut);
+      rowsOut.forEach(r => {
+        const outSCL = String(r["No SCL"] || r["No CASE"] || r["NO. CASE"] || r["No WO"] || "").trim().toUpperCase();
+        if(outSCL){
+          completedSet[outSCL] = true;
+          try { localStorage.setItem("pdi_completed_out_" + outSCL, "1"); } catch(e){}
+        }
+      });
     }
 
-    if(!loadedFromServer){
-      const [resIn, resOut] = await Promise.all([
-        fetchGvizSheet(SHEET_NAME_IN),
-        fetchGvizSheet(SHEET_NAME_OUT)
-      ]);
+    // Ambil data PDIIN yang belum selesai di PDOUT untuk site ini
+    if(resIn){
+      const rowsIn = parseGvizToDictList(resIn);
+      rowsIn.forEach(r => {
+        const rawSite = String(r["Site Service Center"] || "").trim();
+        if(siteCode && normalizeSite(rawSite) !== siteCode) return;
 
-      if(resOut && resOut.table && Array.isArray(resOut.table.rows)){
-        const rowsOut = resOut.table.rows;
-        let startRowOut = (rowsOut.length > 0 && String(rowsOut[0]?.c?.[3]?.v || "").toUpperCase() === "NO SCL") ? 1 : 0;
-        for(let o = startRowOut; o < rowsOut.length; o++){
-          const rO = rowsOut[o];
-          if(!rO || !rO.c || rO.c.length <= 3) continue;
-          const outWO = String(rO.c[3]?.v || "").trim().toUpperCase();
-          if(outWO) {
-            completedSet[outWO] = true;
-            localStorage.setItem("pdi_completed_out_" + outWO, "1");
-          }
+        const scl = String(r["No SCL"] || r["No CASE"] || r["NO. CASE"] || r["No WO"] || "").trim();
+        if(!scl || !isValidScl(scl)) return;
+
+        const cleanSCL = scl.toUpperCase();
+        if(completedSet[cleanSCL] || isSclCompletedLocally(cleanSCL)) return;
+
+        const model = String(r["Model Unit"] || "").trim();
+        const vin = String(r["VIN"] || "").trim();
+        const layanan = String(r["Jenis Layanan"] || "").trim();
+        const teknisi = String(r["Teknisi"] || "").trim();
+        const rawCat = String(r["Kategori Produk"] || "").trim();
+
+        let normCat = "Motor Listrik (EV)";
+        if(rawCat && !rawCat.includes("EV") && !rawCat.includes("Motor")){
+          normCat = "Non-EV / Elektronik";
         }
-      }
 
-      if(resIn && resIn.table && Array.isArray(resIn.table.rows)){
-        const rowsIn = resIn.table.rows;
-        let startRowIn = (rowsIn.length > 0 && String(rowsIn[0]?.c?.[2]?.v || "").toUpperCase() === "NO SCL") ? 1 : 0;
+        serverItems.push({
+          scl: cleanSCL,
+          wo: cleanSCL,
+          caseNo: cleanSCL,
+          model: model,
+          vin: vin,
+          cat: normCat,
+          layanan: layanan,
+          teknisi: teknisi,
+          site: rawSite || siteCode,
+          date: r["Tanggal"] || r["Waktu Submit"] || ""
+        });
+      });
+      serverItems.reverse();
+      loadedFromServer = true;
+    }
 
-        for(let i = startRowIn; i < rowsIn.length; i++){
-          const r = rowsIn[i];
-          if(!r || !r.c || r.c.length <= 2) continue;
-          const scl = String(r.c[2]?.v || "").trim();
-          if(!scl) continue;
-
-          const rawSite = String(r.c[12]?.v || "").trim();
-          if(normalizeSite(rawSite) !== siteCode) continue;
-
-          const cleanSCL = scl.toUpperCase();
-          if(completedSet[cleanSCL] || isSclCompletedLocally(cleanSCL)) continue;
-
-          const model = String(r.c[5]?.v || "").trim();
-          const vin = String(r.c[7]?.v || "").trim();
-          const layanan = String(r.c[3]?.v || "").trim();
-          const teknisi = String(r.c[13]?.v || "").trim();
-          const rawCat = (r.c.length > 52 && r.c[52]?.v) ? String(r.c[52].v).trim() : "";
-
-          let normCat = "Motor Listrik (EV)";
-          if(rawCat && !rawCat.includes("EV") && !rawCat.includes("Motor")){
-            normCat = "Non-EV / Elektronik";
-          }
-
-          serverItems.push({
-            scl: cleanSCL,
-            wo: cleanSCL,
-            caseNo: cleanSCL,
-            model: model,
-            vin: vin,
-            cat: normCat,
-            layanan: layanan,
-            teknisi: teknisi,
-            site: rawSite
+    // Jika GViz kosong atau ada kendala koneksi, coba fallback Apps Script get_pending_scl
+    if(serverItems.length === 0){
+      try {
+        const r = await jsonp(SCRIPT_URL + "?action=get_pending_scl&site=" + encodeURIComponent(siteCode), 5000);
+        if(r && r.ok && Array.isArray(r.items)){
+          r.items.forEach(it => {
+            const k = String(it.scl || it.wo || it.caseNo || "").trim().toUpperCase();
+            if(isValidScl(k) && !completedSet[k] && !isSclCompletedLocally(k)){
+              serverItems.push(it);
+            }
           });
+          loadedFromServer = true;
         }
-        serverItems.reverse();
-        loadedFromServer = true;
-      }
+      } catch(e){}
     }
   } catch(errFetch){
     console.log("Error loading pending cases from server:", errFetch);
@@ -3287,7 +3389,10 @@ async function submit(e){
 history.replaceState({tab:"IN"}, "", "#pdi-in");
 
 function tab(w, push=true){
- if(cur === w) return;
+ if(cur === w) {
+  if(w === "OUT") loadSCL();
+  return;
+ }
  if(document.activeElement && typeof document.activeElement.blur === "function"){
   document.activeElement.blur();
  }
@@ -3302,6 +3407,9 @@ function tab(w, push=true){
   }
  }
  render();
+ if(w === "OUT"){
+  loadSCL();
+ }
  window.scrollTo({top:0, behavior:"smooth"});
 }
 
