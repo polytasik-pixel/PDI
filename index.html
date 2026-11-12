@@ -154,7 +154,7 @@ header small{display:block;color:#bbb;margin-top:1px;font-size:11px}
 }
 .tabs button{
   flex:1;
-  padding:12px 4px;
+  padding:calc(12px - 1mm) 4px;
   border:0;
   background:#6b7280; /* Warna Abu-abu untuk menu yang tidak aktif (bisa diklik) */
   color:#ffffff;
@@ -1085,7 +1085,6 @@ body.is-printing fieldset {
       </div>
       <div class="header-site">
         <span id="headerSiteGroup" style="display:inline-flex; align-items:center; gap:5px;">
-          <span>Site:</span>
           <b id="activeSiteBadge">- Belum Dipilih -</b>
           <button type="button" class="btn-change-site" id="btnChangeSite" onclick="openSiteModal()" title="Ubah Site">Ganti</button>
         </span>
@@ -1748,7 +1747,7 @@ function render(preserveSCL=""){
      </label>
      <label class="f">${ev ? "No. Rangka / VIN" : "No. Seri (Serial Number)"}
        <div class="input-with-btn">
-         <input type="text" name="VIN" id="seriInput" placeholder="Ketik atau scan seri..." required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+         <input type="text" name="VIN" id="seriInput" placeholder="Ketik atau Scan" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
          <button class="btn-scan" type="button" onclick="startScanner()" title="Scan Barcode / QR">
            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
              <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
@@ -1784,7 +1783,7 @@ function render(preserveSCL=""){
      </label>
      <label class="f">${ev ? "No. Rangka / VIN" : "No. Seri (Serial Number)"}
        <!-- Tanpa tombol scan di PDI OUT sesuai permintaan, tapi input tetap bisa diedit -->
-       <input type="text" name="VIN" id="seriInput" placeholder="No. Rangka / VIN / Seri..." required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+       <input type="text" name="VIN" id="seriInput" placeholder="Ketik atau Scan" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
      </label>
      <label class="f">${F.tech}
        <div id="techBox"></div>
@@ -2397,7 +2396,7 @@ async function executePrintPDF() {
     // A. JIKA BERADA DI DALAM APLIKASI ANDROID (APK) -> Gunakan Android PrintManager Native
     if (window.AndroidPrint) {
       closePrintModal();
-      toast("✓ Membuka dialog Cetak / Simpan PDF...", "#15803d", 3500);
+      // Dialog cetak langsung dibuka tanpa toast
       setTimeout(() => {
         try {
           if (typeof window.AndroidPrint.printHtml === "function") {
@@ -2413,7 +2412,7 @@ async function executePrintPDF() {
     }
 
     // B. JIKA BERADA DI BROWSER (Chrome / PC) -> Gunakan dialog cetak browser
-    toast("✓ Menyiapkan cetak PDF...", "#15803d", 2500);
+    // Dialog cetak langsung dibuka tanpa toast
     const origTitle = document.title;
     document.title = cleanDocName;
     setTimeout(() => {
