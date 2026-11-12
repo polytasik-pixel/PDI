@@ -691,16 +691,7 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   display: none;
 }
 
-body.is-printing > *:not(#printReportArea) {
-  display: none !important;
-}
-body.is-printing main,
-body.is-printing #app,
-body.is-printing #f,
-body.is-printing .wo-box,
-body.is-printing fieldset {
-  display: none !important;
-}
+/* Screen display is preserved during print; @media print manages document output */
 
 @media print {
   @page {
@@ -1168,9 +1159,40 @@ if ('scrollRestoration' in history) {
 function syncTopNavSpacer() {
   // In modern App-Shell layout (#app flex sibling), padding-top is managed by flexbox
 }
-window.addEventListener("DOMContentLoaded", () => {
-  try { window.scrollTo(0, 0); } catch(e){}
-});
+
+// SISTEM ROOT SCROLL LOCK & SAFE IN-APP SCROLLING
+// Mencegah window/body bergeser atau terpotong saat tombol diklik / difokuskan
+(function initRootScrollLock() {
+  function resetRootScroll() {
+    if (document.body && document.body.scrollTop !== 0) document.body.scrollTop = 0;
+    if (document.documentElement && document.documentElement.scrollTop !== 0) document.documentElement.scrollTop = 0;
+    if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
+  }
+
+  // Intersep Element.prototype.scrollIntoView agar selalu menggeser kontainer #app saja
+  // sehingga top-nav-bar dan header tidak pernah terdorong keluar layar
+  const origScrollIntoView = Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView = function(options) {
+    const app = document.getElementById("app");
+    if (app && app.contains(this)) {
+      const appRect = app.getBoundingClientRect();
+      const elRect = this.getBoundingClientRect();
+      const targetScroll = app.scrollTop + (elRect.top - appRect.top) - (appRect.height / 3);
+      app.scrollTo({ top: Math.max(0, targetScroll), behavior: "smooth" });
+      resetRootScroll();
+      return;
+    }
+    origScrollIntoView.call(this, options);
+    resetRootScroll();
+  };
+
+  window.addEventListener("scroll", resetRootScroll, { passive: true });
+  document.addEventListener("scroll", resetRootScroll, { passive: true });
+  document.addEventListener("focusin", resetRootScroll, { passive: true });
+  document.addEventListener("click", () => setTimeout(resetRootScroll, 50), { passive: true });
+  window.addEventListener("DOMContentLoaded", resetRootScroll);
+  window.addEventListener("resize", resetRootScroll);
+})();
 
 
 function getSiteDisplayName(code){
@@ -2412,28 +2434,19 @@ async function executePrintPDF() {
     }
 
     // B. JIKA BERADA DI BROWSER (Chrome / PC) -> Gunakan dialog cetak browser
-    // Dialog cetak langsung dibuka tanpa toast
+    // Layar aplikasi tetap utuh (tidak di-hide) karena @media print sudah mengatur dokumen cetak
     const origTitle = document.title;
     document.title = cleanDocName;
+    closePrintModal();
     setTimeout(() => {
-      const appEl = document.getElementById("app");
-      const printModalEl = document.getElementById("printModal");
-      if (appEl) appEl.style.setProperty("display", "none", "important");
-      if (printModalEl) printModalEl.style.setProperty("display", "none", "important");
-      document.body.classList.add("is-printing");
-
-      const restorePrint = () => {
+      const restoreTitle = () => {
         document.title = origTitle;
-        if (appEl) appEl.style.display = "";
-        if (printModalEl) printModalEl.style.display = "";
-        document.body.classList.remove("is-printing");
-        window.removeEventListener("afterprint", restorePrint);
+        window.removeEventListener("afterprint", restoreTitle);
       };
-      window.addEventListener("afterprint", restorePrint);
-      setTimeout(restorePrint, 2500);
-
+      window.addEventListener("afterprint", restoreTitle);
+      setTimeout(restoreTitle, 3000);
       window.print();
-    }, 350);
+    }, 200);
 
   } catch(err) {
     alert("Gagal memproses cetak PDF: " + err.message);
@@ -3774,7 +3787,7 @@ function tab(w, push=true){
  if(w === "OUT"){
   loadSCL();
  }
- window.scrollTo({top:0, behavior:"smooth"});
+ const appScrollEl = $("#app"); if(appScrollEl) appScrollEl.scrollTo({top:0, behavior:"smooth"});
 }
 
 function isModalOpen(selector) {
