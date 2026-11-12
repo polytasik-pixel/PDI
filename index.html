@@ -288,7 +288,7 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   min-width:220px;
   max-width:90vw;
   padding:12px 24px;
-  border-radius:30px;
+  border-radius:3px; /* Sudut 90 derajat tapi tidak lancip */
   color:#fff;
   background:#15803d;
   display:none;
@@ -920,7 +920,10 @@ body.is-printing fieldset {
     <select id="modalSiteSelect">
       <option value="">-- Pilih Kode Site --</option>
     </select>
-    <button type="button" class="btn-save" id="btnSaveSite" disabled onclick="saveSiteSelection()">Simpan & Lanjutkan</button>
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button type="button" class="btn-save" id="btnSaveSite" disabled onclick="saveSiteSelection()" style="flex:2;">Simpan & Lanjutkan</button>
+      <button type="button" class="btn-close-modal" id="btnCancelSite" onclick="closeSiteModal()" style="flex:1; padding:12px; background:#e0e0e0; color:#333; border:none; border-radius:4px; font-weight:600; cursor:pointer;">Batal</button>
+    </div>
   </div>
 </div>
 
@@ -1028,14 +1031,27 @@ function toast(t, bg="#15803d", ms=1000){
 }
 
 // Dialog Login Pilih Site (Hanya Menampilkan KODE Site Saja)
-function openSiteModal(){
+function openSiteModal(push=true){
  const modal=$("#siteModal");
  const sel=$("#modalSiteSelect");
  sel.innerHTML='<option value="">-- Pilih Kode Site --</option>' +
   SITE_CODES.map(code=>`<option value="${code}"${code===currentSite?' selected':''}>${code}</option>`).join("");
  $("#btnSaveSite").disabled = !sel.value;
  sel.onchange = e => { $("#btnSaveSite").disabled = !e.target.value; };
+ const cancelBtn = $("#btnCancelSite");
+ if(cancelBtn) cancelBtn.style.display = currentSite ? "block" : "none";
  modal.style.display="flex";
+ if(push){
+  history.pushState({modal:"site", tab:cur}, "", "#modal-site");
+ }
+}
+
+function closeSiteModal(fromBack=false){
+ const modal = $("#siteModal");
+ if(modal) modal.style.display = "none";
+ if(!fromBack && location.hash === "#modal-site"){
+  history.back();
+ }
 }
 
 function saveSiteSelection(){
@@ -1043,7 +1059,7 @@ function saveSiteSelection(){
  if(!val) return;
  currentSite=val;
  localStorage.setItem(SITE_STORAGE_KEY, currentSite);
- $("#siteModal").style.display="none";
+ closeSiteModal();
  updateSiteUI();
  renderTechField(currentSite);
  if(cur==="OUT"){ loadSCL(); }
@@ -1622,10 +1638,13 @@ function render(preserveSCL=""){
 // ==============================================================================
 let printSclCache = [];
 
-function openPrintModal() {
+function openPrintModal(push=true) {
   const modal = $("#printModal");
   if (!modal) return;
   modal.style.display = "flex";
+  if (push) {
+    history.pushState({modal:"print", tab:cur}, "", "#modal-print");
+  }
   
   const siteCode = normalizeSite(currentSite || ($("#site") ? $("#site").value : ""));
   $("#printSiteLabel").textContent = siteCode || "(Belum Pilih Site)";
@@ -1633,9 +1652,12 @@ function openPrintModal() {
   loadPrintSclList();
 }
 
-function closePrintModal() {
+function closePrintModal(fromBack=false) {
   const modal = $("#printModal");
   if (modal) modal.style.display = "none";
+  if (!fromBack && location.hash === "#modal-print") {
+    history.back();
+  }
 }
 
 async function loadPrintSclList() {
@@ -3015,10 +3037,34 @@ function tab(w, push=true){
  window.scrollTo({top:0, behavior:"smooth"});
 }
 
-// Tangani tombol Back HP: Jika di PDI OUT -> Kembali ke PDI IN
+function isModalOpen(selector) {
+ const el = $(selector);
+ return el && el.style.display !== "none" && el.style.display !== "";
+}
+
+// Tangani tombol Back HP & Chrome: Menutup popup otomatis jika ada yang terbuka
 window.addEventListener("popstate", e => {
+ // 1. Tutup popup Scanner Kamera jika sedang terbuka
+ if (isModalOpen("#scannerModal")) {
+  stopScanner(true);
+  return;
+ }
+ // 2. Tutup popup Cetak PDF jika sedang terbuka
+ if (isModalOpen("#printModal")) {
+  closePrintModal(true);
+  return;
+ }
+ // 3. Tutup popup Pilih Site jika sedang terbuka (jika site sudah ada)
+ if (isModalOpen("#siteModal")) {
+  if (currentSite) {
+   closeSiteModal(true);
+   return;
+  }
+ }
+
+ // 4. Tangani perpindahan tab (PDI OUT -> PDI IN)
  const target = (e.state && e.state.tab) || (location.hash === "#pdi-out" ? "OUT" : "IN");
- if(target !== cur){
+ if (target !== cur) {
   tab(target, false);
  }
 });
@@ -3055,12 +3101,15 @@ function hideScannerStatus() {
   if (el) el.style.display = "none";
 }
 
-async function startScanner() {
+async function startScanner(push=true) {
   if (isScannerStarting) return;
   isScannerStarting = true;
 
   const modal = $("#scannerModal");
   modal.style.display = "flex";
+  if (push) {
+    history.pushState({modal:"scanner", tab:cur}, "", "#modal-scanner");
+  }
   showScannerStatus("📷 Membuka kamera...");
 
   // 1. Cek keamanan protokol HTTPS jika di web browser
@@ -3170,7 +3219,7 @@ async function startScanner() {
   }
 }
 
-async function stopScanner() {
+async function stopScanner(fromBack=false) {
   const modal = $("#scannerModal");
   modal.style.display = "none";
   hideScannerStatus();
@@ -3187,6 +3236,9 @@ async function stopScanner() {
     } catch(e) {
       try { s.clear(); } catch(e2){}
     }
+  }
+  if (!fromBack && location.hash === "#modal-scanner") {
+    history.back();
   }
 }
 
@@ -3215,7 +3267,7 @@ hideLoader();
 render();
 updateSiteUI();
 if(!currentSite){
- openSiteModal();
+ openSiteModal(false);
 }
 </script>
 </body>
