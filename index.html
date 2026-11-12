@@ -137,16 +137,20 @@ header small{display:block;color:#bbb;margin-top:1px;font-size:11px}
   flex:1;
   padding:12px 4px;
   border:0;
-  background:#333;
-  color:#ddd;
+  background:#6b7280; /* Warna Abu-abu untuk menu yang tidak aktif (bisa diklik) */
+  color:#ffffff;
   font-size:14px;
-  font-weight:600;
+  font-weight:700;
   cursor:pointer;
   transition:background .15s ease;
 }
+.tabs button:hover:not(.on){
+  background:#4b5563;
+}
 .tabs button.on{
-  background:var(--red) !important; /* Warna Merah */
-  color:#fff !important;
+  background:var(--red) !important; /* Warna Merah untuk menu aktif */
+  color:#ffffff !important;
+  box-shadow:inset 0 -4px 0 0 #ffffff; /* Strip putih di bawah menu aktif */
 }
 
 main{max-width:100%;margin:0 auto;padding:6px 1mm max(16px,env(safe-area-inset-bottom)) 1mm;width:100%;}
@@ -158,22 +162,42 @@ fieldset{
   padding:8px 8px 10px;
   border-radius:2px;
 }
-legend{font-weight:700;font-size:13px;padding:0 4px;color:var(--ink)}
+legend{font-weight:700;font-size:12.5px;padding:0 4px;color:var(--ink)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
 
-label.f{display:block;font-size:12px;color:var(--mute);margin-bottom:2px;font-weight:500}
+label.f{display:block;font-size:12px;color:var(--mute);margin-bottom:2px;font-weight:600}
+/* Placeholder tidak kapital (mempertahankan huruf kecil / normal saat kotak kosong) */
+input::placeholder, textarea::placeholder {
+  text-transform: none !important;
+}
+select:has(option[value=""]:checked), select:invalid {
+  text-transform: none !important;
+}
+select option[value=""] {
+  text-transform: none !important;
+}
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+  text-transform: none !important;
+}
+input::-moz-placeholder, textarea::-moz-placeholder {
+  text-transform: none !important;
+}
+input:-ms-input-placeholder, textarea:-ms-input-placeholder {
+  text-transform: none !important;
+}
+
 input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{
   width:100%;
-  padding:8px 10px;
+  padding:6px 8px;
   border:1px solid #bbb;
   border-radius:4px;
   font:inherit;
   margin-top:2px;
   background:#fff;
   color:var(--ink);
-  font-size:16px; /* 16px mencegah auto-zoom pada layar HP saat fokus */
-  min-height:42px;
+  font-size:12.5px; /* Disamakan dengan teks opsi (ya/tidak/tidak ada) di bawah */
+  min-height:38px;  /* Kotak disesuaikan tingginya serasi dengan kotak opsi di bawah */
   box-sizing:border-box;
 }
 textarea{
@@ -201,11 +225,11 @@ textarea{
   color:#fff;
   border:1px solid #444;
   border-radius:4px;
-  padding:0 12px;
+  padding:0 10px;
   cursor:pointer;
   font-weight:600;
-  font-size:13px;
-  min-height:42px;
+  font-size:12.5px;
+  min-height:38px;
 }
 .btn-scan:hover,.btn-scan:active{background:var(--red);border-color:var(--red)}
 .btn-scan svg{stroke:#fff}
@@ -269,14 +293,14 @@ textarea{
   font-weight:700;
 }
 .opts label.na:has(input:checked), .opts label.na.sel{
-  background:#64748b !important;
+  background:#334155 !important; /* Abu Tua saat dipilih */
   color:#fff !important;
-  border-color:#64748b !important;
+  border-color:#1e293b !important;
   font-weight:700;
 }
 .opts label:has(input:focus-visible){outline:3px solid #0a6cff}
 
-.note{margin-top:5px;padding:5px 8px;font-size:12px;min-height:36px}
+.note{margin-top:5px;padding:6px 8px;font-size:12.5px;min-height:38px}
 .item.miss{background:#fff1f1;outline:2px solid var(--red);border-radius:4px;padding:7px 6px}
 .item.miss::after{content:"⚠️ Wajib diperiksa & dipilih";color:var(--red);font-weight:700;font-size:11px;display:block;margin-top:4px}
 
@@ -293,6 +317,7 @@ button.send{
   cursor:pointer;
   margin-top:6px;
   letter-spacing:.3px;
+  text-transform:uppercase;              /* Tombol Simpan Huruf Kapital */
   box-shadow:0 2px 6px rgba(0,0,0,.15);
   transition:background .15s ease;
 }
@@ -304,14 +329,14 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 
 #msg{
   position:fixed;
-  top:max(16px, env(safe-area-inset-top));
+  top:max(8px, env(safe-area-inset-top));
   left:50%;
   transform:translateX(-50%) translateY(-25px);
-  width:auto;
-  min-width:220px;
-  max-width:90vw;
-  padding:12px 24px;
-  border-radius:3px; /* Sudut 90 derajat tapi tidak lancip */
+  width:calc(100vw - 2mm);
+  max-width:calc(100vw - 2mm);
+  box-sizing:border-box;
+  padding:10px 1mm;
+  border-radius:4px;
   color:#fff;
   background:#15803d;
   display:none;
@@ -319,8 +344,12 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   z-index:9999999;
   text-align:center;
   font-weight:700;
-  font-size:14px;
-  box-shadow:0 8px 24px rgba(0,0,0,0.35);
+  font-size:13.5px;
+  line-height:1.35;
+  white-space:normal;
+  word-break:break-word;
+  overflow-wrap:break-word;
+  box-shadow:0 4px 16px rgba(0,0,0,0.35);
   pointer-events:none;
   transition:transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
 }
@@ -760,6 +789,60 @@ body.is-printing fieldset {
     font-weight: 700;
     margin-top: 1px;
   }
+    .print-two-boxes {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    page-break-inside: avoid;
+  }
+  .print-box-half {
+    flex: 1 1 50%;
+    width: 49.5%;
+    box-sizing: border-box;
+  }
+  .print-box-half .print-table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+  }
+  .print-box-title-in {
+    background: #C8102E;
+    color: #fff;
+    font-weight: bold;
+    font-size: 7.5pt;
+    padding: 3px 6px;
+    text-align: center;
+    border: 1px solid #C8102E;
+    letter-spacing: 0.5px;
+  }
+  .print-box-title-out {
+    background: #1e293b;
+    color: #fff;
+    font-weight: bold;
+    font-size: 7.5pt;
+    padding: 3px 6px;
+    text-align: center;
+    border: 1px solid #1e293b;
+    letter-spacing: 0.5px;
+  }
+  .print-cat-row {
+    background: #f1f5f9;
+    font-weight: bold;
+    font-size: 7pt;
+    color: #0f172a;
+    padding: 2px 4px !important;
+    border-top: 1px solid #cbd5e1;
+    border-bottom: 1px solid #cbd5e1;
+    text-transform: uppercase;
+  }
+  .print-item-row td {
+    padding: 2px 4px !important;
+    font-size: 7pt !important;
+    line-height: 1.2 !important;
+  }
   .print-section-hdr {
     background: #f0f0f0;
     border-left: 3px solid #C8102E;
@@ -922,40 +1005,27 @@ body.is-printing fieldset {
 <div id="printModal">
   <div class="print-modal-box">
     <div class="modal-top">
-      <h3>🖨️ Cetak Dokumen PDI (IN & OUT)</h3>
+      <h3>🖨️ CETAK DOKUMEN</h3>
       <button type="button" class="btn-modal-x" onclick="closePrintModal()" title="Tutup">✕</button>
-    </div>
-    
-    <div style="background:#FFF3E0; border-left:4px solid #FF9800; padding:8px 12px; margin-bottom:12px; font-size:13px; color:#E65100; border-radius:3px;">
-      Pilih NO. CASE untuk mencetak dokumen pemeriksaan lengkap gabungan <strong>PDI IN & PDI OUT</strong> dalam format PDF resmi.
     </div>
 
     <div style="margin-bottom:10px; font-size:13px;">
       Site Service Center: <strong id="printSiteLabel" style="color:var(--red); font-size:14px;">-</strong>
     </div>
 
-    <label class="f" style="margin-bottom:12px; font-size:13px; font-weight:600;">Pilih NO. CASE (Site Aktif):
-      <select id="printSclSelect" onchange="onPrintSCLSelected()" style="width:100%; padding:10px; font-size:14px; font-weight:600; border:1px solid #aaa; border-radius:4px;">
-        <option value="">Memuat daftar NO. CASE...</option>
+    <label class="f" style="margin-bottom:14px; font-size:13px; font-weight:600;">Pilih No Case:
+      <select id="printSclSelect" onchange="onPrintSCLSelected()" style="width:100%; padding:10px; font-size:13.5px; font-weight:600; border:1px solid #aaa; border-radius:4px;">
+        <option value="">Memuat daftar No Case...</option>
       </select>
     </label>
 
-    <!-- Info Pratinjau Singkat SCL -->
-    <div id="printPreviewBox" style="display:none; background:#F8F9FA; border:1px solid #DDD; border-radius:6px; padding:12px; margin-bottom:15px; font-size:13px;">
-      <div style="font-weight:bold; font-size:14px; color:#111; margin-bottom:6px;" id="prevSCLTitle">-</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#444;">
-        <div>Tipe/Model: <strong id="prevModel">-</strong></div>
-        <div>No. Rangka/VIN: <strong id="prevVIN" class="mono">-</strong></div>
-        <div>Status PDI IN: <span id="prevStatusIn" style="font-weight:bold; color:#2E7D32;">✓ Ada</span></div>
-        <div>Status PDI OUT: <span id="prevStatusOut" style="font-weight:bold; color:#1565C0;">-</span></div>
-      </div>
-    </div>
-
-    <div style="display:flex; gap:10px;">
-      <button type="button" id="btnDoPrint" onclick="executePrintPDF()" class="btn-save" style="flex:2; background:#C8102E; color:#FFFFFF !important; font-size:15px; font-weight:700; padding:12px; border-radius:3px;" disabled>
-        🖨️ Cetak / Simpan PDF
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button type="button" id="btnDoPrint" onclick="executePrintPDF()" class="btn-save" style="flex:1; min-height:42px; background:#C8102E; color:#FFFFFF !important; font-size:14px; font-weight:700; padding:10px 14px; border-radius:4px; border:none; cursor:pointer;" disabled>
+        CETAK
       </button>
-      <button type="button" class="btn-close-modal" onclick="closePrintModal()" style="flex:1; padding:12px;">Batal</button>
+      <button type="button" class="btn-close-modal" onclick="closePrintModal()" style="flex:1; min-height:42px; background:#6c757d; color:#FFFFFF !important; font-size:14px; font-weight:700; padding:10px 14px; border-radius:4px; border:none; cursor:pointer;">
+        BATAL
+      </button>
     </div>
   </div>
 </div>
@@ -981,9 +1051,11 @@ body.is-printing fieldset {
         <small>Pre-Delivery Inspection Service Center</small>
       </div>
       <div class="header-site">
-        <span>Site:</span>
-        <b id="activeSiteBadge">- Belum Dipilih -</b>
-        <button type="button" class="btn-change-site" id="btnChangeSite" onclick="openSiteModal()" title="Ubah Site">Ganti</button>
+        <span id="headerSiteGroup" style="display:inline-flex; align-items:center; gap:5px;">
+          <span>Site:</span>
+          <b id="activeSiteBadge">- Belum Dipilih -</b>
+          <button type="button" class="btn-change-site" id="btnChangeSite" onclick="openSiteModal()" title="Ubah Site">Ganti</button>
+        </span>
         <button type="button" class="btn-print-act" id="headerPrintBtn" onclick="openPrintModal()" style="display:none; padding:2px 7px; font-size:11px; margin-left:4px; font-weight:700; border-radius:3px;" title="Cetak Dokumen Lengkap">🖨️ Cetak</button>
       </div>
     </div>
@@ -1063,8 +1135,8 @@ function getSiteDisplayName(code){
  return code ? normalizeSite(code) : "- Belum Dipilih -";
 }
 
-const CATS = ["Motor Listrik (EV)", "Non-EV / Elektronik"];
-const LAYANAN = ["Walk-in", "Home", "Dealer", "Out of Town"];
+const CATS = ["MOTOR LISTRIK (EV)", "NON-EV / ELEKTRONIK"];
+const LAYANAN = ["WALK-IN", "HOME", "DEALER", "OUT OF TOWN"];
 const S_IN = ["Bagus", "Rusak", "Tidak Ada"];
 const S_OUT = ["Ya", "Tidak", "Tidak Ada"];
 
@@ -1091,9 +1163,14 @@ function serialize(form) {
   for (const [k, v] of fd.entries()) {
     data[k] = v;
   }
-  data.get = function(k) {
-    return this[k] !== undefined && this[k] !== null ? this[k] : "";
-  };
+  Object.defineProperty(data, "get", {
+    value: function(k) {
+      return this[k] !== undefined && this[k] !== null ? this[k] : "";
+    },
+    enumerable: false,
+    writable: true,
+    configurable: true
+  });
   return data;
 }
 
@@ -1322,10 +1399,8 @@ async function syncAllDatabaseFromGoogleSheets(isAuto = false) {
       syncTeknisiMap().catch(e => console.log("Sync Teknisi error:", e))
     ]);
 
-    // 2. Jika saat ini di tab PDI OUT, segarkan daftar No. SCL dari sheet PDIIN & PDOUT
-    if (cur === "OUT") {
-      await loadSCL();
-    }
+    // 2. Selalu sinkronkan data kasus PDIIN & PDOUT terbaru dari Google Sheets (memperbarui cache lokal & dropdown)
+    await loadSCL();
 
     // 3. Jika modal cetak sedang terbuka, segarkan daftar SCL
     const printModal = $("#printModal");
@@ -1372,13 +1447,13 @@ function renderTechField(siteName){
  const box = $("#techBox");
  if(!box) return;
  const siteCode = normalizeSite(siteName || currentSite);
- const techs = (siteCode && TEKNISI_MAP[siteCode]) ? TEKNISI_MAP[siteCode] : [];
+ const rawTechs = (siteCode && TEKNISI_MAP[siteCode]) ? TEKNISI_MAP[siteCode] : [];
+ const techs = [...rawTechs].filter(t => t && String(t).trim()).sort((a, b) => String(a).localeCompare(String(b), undefined, {sensitivity: "base"}));
 
  if(techs.length > 0){
   box.innerHTML = `
    <select name="Teknisi" id="techSelect" required>
-     <option value="">-- Pilih Teknisi (${siteCode}) --</option>
-     ${techs.map(t=>`<option value="${t}">${t}</option>`).join("")}
+     ${techs.map((t, idx)=>`<option value="${t}"${idx===0?" selected":""}>${t}</option>`).join("")}
      <option value="__OTHER__">+ Ketik Nama Lain...</option>
    </select>
    <input type="text" id="customTechInput" placeholder="Ketik nama teknisi..." style="display:none;margin-top:4px;">
@@ -1397,7 +1472,26 @@ function renderTechField(siteName){
    }
   };
  } else {
-  box.innerHTML = `<input type="text" name="Teknisi" id="techSelect" placeholder="Ketik nama teknisi..." required>`;
+  box.innerHTML = `
+   <select name="Teknisi" id="techSelect" required>
+     <option value="-">-</option>
+     <option value="__OTHER__">+ Ketik Nama Lain...</option>
+   </select>
+   <input type="text" id="customTechInput" placeholder="Ketik nama teknisi..." style="display:none;margin-top:4px;">
+  `;
+  const sel = $("#techSelect");
+  const cust = $("#customTechInput");
+  sel.onchange = () => {
+   if(sel.value === "__OTHER__"){
+    cust.style.display = "block";
+    cust.required = true;
+    cust.focus();
+   } else {
+    cust.style.display = "none";
+    cust.required = false;
+    cust.value = "";
+   }
+  };
  }
 }
 
@@ -1405,37 +1499,21 @@ function renderTechField(siteName){
 function findProductModel(val){
  if(!val) return "";
  const raw = String(val).trim().toUpperCase();
- if(!raw) return "";
-
- // 1. Direct match full string, 4 digit, 3 digit
- if(PRODUCT_MAP[raw]) return PRODUCT_MAP[raw];
- const k4 = raw.slice(0, 4);
- if(PRODUCT_MAP[k4]) return PRODUCT_MAP[k4];
- const k3 = raw.slice(0, 3);
- if(PRODUCT_MAP[k3]) return PRODUCT_MAP[k3];
-
- // 2. Bersihkan karakter non-alphanumeric (spasi, tanda hubung, titik dua)
  const alpha = raw.replace(/[^A-Z0-9]/g, "");
- if(PRODUCT_MAP[alpha]) return PRODUCT_MAP[alpha];
- if(alpha.length >= 4 && PRODUCT_MAP[alpha.slice(0, 4)]) {
-  return PRODUCT_MAP[alpha.slice(0, 4)];
+ if(alpha.length < 4) return "";
+
+ // 1. Deteksi 4 kode pertama (Standar Barcode/Serial Polytron)
+ const k4 = alpha.slice(0, 4);
+ if(PRODUCT_MAP[k4]) {
+   return PRODUCT_MAP[k4];
  }
 
- // 3. Sliding scan untuk mendeteksi 4-karakter kode barcode di dalam string panjang (misal scanner ada prefix)
- for(let i = 0; i <= alpha.length - 4; i++){
-  const sub = alpha.substr(i, 4);
-  if(PRODUCT_MAP[sub]) return PRODUCT_MAP[sub];
+ // 2. Direct match jika seluruh string adalah kode produk
+ if(PRODUCT_MAP[alpha]) {
+   return PRODUCT_MAP[alpha];
  }
 
- // 4. Pencocokan nama model / tipe jika user mengetik nama model
- for(let code in PRODUCT_MAP){
-  const m = PRODUCT_MAP[code].toUpperCase();
-  if(m === raw || m.replace(/[^A-Z0-9]/g, "") === alpha){
-   return PRODUCT_MAP[code];
-  }
- }
-
- // 5. Alias Model EV (Motor Listrik)
+ // 3. Alias Model EV (Motor Listrik) khusus jika disebutkan secara eksplisit
  if(raw.includes("FOX-R") || raw.includes("FOXR") || raw.includes("FOX R")) return "FOX-R";
  if(raw.includes("FOX-S") || raw.includes("FOXS") || raw.includes("FOX S")) return "PS-FOXSAT";
  if(raw.includes("FOX 350") || raw.includes("FOX350")) return "FOX 350";
@@ -1446,15 +1524,18 @@ function findProductModel(val){
  return "";
 }
 
-// Auto-Lookup Model (Hening tanpa notifikasi/popup apapun)
+// Auto-Lookup Model (Hanya mengubah isi kotak jika 4 kode produk valid terdeteksi)
 function lookupModel(val){
  const modelEl = document.querySelector('#f input[name="Model Unit"]');
  if(!modelEl || cur !== "IN") return;
+ if(!val || String(val).trim().length < 4) return;
 
  const matched = findProductModel(val);
- if(matched){
-  modelEl.value = matched;
+ // HANYA UBAH jika hasil lookup benar-benar ditemukan!
+ if(matched && String(matched).trim() !== ""){
+  modelEl.value = String(matched).toUpperCase();
  }
+ // Jika 4 kode tidak terdeteksi, JANGAN UBAH isinya sama sekali!
 }
 
 const FORMS = {
@@ -1534,6 +1615,10 @@ function render(preserveSCL=""){
  if(hPrint) {
    hPrint.style.display = (cur === "OUT") ? "inline-flex" : "none";
  }
+ const siteGroup = $("#headerSiteGroup");
+ if(siteGroup) {
+   siteGroup.style.display = (cur === "OUT") ? "none" : "inline-flex";
+ }
  const btnChangeSite = $("#btnChangeSite");
  if(btnChangeSite) {
    btnChangeSite.style.display = (cur === "IN") ? "inline-block" : "none";
@@ -1554,7 +1639,7 @@ function render(preserveSCL=""){
   <fieldset>
     <legend>Kategori Produk</legend>
     <label class="f">Pilih kategori produk
-      <select id="cat">
+      <select id="cat" style="text-transform:uppercase;">
         ${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}
       </select>
     </label>
@@ -1564,16 +1649,16 @@ function render(preserveSCL=""){
   h += `
   <fieldset class="wo-box" id="sclBox">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <legend style="margin:0; padding:0 4px; font-weight:bold; color:var(--red);">NO. CASE - Pilih dari PDI IN (${currentSite || '-'})</legend>
+      <legend style="margin:0; padding:0 4px; font-weight:bold; color:var(--red);">NO. CASE - Pilih dari PDI IN</legend>
       <button type="button" id="btnRefreshScl" onclick="loadSCL()" title="Segarkan Data PDI IN" style="background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:3px 8px; font-size:11px; font-weight:600; color:#1e293b; display:inline-flex; align-items:center; gap:4px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
         <span id="refreshSclIcon" style="display:inline-block;">🔄</span> Refresh
       </button>
     </div>
-    <label class="f">Pilih NO. CASE yang siap PDI OUT:
+    <div class="f">
       <select id="sclSelect" name="No SCL" required>
         <option value="">Memuat data...</option>
       </select>
-    </label>
+    </div>
     <div id="noCaseWarning" class="warn-msg" style="display:none; margin-top:5px; font-size:12px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
@@ -1597,32 +1682,30 @@ function render(preserveSCL=""){
        <input type="date" name="Tanggal" value="${today}" required>
      </label>
 
-     <label class="f">Site Service Center
-       <select name="Site Service Center" id="site" required>
-         <option value="">-- Pilih Site --</option>
-         ${SITE_CODES.map(code=>`<option value="${code}"${code===currentSite?" selected":""}>${code}</option>`).join("")}
-       </select>
-     </label>
  `;
 
- if(cur === "IN"){
-  // Di PDI IN: No. SCL di dalam grid dengan placeholder "Masukan No. SCL"
+  // Kotak dropdown Site Service Center disembunyikan di PDI IN dan PDI OUT (menggunakan hidden input agar data site tetap lengkap saat submit)
   h += `
+     <input type="hidden" name="Site Service Center" id="site" value="${currentSite}">
+  `;
+
+ if(cur === "IN"){
+  // Di PDI IN: Posisi Jenis Layanan dan NO. CASE ditukar sesuai instruksi user
+  h += `
+     <label class="f">Jenis Layanan
+       <select name="Jenis Layanan" required style="text-transform:uppercase;">
+         ${LAYANAN.map((x, idx)=>`<option value="${x}"${idx===0?" selected":""}>${x}</option>`).join("")}
+       </select>
+     </label>
      <label class="f">NO. CASE
        <input type="text" name="No WO" id="sclInput" placeholder="Masukan NO. CASE" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
      </label>
-     <label class="f">Jenis Layanan
-       <select name="Jenis Layanan" required>
-         <option value="">Pilih layanan...</option>
-         ${LAYANAN.map(x=>`<option>${x}</option>`).join("")}
-       </select>
-     </label>
      <label class="f">Model / Tipe Unit
-       <input type="text" name="Model Unit" id="modelInput" placeholder="Masukan Type/Model" required autocomplete="off">
+       <input type="text" name="Model Unit" id="modelInput" placeholder="Masukan Type/Model" required autocomplete="off" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
      </label>
      <label class="f">${ev ? "No. Rangka / VIN" : "No. Seri (Serial Number)"}
        <div class="input-with-btn">
-         <input type="text" name="VIN" id="seriInput" placeholder="Ketik atau scan seri..." required>
+         <input type="text" name="VIN" id="seriInput" placeholder="Ketik atau scan seri..." required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
          <button class="btn-scan" type="button" onclick="startScanner()" title="Scan Barcode / QR">
            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
              <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
@@ -1649,17 +1732,16 @@ function render(preserveSCL=""){
        </select>
      </label>
      <label class="f">Jenis Layanan
-       <select name="Jenis Layanan" id="layananInput" required>
-         <option value="">Pilih layanan...</option>
-         ${LAYANAN.map(x=>`<option>${x}</option>`).join("")}
+       <select name="Jenis Layanan" id="layananInput" required style="text-transform:uppercase;">
+         ${LAYANAN.map((x, idx)=>`<option value="${x}"${idx===0?" selected":""}>${x}</option>`).join("")}
        </select>
      </label>
      <label class="f">Model / Tipe Unit
-       <input type="text" name="Model Unit" id="modelInput" placeholder="Masukan Type/Model" required>
+       <input type="text" name="Model Unit" id="modelInput" placeholder="Masukan Type/Model" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
      </label>
      <label class="f">${ev ? "No. Rangka / VIN" : "No. Seri (Serial Number)"}
        <!-- Tanpa tombol scan di PDI OUT sesuai permintaan, tapi input tetap bisa diedit -->
-       <input type="text" name="VIN" id="seriInput" placeholder="No. Rangka / VIN / Seri..." required>
+       <input type="text" name="VIN" id="seriInput" placeholder="No. Rangka / VIN / Seri..." required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
      </label>
      <label class="f">${F.tech}
        <div id="techBox"></div>
@@ -1716,7 +1798,7 @@ function render(preserveSCL=""){
      </div>
    </div>
  </fieldset>
- <button class="send" type="submit">${cur === "OUT" ? "Simpan PDI OUT" : "Simpan PDI IN"}</button>
+ <button class="send" type="submit">${cur === "OUT" ? "SIMPAN PDI OUT" : "SIMPAN PDI IN"}</button>
  </form>`;
 
  $("#app").innerHTML = h;
@@ -1733,32 +1815,53 @@ function render(preserveSCL=""){
   };
  }
 
- $("#site").onchange = e => {
-  currentSite = normalizeSite(e.target.value);
-  if(currentSite){ localStorage.setItem(SITE_STORAGE_KEY, currentSite); }
-  updateSiteUI();
-  renderTechField(currentSite);
-  if(cur === "OUT"){ loadSCL(); }
- };
+ const siteElSelect = $("#site");
+ if(siteElSelect && siteElSelect.tagName === "SELECT"){
+  siteElSelect.onchange = e => {
+   currentSite = normalizeSite(e.target.value);
+   if(currentSite){ localStorage.setItem(SITE_STORAGE_KEY, currentSite); }
+   updateSiteUI();
+   renderTechField(currentSite);
+   if(cur === "OUT"){ loadSCL(); }
+  };
+ }
 
  const seriInput = $("#seriInput");
- if(seriInput && cur === "IN"){
-  seriInput.addEventListener("input", e => lookupModel(e.target.value));
-  seriInput.addEventListener("change", e => lookupModel(e.target.value));
+ if(seriInput){
+  seriInput.addEventListener("input", e => {
+   e.target.value = e.target.value.toUpperCase();
+   if(cur === "IN") lookupModel(e.target.value);
+  });
+  seriInput.addEventListener("change", e => {
+   e.target.value = e.target.value.toUpperCase();
+   if(cur === "IN") lookupModel(e.target.value);
+  });
   seriInput.addEventListener("paste", e => {
-   setTimeout(() => lookupModel(e.target.value), 50);
+   setTimeout(() => {
+    e.target.value = e.target.value.toUpperCase();
+    if(cur === "IN") lookupModel(e.target.value);
+   }, 50);
   });
  }
 
  const modelInput = $("#modelInput");
- if(modelInput && cur === "IN"){
+ if(modelInput){
+  modelInput.addEventListener("input", e => {
+   e.target.value = e.target.value.toUpperCase();
+  });
   modelInput.addEventListener("change", e => {
-   const m = findProductModel(e.target.value);
-   if(m) e.target.value = m;
+   e.target.value = e.target.value.toUpperCase();
+   if(cur === "IN"){
+    const m = findProductModel(e.target.value);
+    if(m) e.target.value = m.toUpperCase();
+   }
   });
   modelInput.addEventListener("blur", e => {
-   const m = findProductModel(e.target.value);
-   if(m) e.target.value = m;
+   e.target.value = e.target.value.toUpperCase();
+   if(cur === "IN"){
+    const m = findProductModel(e.target.value);
+    if(m) e.target.value = m.toUpperCase();
+   }
   });
  }
  updateModelDatalist();
@@ -1877,25 +1980,33 @@ async function loadPrintSclList() {
     console.log("Apps Script print list fetch:", e);
   }
 
-  // 4. Tambahkan juga fallback ke GViz PDIIN jika ada case yang belum terdaftar di sclList
+  // 4. Ambil data resmi dari GViz PDIIN dan pastikan hanya case yang ada di Google Sheets yang muncul
   try {
     const resGIn = await fetchGvizSheet(SHEET_NAME_IN, 6000).catch(() => null);
     if (resGIn) {
       const gInRows = parseGvizToDictList(resGIn);
+      const serverScls = new Set();
       gInRows.forEach(r => {
         const rawSite = String(r["Site Service Center"] || "").trim();
         if (siteCode && normalizeSite(rawSite) !== siteCode) return;
         const s = String(r["No SCL"] || r["No CASE"] || r["NO. CASE"] || r["No WO"] || "").trim();
-        if (!s || seenSCL[s.toUpperCase()]) return;
-        seenSCL[s.toUpperCase()] = true;
-        sclList.push({
-          scl: s,
-          model: r["Model Unit"] || "",
-          vin: r["VIN"] || "",
-          tglIn: r["Tanggal"] || r["Waktu Submit"] || "",
-          hasOut: false
-        });
+        if (!s || !isValidScl(s)) return;
+        serverScls.add(s.toUpperCase());
+        if (!seenSCL[s.toUpperCase()]) {
+          seenSCL[s.toUpperCase()] = true;
+          sclList.push({
+            scl: s,
+            model: r["Model Unit"] || "",
+            vin: r["VIN"] || "",
+            tglIn: r["Tanggal"] || r["Waktu Submit"] || "",
+            hasOut: false
+          });
+        }
       });
+      // Filter sclList agar tidak memunculkan case lama yang sudah dihapus/diedit di Google Sheets
+      if (serverScls.size > 0) {
+        sclList = sclList.filter(it => serverScls.has(String(it.scl || it.wo || "").trim().toUpperCase()));
+      }
     }
   } catch(e) {
     console.log("GViz print list fallback:", e);
@@ -1911,11 +2022,10 @@ async function loadPrintSclList() {
   const currentFormSCL = String($("#sclSelect") ? $("#sclSelect").value : "").trim();
 
   if (sclList.length > 0) {
-    sel.innerHTML = '<option value="">-- Pilih NO. CASE untuk Dicetak --</option>' +
+    sel.innerHTML = '<option value="">-- Pilih No Case --</option>' +
       sclList.map(it => {
         const isSel = (it.scl.toUpperCase() === currentFormSCL.toUpperCase());
-        const desc = [it.model, it.vin ? `(${it.vin})` : ""].filter(Boolean).join(" ");
-        return `<option value="${it.scl}"${isSel ? " selected" : ""}>${it.scl}${desc ? " - " + desc : ""}</option>`;
+        return `<option value="${it.scl}"${isSel ? " selected" : ""}>${it.scl}</option>`;
       }).join("");
 
     if (currentFormSCL) {
@@ -1923,36 +2033,114 @@ async function loadPrintSclList() {
       onPrintSCLSelected();
     }
   } else {
-    sel.innerHTML = '<option value="">(Belum ada data NO. CASE untuk site ini)</option>';
+    sel.innerHTML = '<option value="">(Belum ada data No Case untuk site ini)</option>';
   }
 }
 
 function onPrintSCLSelected() {
   const sel = $("#printSclSelect");
-  const prevBox = $("#printPreviewBox");
   const btnPrint = $("#btnDoPrint");
   if (!sel || !sel.value) {
-    if (prevBox) prevBox.style.display = "none";
     if (btnPrint) btnPrint.disabled = true;
     return;
   }
+  if (btnPrint) btnPrint.disabled = false;
+}
 
-  const sclVal = sel.value.trim();
-  const item = printSclCache.find(x => x.scl.toUpperCase() === sclVal.toUpperCase()) || { scl: sclVal };
 
-  $("#prevSCLTitle").textContent = "NO. CASE: " + sclVal;
-  $("#prevModel").textContent = item.model || "-";
-  $("#prevVIN").textContent = item.vin || "-";
-  $("#prevStatusIn").textContent = "✓ Ada (Tgl: " + (item.tglIn || "-") + ")";
-  
-  if (item.hasOut || item.tglOut) {
-    $("#prevStatusOut").innerHTML = '<span style="color:#2E7D32; font-weight:bold;">✓ Selesai (Tgl: ' + (item.tglOut || "-") + ')</span>';
-  } else {
-    $("#prevStatusOut").innerHTML = '<span style="color:#F57C00; font-weight:bold;">⏳ Masih di PDI IN (Siap OUT)</span>';
+// Helper pencari TTD di dictionary data Google Sheets / lokal secara fleksibel
+function findSigInDict(dict, role) {
+  if (!dict) return "";
+  const rLow = role.toLowerCase();
+  // 1. Cek langsung kunci umum
+  if (dict["TTD " + role + " (link)"] && typeof dict["TTD " + role + " (link)"] !== "function") return String(dict["TTD " + role + " (link)"]).trim();
+  if (dict["TTD " + role] && typeof dict["TTD " + role] !== "function") return String(dict["TTD " + role]).trim();
+  if (dict["Link TTD " + role] && typeof dict["Link TTD " + role] !== "function") return String(dict["Link TTD " + role]).trim();
+
+  // 2. Fuzzy scan semua kunci yang mengandung kata ttd / tanda tangan
+  for (const k in dict) {
+    if (!Object.prototype.hasOwnProperty.call(dict, k)) continue;
+    if (typeof dict[k] === "function") continue;
+    const kLow = k.toLowerCase();
+    if (kLow.includes("ttd") || kLow.includes("signature") || kLow.includes("tanda")) {
+      if (kLow.includes(rLow)) {
+        const val = String(dict[k] || "").trim();
+        if (val) return val;
+      }
+    }
+  }
+  return "";
+}
+
+// Helper konversi URL gambar ke Base64 via Canvas (fallback jika fetch mode cors gagal)
+function convertImageViaCanvas(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    const to = setTimeout(() => resolve(url), 4000);
+    img.onload = () => {
+      clearTimeout(to);
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth || img.width || 300;
+        canvas.height = img.naturalHeight || img.height || 100;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataUrl = canvas.toDataURL("image/png");
+        resolve((dataUrl && dataUrl.indexOf("data:image") === 0) ? dataUrl : url);
+      } catch(e) {
+        resolve(url);
+      }
+    };
+    img.onerror = () => {
+      clearTimeout(to);
+      resolve(url);
+    };
+    img.src = url;
+  });
+}
+
+// Mengunduh gambar Google Drive secara asinkron dan mengubahnya menjadi Base64
+// Menggunakan endpoint langsung lh3.googleusercontent.com (tanpa 302 redirect, bebas blokir CORS)
+async function convertDriveUrlToBase64(driveUrl) {
+  if (!driveUrl || typeof driveUrl !== "string") return "";
+  const v = driveUrl.trim();
+  if (v.indexOf("data:image") === 0) return v;
+
+  // Ekstrak ID file dari link Google Drive
+  const m1 = v.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  const m2 = v.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  const fileId = (m1 && m1[1]) ? m1[1] : ((m2 && m2[1]) ? m2[1] : "");
+  if (!fileId) return v;
+
+  // URL langsung Google UserContent (Status 200, Access-Control-Allow-Origin: *)
+  const directUrl = "https://lh3.googleusercontent.com/d/" + fileId + "=w600";
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const res = await fetch(directUrl, { mode: "cors", signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const blob = await res.blob();
+      const b64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result || "");
+        reader.onerror = () => resolve("");
+        reader.readAsDataURL(blob);
+      });
+      if (b64 && b64.indexOf("data:image") === 0) return b64;
+    }
+  } catch (err) {
+    console.warn("Fetch directUrl error, mencoba fallback Canvas:", err);
   }
 
-  if (prevBox) prevBox.style.display = "block";
-  if (btnPrint) btnPrint.disabled = false;
+  // Fallback ke Canvas Image conversion
+  try {
+    const canvasB64 = await convertImageViaCanvas(directUrl);
+    if (canvasB64 && canvasB64.indexOf("data:image") === 0) return canvasB64;
+  } catch(e) {}
+
+  return directUrl;
 }
 
 async function executePrintPDF() {
@@ -1980,13 +2168,65 @@ async function executePrintPDF() {
       if (locOut) Object.assign(outData, JSON.parse(locOut));
     } catch(e) {}
 
-    // 2. Jika saat ini form PDI OUT sedang aktif untuk NO. CASE ini, ambil form terkini
+    // 2. Jika saat ini form PDI OUT atau PDI IN sedang aktif untuk NO. CASE ini, ambil form terkini
+    const cleanKey = String(targetSCL).replace(/[\/\:*?"<>|]/g, "_").trim().toUpperCase();
+    const locInExtra = localStorage.getItem("pdi_in_data_" + cleanKey);
+    if (locInExtra) { try { Object.assign(inData, JSON.parse(locInExtra)); } catch(e){} }
+    const locOutExtra = localStorage.getItem("pdi_out_data_" + cleanKey);
+    if (locOutExtra) { try { Object.assign(outData, JSON.parse(locOutExtra)); } catch(e){} }
+
     if (cur === "OUT") {
       const curFormSCL = String($("#sclSelect") ? $("#sclSelect").value : "").trim().toUpperCase();
       if (curFormSCL === targetSCL) {
         try {
           const liveForm = serialize(document.forms.f);
           Object.assign(outData, liveForm);
+          const t0 = document.querySelector('textarea[name="T0"]');
+          const t1 = document.querySelector('textarea[name="T1"]');
+          if (t0 && t0.value) outData["Ringkasan Pekerjaan"] = t0.value.trim();
+          if (t1 && t1.value) outData["Catatan Tambahan Teknisi"] = t1.value.trim();
+
+          const liveNotes = [];
+          document.querySelectorAll("#f .item").forEach(it => {
+            const k = it.dataset.k;
+            const noteEl = it.querySelector(".note");
+            const n = noteEl ? noteEl.value.trim() : "";
+            if (k && n) {
+              liveNotes.push(k + ": " + n);
+              outData["Catatan " + k] = n;
+              const nmEl = it.querySelector(".nm");
+              const nmClean = nmEl ? nmEl.textContent.replace(/^[0-9]+\.\s*/, "").trim() : "";
+              if (nmClean) outData["Catatan " + nmClean] = n;
+            }
+          });
+          if (liveNotes.length > 0) outData["Catatan Per Item"] = liveNotes.join(" | ");
+        } catch(e) {}
+      }
+    } else if (cur === "IN") {
+      const curFormSCL = String($("#sclInput") ? $("#sclInput").value : "").trim().toUpperCase();
+      if (curFormSCL === targetSCL) {
+        try {
+          const liveForm = serialize(document.forms.f);
+          Object.assign(inData, liveForm);
+          const t0 = document.querySelector('textarea[name="T0"]');
+          const t1 = document.querySelector('textarea[name="T1"]');
+          if (t0 && t0.value) inData["Keluhan Konsumen"] = t0.value.trim();
+          if (t1 && t1.value) inData["Catatan Tambahan Teknisi"] = t1.value.trim();
+
+          const liveNotes = [];
+          document.querySelectorAll("#f .item").forEach(it => {
+            const k = it.dataset.k;
+            const noteEl = it.querySelector(".note");
+            const n = noteEl ? noteEl.value.trim() : "";
+            if (k && n) {
+              liveNotes.push(k + ": " + n);
+              inData["Catatan " + k] = n;
+              const nmEl = it.querySelector(".nm");
+              const nmClean = nmEl ? nmEl.textContent.replace(/^[0-9]+\.\s*/, "").trim() : "";
+              if (nmClean) inData["Catatan " + nmClean] = n;
+            }
+          });
+          if (liveNotes.length > 0) inData["Catatan Per Item"] = liveNotes.join(" | ");
         } catch(e) {}
       }
     }
@@ -2044,22 +2284,54 @@ async function executePrintPDF() {
       }
     } catch(e) {}
 
-    // 4. Susun Dokumen Cetak ke dalam container #printReportArea
-    const fullHtml = renderPrintDocument(targetSCL, inData, outData);
+    // 3b. Ambil TTD dan konversi Google Drive link ke Base64 secara paralel
+    const rawSigKons = localStorage.getItem("pdi_sig_konsumen_" + targetSCL) || findSigInDict(outData, "Konsumen") || findSigInDict(inData, "Konsumen") || "";
+    const rawSigIn = localStorage.getItem("pdi_sig_tek_in_" + targetSCL) || findSigInDict(inData, "Teknisi") || "";
+    const rawSigOut = localStorage.getItem("pdi_sig_tek_out_" + targetSCL) || findSigInDict(outData, "Teknisi") || "";
+
+    const [b64Kons, b64TekIn, b64TekOut] = await Promise.all([
+      convertDriveUrlToBase64(rawSigKons).catch(() => rawSigKons),
+      convertDriveUrlToBase64(rawSigIn).catch(() => rawSigIn),
+      convertDriveUrlToBase64(rawSigOut).catch(() => rawSigOut)
+    ]);
+
+    if (b64Kons && b64Kons.indexOf("data:") === 0) {
+      try { localStorage.setItem("pdi_sig_konsumen_" + targetSCL, b64Kons); } catch(e){}
+    }
+    if (b64TekIn && b64TekIn.indexOf("data:") === 0) {
+      try { localStorage.setItem("pdi_sig_tek_in_" + targetSCL, b64TekIn); } catch(e){}
+    }
+    if (b64TekOut && b64TekOut.indexOf("data:") === 0) {
+      try { localStorage.setItem("pdi_sig_tek_out_" + targetSCL, b64TekOut); } catch(e){}
+    }
+
+    const prefetchedSigs = {
+      konsumen: b64Kons || rawSigKons,
+      tekIn: b64TekIn || rawSigIn,
+      tekOut: b64TekOut || rawSigOut
+    };
+
+    // 4. Susun Dokumen Cetak ke dalam container #printReportArea dengan TTD Base64 tertanam
+    const fullHtml = renderPrintDocument(targetSCL, inData, outData, prefetchedSigs);
 
     btn.disabled = false;
     btn.innerHTML = origBtnText;
 
+    // Nama cetak / dokumen PDF = No Case tanpa karakter terlarang (seperti / \ : * ? " < > |)
+    const cleanDocName = String(targetSCL).replace(/[\/\:*?"<>|]/g, "_").trim();
+
     // A. JIKA BERADA DI DALAM APLIKASI ANDROID (APK) -> Gunakan Android PrintManager Native
     if (window.AndroidPrint && typeof window.AndroidPrint.printHtml === "function") {
       closePrintModal();
-      window.AndroidPrint.printHtml(fullHtml, "PDI_" + targetSCL);
+      window.AndroidPrint.printHtml(fullHtml, cleanDocName);
       toast("✓ Membuka dialog Cetak / Simpan PDF...", "#15803d", 3500);
       return;
     }
 
     // B. JIKA BERADA DI BROWSER (Chrome / PC) -> Gunakan dialog cetak browser
     toast("✓ Menyiapkan cetak PDF...", "#15803d", 2500);
+    const origTitle = document.title;
+    document.title = cleanDocName;
     setTimeout(() => {
       const appEl = document.getElementById("app");
       const printModalEl = document.getElementById("printModal");
@@ -2068,6 +2340,7 @@ async function executePrintPDF() {
       document.body.classList.add("is-printing");
 
       const restorePrint = () => {
+        document.title = origTitle;
         if (appEl) appEl.style.display = "";
         if (printModalEl) printModalEl.style.display = "";
         document.body.classList.remove("is-printing");
@@ -2086,36 +2359,49 @@ async function executePrintPDF() {
   }
 }
 
-function renderPrintDocument(scl, inData, outData) {
+function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
   const area = $("#printReportArea");
   if (!area) return;
 
-  const site = inData["Site Service Center"] || outData["Site Service Center"] || currentSite || "-";
-  const kat = inData["Kategori Produk"] || outData["Kategori Produk"] || "Motor Listrik (EV)";
-  const model = inData["Model Unit"] || outData["Model Unit"] || "-";
-  const vin = inData["VIN"] || outData["VIN"] || "-";
-  const layanan = inData["Jenis Layanan"] || outData["Jenis Layanan"] || "-";
+  const cleanSclKey = String(scl).trim().toUpperCase();
+  const site = String(inData["Site Service Center"] || outData["Site Service Center"] || currentSite || "-").trim().toUpperCase();
+  const kat = String(inData["Kategori Produk"] || outData["Kategori Produk"] || "Motor Listrik (EV)").trim().toUpperCase();
+  const model = String(inData["Model Unit"] || outData["Model Unit"] || "-").trim().toUpperCase();
+  const vin = String(inData["VIN"] || outData["VIN"] || inData["No. Seri (Serial Number)"] || inData["No. Rangka / VIN"] || "-").trim().toUpperCase();
+  const layanan = String(inData["Jenis Layanan"] || outData["Jenis Layanan"] || "-").trim().toUpperCase();
   const namaKonsumen = inData["Nama Konsumen"] || "-";
   const noTelepon = inData["No Telepon"] || "";
   const noPolisi = inData["No Polisi"] || "";
   const warnaUnit = inData["Warna Unit"] || "";
-  const odo = inData["Odometer"] || "";
   
   const tglIn = inData["Tanggal"] || inData["Waktu Submit"] || "-";
   const tglOut = outData["Tanggal"] || outData["Waktu Submit"] || "(Belum Selesai PDI OUT)";
-  const tekIn = inData["Teknisi"] || "-";
-  const tekOut = outData["Teknisi"] || "(Belum Ditentukan)";
+  const tekIn = String(inData["Teknisi"] || "-").trim().toUpperCase();
+  const tekOut = String(outData["Teknisi"] || "(Belum Ditentukan)").trim().toUpperCase();
 
-  const keluhanIn = inData["Keluhan Konsumen"] || inData["Catatan Tambahan Teknisi"] || "-";
-  const ringkasanOut = outData["Ringkasan Pekerjaan"] || outData["Catatan Tambahan Teknisi"] || outData["Hasil Pemeriksaan Akhir"] || "-";
+  function getNoteValue(dict, ...keys) {
+    if (!dict) return "-";
+    for (const k of keys) {
+      if (dict[k] !== undefined && dict[k] !== null) {
+        const str = String(dict[k]).trim();
+        if (str !== "" && str !== "undefined" && str !== "null" && str !== "-") return str;
+      }
+    }
+    return "-";
+  }
 
-  // Ambil Tanda Tangan: Utamakan Base64 lokal, jika tidak ada baru gunakan Link Drive
-  const cleanSclKey = String(scl).trim().toUpperCase();
-  const rawSigKonsumen = localStorage.getItem("pdi_sig_konsumen_" + cleanSclKey) || outData["TTD Konsumen (link)"] || inData["TTD Konsumen (link)"] || "";
-  const rawSigTekIn = localStorage.getItem("pdi_sig_tek_in_" + cleanSclKey) || inData["TTD Teknisi (link)"] || "";
-  const rawSigTekOut = localStorage.getItem("pdi_sig_tek_out_" + cleanSclKey) || outData["TTD Teknisi (link)"] || "";
+  const keluhanIn = getNoteValue(inData, "Keluhan Konsumen", "C. Keluhan Konsumen", "T0", "Keluhan", "Catatan Masuk");
+  const catatanIn = getNoteValue(inData, "Catatan Tambahan Teknisi", "D. Catatan Tambahan Teknisi", "Catatan Tambahan", "T1");
 
-  // Helper untuk mengubah Google Drive link atau Base64 menjadi URL Gambar asli
+  const ringkasanOut = getNoteValue(outData, "Ringkasan Pekerjaan", "E. Ringkasan Pekerjaan", "T0", "Ringkasan", "Hasil Pemeriksaan Akhir");
+  const catatanOut = getNoteValue(outData, "Catatan Tambahan Teknisi", "F. Catatan Tambahan Teknisi", "Catatan Tambahan", "T1");
+
+  // Ambil Tanda Tangan: Utamakan prefetched Base64, lalu localStorage, lalu cari di inData / outData
+  const pSigs = prefetchedSigs || {};
+  const rawSigKonsumen = pSigs.konsumen || localStorage.getItem("pdi_sig_konsumen_" + cleanSclKey) || findSigInDict(outData, "Konsumen") || findSigInDict(inData, "Konsumen") || "";
+  const rawSigTekIn = pSigs.tekIn || localStorage.getItem("pdi_sig_tek_in_" + cleanSclKey) || findSigInDict(inData, "Teknisi") || "";
+  const rawSigTekOut = pSigs.tekOut || localStorage.getItem("pdi_sig_tek_out_" + cleanSclKey) || findSigInDict(outData, "Teknisi") || "";
+
   function resolveSigImage(sigVal) {
     if (!sigVal || typeof sigVal !== "string") return { src: "", driveLink: "" };
     const v = sigVal.trim();
@@ -2128,7 +2414,7 @@ function renderPrintDocument(scl, inData, outData) {
       const fileId = (m1 && m1[1]) ? m1[1] : ((m2 && m2[1]) ? m2[1] : "");
       if (fileId) {
         return {
-          src: "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w600",
+          src: "https://lh3.googleusercontent.com/d/" + fileId + "=w600",
           driveLink: v
         };
       }
@@ -2137,16 +2423,12 @@ function renderPrintDocument(scl, inData, outData) {
     return { src: "", driveLink: "" };
   }
 
-  // Render Box TTD dengan Gambar TTD Asli
   function renderSigBox(title, name, rawSig, dateVal) {
     const { src, driveLink } = resolveSigImage(rawSig);
     let imgHtml = "";
 
     if (src) {
-      imgHtml = `<img src="${src}" style="max-height:48px; max-width:92%; object-fit:contain;" alt="TTD">`;
-      if (driveLink) {
-        imgHtml += `<div style="font-size:6.5pt; color:#666; margin-top:1px;"><a href="${driveLink}" target="_blank" style="color:#0D47A1; text-decoration:underline;">Link Drive ↗</a></div>`;
-      }
+      imgHtml = `<img src="${src}" style="max-height:55px; max-width:95%; object-fit:contain; display:block; margin:0 auto;" alt="TTD">`;
     } else if (rawSig && (rawSig.indexOf("Tersimpan") !== -1 || rawSig.indexOf("Aplikasi") !== -1)) {
       imgHtml = `<div style="font-size:8pt; color:#2E7D32; font-weight:bold; border:1px dashed #2E7D32; padding:3px 6px; border-radius:3px; display:inline-block;">✓ Terverifikasi Digital</div>`;
     } else {
@@ -2164,394 +2446,258 @@ function renderPrintDocument(scl, inData, outData) {
 
   const isEV = !String(kat).toLowerCase().includes("non-ev") && !String(kat).toLowerCase().includes("elektronik");
 
-  // Helper pencocokan nilai checklist dengan fuzzy fallback
   function findValueInDict(dict, primaryKey, itemName) {
     if (!dict) return "";
-    if (primaryKey && dict[primaryKey] !== undefined && dict[primaryKey] !== null && String(dict[primaryKey]).trim() !== "") {
-      return String(dict[primaryKey]).trim();
+    if (primaryKey && dict[primaryKey] !== undefined && dict[primaryKey] !== null) {
+      const pVal = dict[primaryKey];
+      if (typeof pVal !== "function" && String(pVal).trim() !== "") {
+        return String(pVal).trim();
+      }
     }
-    const norm = s => String(s || "").toLowerCase().replace(/^[a-z]\.\s*/, "").replace(/[^a-z0-9]/g, "");
+    const norm = s => String(s || "").toLowerCase().replace(/^[a-z0-9]\.\s*/, "").replace(/[^a-z0-9]/g, "");
     const targetNorm = norm(primaryKey || itemName);
     const nameNorm = norm(itemName);
 
     for (const k in dict) {
+      if (!Object.prototype.hasOwnProperty.call(dict, k)) continue;
+      if (k === "get" || k === "set" || k === "toString" || k === "valueOf") continue;
       const val = dict[k];
-      if (val === undefined || val === null || String(val).trim() === "") continue;
+      if (typeof val === "function" || val === undefined || val === null) continue;
+      const strVal = String(val).trim();
+      if (strVal === "") continue;
+
       const kNorm = norm(k);
-      if (targetNorm && (kNorm === targetNorm || kNorm.includes(targetNorm) || targetNorm.includes(kNorm))) {
-        return String(val).trim();
+      // 1. Exact normalized match
+      if (targetNorm && kNorm === targetNorm) return strVal;
+      if (nameNorm && kNorm === nameNorm) return strVal;
+
+      // 2. Substring match HANYA jika key dan target panjang (minimal 8 karakter)
+      if (kNorm.length >= 8 && targetNorm.length >= 8) {
+        if (kNorm.includes(targetNorm) || targetNorm.includes(kNorm)) {
+          return strVal;
+        }
       }
-      if (nameNorm && (kNorm === nameNorm || kNorm.includes(nameNorm) || nameNorm.includes(kNorm))) {
-        return String(val).trim();
+      if (kNorm.length >= 8 && nameNorm.length >= 8) {
+        if (kNorm.includes(nameNorm) || nameNorm.includes(kNorm)) {
+          return strVal;
+        }
       }
     }
     return "";
   }
 
-  // Helper render baris tabel checklist
-  function renderChecklistRows(groups, startNum = 1) {
+  // Helper parser Catatan Per Item dari Google Sheets atau snapshot lokal
+  function parseCatatanPerItem(dict) {
+    const map = {};
+    if (!dict) return map;
+    const raw = String(dict["Catatan Per Item"] || dict["catatan per item"] || dict["Catatan Item"] || "").trim();
+    if (raw) {
+      const parts = raw.split(/\s*\|\s*/);
+      parts.forEach(p => {
+        const colonIdx = p.indexOf(":");
+        if (colonIdx !== -1) {
+          const itemKey = p.slice(0, colonIdx).trim();
+          const noteText = p.slice(colonIdx + 1).trim();
+          if (itemKey && noteText) {
+            map[itemKey] = noteText;
+            const cleanKey = itemKey.replace(/^[a-z0-9]\.\s*/i, "").trim().toLowerCase();
+            map[cleanKey] = noteText;
+          }
+        }
+      });
+    }
+    return map;
+  }
+
+  // Helper render 1 kotak tabel checklist (PDI IN atau PDI OUT) sesuai Google Sheets
+  function renderSingleBoxChecklist(dict, sections) {
     let rowsHtml = "";
-    let counter = startNum;
-    groups.forEach(grp => {
-      rowsHtml += `<tr><td colspan="5" style="background:#eef3f8; font-weight:bold; color:#0D47A1; padding:2px 5px; font-size:8pt;">${grp.cat}</td></tr>`;
-      grp.items.forEach(it => {
-        let valIn = findValueInDict(inData, it.inKey, it.name);
-        if (!valIn) valIn = "-";
+    const notesMap = parseCatatanPerItem(dict);
 
-        let valOut = findValueInDict(outData, it.outKey, it.name);
-        if (!valOut) valOut = "-";
+    sections.forEach(sec => {
+      const catTitle = String(sec[0]).toUpperCase();
+      const items = sec[1];
+      rowsHtml += `<tr><td colspan="2" class="print-cat-row">${catTitle}</td></tr>`;
+      items.forEach((it, idx) => {
+        const fullKey = catTitle.slice(0, 2).trim() + " " + it;
+        let val = findValueInDict(dict, fullKey, it);
+        if (!val) val = findValueInDict(dict, it, it);
+        if (!val) val = "-";
 
-        let badgeIn = valIn;
-        const vInLow = String(valIn).trim().toLowerCase();
-        if (vInLow === "bagus" || vInLow === "baik" || vInLow === "ada" || vInLow === "ok") {
-          badgeIn = `<span class="badge-ok">✓ ${valIn}</span>`;
-        } else if (vInLow === "rusak" || vInLow === "tidak ok" || vInLow === "ng") {
-          badgeIn = `<span class="badge-ng">✕ ${valIn}</span>`;
-        } else if (vInLow === "tidak ada") {
-          badgeIn = `<span class="badge-na">- Tidak Ada -</span>`;
-        } else if (vInLow === "n/a" || vInLow === "na" || vInLow === "-") {
-          badgeIn = `<span class="badge-na">- N/A -</span>`;
+        let badge = val;
+        const vLow = String(val).trim().toLowerCase();
+        if (vLow === "ya" || vLow === "ok" || vLow === "bagus" || vLow === "baik" || vLow === "ada") {
+          badge = `<span class="badge-ok">✓ ${val}</span>`;
+        } else if (vLow === "tidak" || vLow === "rusak" || vLow === "tidak ok" || vLow === "ng") {
+          badge = `<span class="badge-ng">✕ ${val}</span>`;
+        } else if (vLow === "tidak ada") {
+          badge = `<span class="badge-na">- Tdk Ada -</span>`;
+        } else if (vLow === "n/a" || vLow === "na" || vLow === "-") {
+          badge = `<span class="badge-na">-</span>`;
+        } else {
+          badge = `<span>${val}</span>`;
         }
 
-        let badgeOut = valOut;
-        const vOutLow = String(valOut).trim().toLowerCase();
-        if (vOutLow === "ya" || vOutLow === "ok" || vOutLow === "bagus" || vOutLow === "baik" || vOutLow === "ada") {
-          badgeOut = `<span class="badge-ok">✓ ${valOut}</span>`;
-        } else if (vOutLow === "tidak" || vOutLow === "tidak ok" || vOutLow === "rusak" || vOutLow === "ng") {
-          badgeOut = `<span class="badge-ng">✕ ${valOut}</span>`;
-        } else if (vOutLow === "tidak ada") {
-          badgeOut = `<span class="badge-na">- Tidak Ada -</span>`;
-        } else if (vOutLow === "n/a" || vOutLow === "na" || vOutLow === "-") {
-          badgeOut = `<span class="badge-na">- N/A -</span>`;
+        // Cari catatan opsional jika ada (dari parsed Catatan Per Item, direct key, atau findValueInDict)
+        const itClean = it.replace(/^[a-z0-9]\.\s*/i, "").trim().toLowerCase();
+        const noteKey = "Catatan " + it;
+        let noteVal = notesMap[fullKey] || notesMap[it] || notesMap[itClean] || dict[noteKey] || dict["Catatan " + fullKey] || "";
+        if (!noteVal) {
+          noteVal = findValueInDict(dict, noteKey, "Catatan " + fullKey);
         }
+        let noteHtml = (noteVal && String(noteVal).trim() !== "" && String(noteVal).trim() !== "-")
+          ? `<div style="font-size:6.5pt; color:#666; font-style:italic; margin-top:1px;">Catatan: ${String(noteVal).trim()}</div>`
+          : "";
 
         rowsHtml += `
-        <tr>
-          <td style="text-align:center; width:5%;">${counter++}</td>
-          <td style="width:47%; font-weight:600;">${it.name}</td>
-          <td style="text-align:center; width:21%;">${badgeIn}</td>
-          <td style="text-align:center; width:21%;">${badgeOut}</td>
-          <td style="width:6%; text-align:center; color:#2E7D32; font-weight:bold;">✓</td>
+        <tr class="print-item-row">
+          <td style="width:72%; vertical-align:middle;">
+            <span style="color:#777; font-size:7pt; margin-right:3px;">${idx + 1}.</span>
+            <strong>${it}</strong>
+            ${noteHtml}
+          </td>
+          <td style="width:28%; text-align:center; vertical-align:middle;">${badge}</td>
         </tr>`;
       });
     });
-    return { html: rowsHtml, nextCounter: counter };
+    return rowsHtml;
   }
 
-  const nowStr = new Date().toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
+  const inSections = FORMS.IN.sections[isEV ? "EV" : "GEN"];
+  const outSections = FORMS.OUT.sections[isEV ? "EV" : "GEN"];
 
+  const inBoxHtml = renderSingleBoxChecklist(inData, inSections);
+  const outBoxHtml = renderSingleBoxChecklist(outData, outSections);
+
+  const nowStr = new Date().toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
   const konsDisp = (namaKonsumen && namaKonsumen !== "-") 
     ? (namaKonsumen + (noTelepon ? ` (${noTelepon})` : "")) 
     : "-";
   const platWarna = [noPolisi, warnaUnit].filter(x => x && x !== "-").join(" / ") || "-";
 
-  let htmlDoc = "";
-
-  if (!isEV) {
-    // ==========================================
-    // NON-EV / ELEKTRONIK -> 1 HALAMAN PAS (A4)
-    // ==========================================
-    const nonEvGroups = [
-      { cat: "A. Kelengkapan Unit & Aksesoris", items: [
-        { name: "Unit utama", inKey: "A. Unit utama", outKey: "A. Keluhan konsumen sudah teratasi" },
-        { name: "Kabel power / adaptor", inKey: "A. Kabel power / adaptor", outKey: "D. Kabel power / adaptor" },
-        { name: "Remote / aksesoris standar", inKey: "A. Remote / aksesoris standar (jika ada)", outKey: "D. Remote / aksesoris standar" },
-        { name: "Buku manual / kartu garansi", inKey: "A. Buku manual / kartu garansi", outKey: "D. Buku manual / kartu garansi" },
-        { name: "Dus / kemasan packing", inKey: "A. Dus / packing (jika ada)", outKey: "D. Buku manual / kartu garansi" }
-      ]},
-      { cat: "B. Kondisi Fisik & Komponen", items: [
-        { name: "Casing / bodi depan", inKey: "B. Casing / bodi depan", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
-        { name: "Casing / bodi belakang & samping", inKey: "B. Casing / bodi belakang & samping", outKey: "A. Tidak ada baut / komponen longgar pada casing" },
-        { name: "Layar / panel display", inKey: "B. Layar / panel display (jika ada)", outKey: "B. Layar / panel display (jika ada)" },
-        { name: "Tombol & kenop kontrol", inKey: "B. Tombol & kenop kontrol", outKey: "B. Tombol & kenop kontrol berfungsi" },
-        { name: "Label / stiker nomor seri", inKey: "B. Label / stiker nomor seri terbaca", outKey: "B. Tombol & kenop kontrol berfungsi" },
-        { name: "Kaki / roda / penyangga", inKey: "B. Kaki / roda / penyangga (jika ada)", outKey: "B. Unit bersih" }
-      ]},
-      { cat: "C. Verifikasi Uji Fungsi & Serah Terima", items: [
-        { name: "Keluhan konsumen teratasi", inKey: "Keluhan Konsumen", outKey: "A. Keluhan konsumen sudah teratasi" },
-        { name: "Pekerjaan sesuai Work Order", inKey: "Jenis Layanan", outKey: "A. Pekerjaan sesuai Work Order" },
-        { name: "Part bekas dikembalikan / dicatat", inKey: "Catatan Tambahan Teknisi", outKey: "A. Part bekas dikembalikan / dicatat (jika diminta)" },
-        { name: "Fungsi utama bekerja normal", inKey: "Catatan Tambahan Teknisi", outKey: "C. Fungsi utama normal" },
-        { name: "Uji nyala (running test) lolos", inKey: "Catatan Tambahan Teknisi", outKey: "C. Menyala / standby normal" }
-      ]}
-    ];
-
-    const { html: nonEvTableRows } = renderChecklistRows(nonEvGroups);
-
-    htmlDoc = `
-    <div class="print-page">
-      <div class="print-header">
-        <div>
-          <div class="print-brand-title">POLYTRON SERVICE CENTER</div>
-          <div class="print-brand-sub">PT. HARTONO ISTANA TEKNOLOGI - SITE ${site}</div>
-        </div>
-        <div class="print-doc-meta">
-          <div class="print-doc-title">LEMBAR PEMERIKSAAN PERANGKAT (PDI)</div>
-          <div class="print-doc-sub">PRE-DELIVERY INSPECTION (IN & OUT)</div>
-          <div class="print-doc-no">NO. CASE: <strong>${scl}</strong></div>
-        </div>
+  const htmlDoc = `
+  <div class="print-page">
+    <div class="print-header">
+      <div>
+        <div class="print-brand-title">POLYTRON SERVICE CENTER</div>
+        <div class="print-brand-sub">PT. SARANA KENCANA MULYA - SITE ${site}</div>
       </div>
-
-      <table class="print-table">
-        <tr>
-          <th width="16%">NO. CASE</th>
-          <td width="34%"><strong>${scl}</strong></td>
-          <th width="16%">Site Service Center</th>
-          <td width="34%"><strong>${site}</strong></td>
-        </tr>
-        <tr>
-          <th>Kategori Produk</th>
-          <td>${kat}</td>
-          <th>Model / Tipe Unit</th>
-          <td><strong>${model}</strong></td>
-        </tr>
-        <tr>
-          <th>No. Seri / VIN</th>
-          <td><span class="mono"><strong>${vin}</strong></span></td>
-          <th>Jenis Layanan</th>
-          <td><strong>${layanan}</strong></td>
-        </tr>
-        <tr>
-          <th>Nama Konsumen</th>
-          <td>${konsDisp}</td>
-          <th>Warna / Keterangan</th>
-          <td>${platWarna}</td>
-        </tr>
-        <tr>
-          <th>Tanggal PDI IN</th>
-          <td>${tglIn} (Teknisi: <strong>${tekIn}</strong>)</td>
-          <th>Tanggal PDI OUT</th>
-          <td>${tglOut} (Teknisi: <strong>${tekOut}</strong>)</td>
-        </tr>
-      </table>
-
-      <table class="print-table">
-        <tr>
-          <th width="50%">Keluhan Konsumen / Catatan Masuk (PDI IN):</th>
-          <th width="50%">Ringkasan Pekerjaan / Catatan Keluar (PDI OUT):</th>
-        </tr>
-        <tr>
-          <td style="min-height:28px; vertical-align:top; font-size:8pt;">${keluhanIn}</td>
-          <td style="min-height:28px; vertical-align:top; font-size:8pt;">${ringkasanOut}</td>
-        </tr>
-      </table>
-
-      <div class="print-section-hdr">DAFTAR PEMERIKSAAN KONDISI & UJI FUNGSI (PDI IN vs PDI OUT)</div>
-      <table class="print-table">
-        <thead>
-          <tr>
-            <th style="text-align:center;">No</th>
-            <th>Item / Komponen Pemeriksaan</th>
-            <th style="text-align:center;">Hasil PDI IN (Masuk)</th>
-            <th style="text-align:center;">Hasil PDI OUT (Keluar)</th>
-            <th style="text-align:center;">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${nonEvTableRows}
-        </tbody>
-      </table>
-
-      <div class="print-signatures">
-        ${renderSigBox("Konsumen / Penerima", namaKonsumen !== "-" ? namaKonsumen : "( .................................. )", rawSigKonsumen, tglOut !== "(Belum Selesai PDI OUT)" ? tglOut : tglIn)}
-        ${renderSigBox("Teknisi (PDI IN)", tekIn, rawSigTekIn, tglIn)}
-        ${renderSigBox("Teknisi (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
-      </div>
-
-      <div class="print-footer">
-        <div>Dokumen digital resmi diterbitkan oleh Sistem PDI Polytron Service Center | ID: PDI-${scl}</div>
-        <div>Halaman 1 dari 1 | Waktu Cetak: ${nowStr}</div>
-      </div>
-    </div>`;
-
-  } else {
-    // ==========================================
-    // MOTOR LISTRIK (EV) -> 2 HALAMAN PRESISI
-    // ==========================================
-    const evPart1 = [
-      { cat: "A. Kelengkapan Unit & Dokumen", items: [
-        { name: "Kunci kontak / Smart key", inKey: "A. Kunci kontak / Smart key", outKey: "G. Kunci kontak / Smart key" },
-        { name: "Charger & kabel charger", inKey: "A. Charger & kabel charger", outKey: "G. Charger & kabel charger" },
-        { name: "Buku manual / kartu garansi", inKey: "A. Buku manual / kartu garansi", outKey: "G. Buku manual / kartu garansi" },
-        { name: "Aksesoris standar bawaan", inKey: "A. Aksesoris standar bawaan (jika ada)", outKey: "G. Aksesoris standar bawaan (jika ada)" },
-        { name: "Spion kiri & kanan", inKey: "A. Spion kiri & kanan", outKey: "B. Spion kiri & kanan" },
-        { name: "Jok / seat", inKey: "A. Jok / seat", outKey: "B. Jok / box terpasang & terkunci baik" },
-        { name: "Box / bagasi (jika ada)", inKey: "A. Box / bagasi (jika ada)", outKey: "B. Jok / box terpasang & terkunci baik" }
-      ]},
-      { cat: "B. Kondisi Fisik, Bodi & Cat", items: [
-        { name: "Body depan (lecet / retak / pecah)", inKey: "B. Body depan (lecet / retak / pecah)", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
-        { name: "Body belakang (lecet / retak / pecah)", inKey: "B. Body belakang (lecet / retak / pecah)", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
-        { name: "Cat & stiker bodi", inKey: "B. Cat & stiker bodi", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
-        { name: "Lampu depan", inKey: "B. Lampu depan", outKey: "B. Lampu depan, belakang & sein berfungsi" },
-        { name: "Lampu belakang / rem", inKey: "B. Lampu belakang / rem", outKey: "B. Lampu depan, belakang & sein berfungsi" },
-        { name: "Lampu sein kiri & kanan", inKey: "B. Lampu sein kiri & kanan", outKey: "B. Lampu depan, belakang & sein berfungsi" },
-        { name: "Spakbor depan & belakang", inKey: "B. Spakbor depan & belakang", outKey: "B. Baut body / cover / fairing kencang, tidak ada yang kendor" },
-        { name: "Standar samping & standar tengah", inKey: "B. Standar samping & standar tengah", outKey: "B. Unit bersih (bodi, jok, velg)" }
-      ]}
-    ];
-
-    const evPart2 = [
-      { cat: "C. Sistem Kelistrikan & Fitur", items: [
-        { name: "Kondisi fisik baterai & segel", inKey: "C. Kondisi fisik baterai & segel", outKey: "C. Baterai terpasang & segel utuh" },
-        { name: "Panel instrumen / dashboard", inKey: "C. Panel instrumen / dashboard menyala normal", outKey: "C. Dashboard menyala normal, tanpa kode error" },
-        { name: "Klakson", inKey: "C. Klakson", outKey: "C. Klakson" },
-        { name: "Speedometer / indikator kecepatan", inKey: "C. Speedometer / indikator kecepatan", outKey: "C. Dashboard menyala normal, tanpa kode error" },
-        { name: "Port / konektor charging", inKey: "C. Port / konektor charging", outKey: "C. Port / konektor charging" }
-      ]},
-      { cat: "D. Sistem Pengereman & Roda", items: [
-        { name: "Rem depan", inKey: "D. Rem depan", outKey: "D. Rem depan" },
-        { name: "Rem belakang", inKey: "D. Rem belakang", outKey: "D. Rem belakang" },
-        { name: "Kabel / hose rem", inKey: "D. Kabel / hose rem", outKey: "D. Kabel / hose rem tidak kendor & tidak bocor" },
-        { name: "Kondisi & tekanan ban depan", inKey: "E. Ban depan", outKey: "E. Kondisi & tekanan ban depan" },
-        { name: "Kondisi & tekanan ban belakang", inKey: "E. Ban belakang", outKey: "E. Kondisi & tekanan ban belakang" },
-        { name: "Suspensi depan & belakang", inKey: "E. Suspensi depan", outKey: "E. Suspensi depan & belakang" }
-      ]},
-      { cat: "E. Verifikasi Akhir & Test Ride", items: [
-        { name: "Keluhan konsumen teratasi", inKey: "Keluhan Konsumen", outKey: "A. Keluhan konsumen sudah teratasi" },
-        { name: "Pekerjaan sesuai Work Order", inKey: "Jenis Layanan", outKey: "A. Pekerjaan sesuai Work Order" },
-        { name: "Part bekas dikembalikan / dicatat", inKey: "Catatan Tambahan Teknisi", outKey: "A. Part bekas dikembalikan / dicatat (jika diminta)" },
-        { name: "Suara motor saat akselerasi", inKey: "F. Suara motor saat dihidupkan", outKey: "F. Suara motor normal" },
-        { name: "Respon throttle / gas halus", inKey: "F. Respon handle gas / throttle", outKey: "F. Respon throttle halus" },
-        { name: "Pengereman & handling seimbang", inKey: "F. Getaran tidak normal saat berjalan", outKey: "F. Pengereman saat test ride normal" }
-      ]}
-    ];
-
-    const { html: evRows1, nextCounter } = renderChecklistRows(evPart1, 1);
-    const { html: evRows2 } = renderChecklistRows(evPart2, nextCounter);
-
-    htmlDoc = `
-    <!-- HALAMAN 1 DARI 2 -->
-    <div class="print-page">
-      <div class="print-header">
-        <div>
-          <div class="print-brand-title">POLYTRON SERVICE CENTER</div>
-          <div class="print-brand-sub">PT. HARTONO ISTANA TEKNOLOGI - SITE ${site}</div>
-        </div>
-        <div class="print-doc-meta">
-          <div class="print-doc-title">LEMBAR PEMERIKSAAN KENDARAAN (PDI)</div>
-          <div class="print-doc-sub">PRE-DELIVERY INSPECTION (IN & OUT)</div>
-          <div class="print-doc-no">NO. CASE: <strong>${scl}</strong></div>
-        </div>
-      </div>
-
-      <table class="print-table">
-        <tr>
-          <th width="16%">NO. CASE</th>
-          <td width="34%"><strong>${scl}</strong></td>
-          <th width="16%">Site Service Center</th>
-          <td width="34%"><strong>${site}</strong></td>
-        </tr>
-        <tr>
-          <th>Kategori Produk</th>
-          <td>${kat}</td>
-          <th>Model / Tipe Unit</th>
-          <td><strong>${model}</strong></td>
-        </tr>
-        <tr>
-          <th>No. Rangka / VIN</th>
-          <td><span class="mono"><strong>${vin}</strong></span></td>
-          <th>Jenis Layanan</th>
-          <td><strong>${layanan}</strong></td>
-        </tr>
-        <tr>
-          <th>Nama Konsumen</th>
-          <td>${konsDisp}</td>
-          <th>No. Polisi / Warna</th>
-          <td>${platWarna}</td>
-        </tr>
-        <tr>
-          <th>Odometer</th>
-          <td>${odo ? odo + " km" : "-"}</td>
-          <th>Tanggal Cetak</th>
-          <td>${nowStr}</td>
-        </tr>
-        <tr>
-          <th>Tanggal PDI IN</th>
-          <td>${tglIn} (Teknisi: <strong>${tekIn}</strong>)</td>
-          <th>Tanggal PDI OUT</th>
-          <td>${tglOut} (Teknisi: <strong>${tekOut}</strong>)</td>
-        </tr>
-      </table>
-
-      <table class="print-table">
-        <tr>
-          <th width="50%">Keluhan Konsumen / Catatan Masuk (PDI IN):</th>
-          <th width="50%">Ringkasan Pekerjaan / Catatan Keluar (PDI OUT):</th>
-        </tr>
-        <tr>
-          <td style="min-height:28px; vertical-align:top; font-size:8pt;">${keluhanIn}</td>
-          <td style="min-height:28px; vertical-align:top; font-size:8pt;">${ringkasanOut}</td>
-        </tr>
-      </table>
-
-      <div class="print-section-hdr">DAFTAR PEMERIKSAAN FISIK & KELENGKAPAN (BAGIAN 1)</div>
-      <table class="print-table">
-        <thead>
-          <tr>
-            <th style="text-align:center;">No</th>
-            <th>Item / Komponen Pemeriksaan</th>
-            <th style="text-align:center;">Hasil PDI IN (Masuk)</th>
-            <th style="text-align:center;">Hasil PDI OUT (Keluar)</th>
-            <th style="text-align:center;">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${evRows1}
-        </tbody>
-      </table>
-
-      <div class="print-footer">
-        <div>Dokumen digital resmi diterbitkan oleh Sistem PDI Polytron Service Center | ID: PDI-${scl}</div>
-        <div>Halaman 1 dari 2</div>
+      <div class="print-doc-meta">
+        <div class="print-doc-title">LEMBAR PEMERIKSAAN PERANGKAT (PDI)</div>
+        <div class="print-doc-sub">PRE-DELIVERY INSPECTION (IN &amp; OUT)</div>
+        <div class="print-doc-no">NO. CASE: <strong>${scl}</strong></div>
       </div>
     </div>
 
-    <!-- PEMISAH HALAMAN PRESISI -->
-    <div class="print-page-break"></div>
+    <table class="print-table" style="margin-bottom:4px;">
+      <tr>
+        <th width="16%">NO. CASE</th>
+        <td width="34%"><strong>${scl}</strong></td>
+        <th width="16%">Site Service Center</th>
+        <td width="34%"><strong>${site}</strong></td>
+      </tr>
+      <tr>
+        <th>Kategori Produk</th>
+        <td>${kat}</td>
+        <th>Model / Tipe Unit</th>
+        <td><strong>${model}</strong></td>
+      </tr>
+      <tr>
+        <th>No. Seri / VIN</th>
+        <td><span class="mono"><strong>${vin}</strong></span></td>
+        <th>Jenis Layanan</th>
+        <td><strong>${layanan}</strong></td>
+      </tr>
+      <tr>
+        <th>Nama Konsumen</th>
+        <td>${konsDisp}</td>
+        <th>Warna / Keterangan</th>
+        <td>${platWarna}</td>
+      </tr>
+      <tr>
+        <th>Tanggal PDI IN</th>
+        <td>${tglIn}</td>
+        <th>Tanggal PDI OUT</th>
+        <td>${tglOut}</td>
+      </tr>
+    </table>
 
-    <!-- HALAMAN 2 DARI 2 -->
-    <div class="print-page">
-      <div class="print-header-mini">
-        <span>POLYTRON SERVICE CENTER - LEMBAR PEMERIKSAAN KENDARAAN (PDI LANJUTAN)</span>
-        <span>NO. CASE: <strong>${scl}</strong></span>
+    <table class="print-table" style="margin-bottom:5px;">
+      <tr>
+        <th width="50%" style="background:#f4f6f8; font-weight:bold; font-size:7.5pt; text-align:left; padding:3px 6px;">CATATAN PEMERIKSAAN PDI IN</th>
+        <th width="50%" style="background:#f4f6f8; font-weight:bold; font-size:7.5pt; text-align:left; padding:3px 6px;">CATATAN PEMERIKSAAN PDI OUT</th>
+      </tr>
+      <tr>
+        <td style="vertical-align:top; font-size:7.5pt; padding:4px 6px; line-height:1.35;">
+          <div style="font-weight:bold; color:#1e293b; margin-bottom:1px;">C. Keluhan Konsumen:</div>
+          <div style="margin-bottom:5px; color:#111; padding-left:3px; white-space:pre-wrap;">${keluhanIn}</div>
+          <div style="font-weight:bold; color:#1e293b; margin-bottom:1px;">D. Catatan Tambahan Teknisi:</div>
+          <div style="color:#111; padding-left:3px; white-space:pre-wrap;">${catatanIn}</div>
+        </td>
+        <td style="vertical-align:top; font-size:7.5pt; padding:4px 6px; line-height:1.35;">
+          <div style="font-weight:bold; color:#1e293b; margin-bottom:1px;">E. Ringkasan Pekerjaan:</div>
+          <div style="margin-bottom:5px; color:#111; padding-left:3px; white-space:pre-wrap;">${ringkasanOut}</div>
+          <div style="font-weight:bold; color:#1e293b; margin-bottom:1px;">F. Catatan Tambahan Teknisi:</div>
+          <div style="color:#111; padding-left:3px; white-space:pre-wrap;">${catatanOut}</div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- DUA KOTAK BERDAMPINGAN: PDI IN & PDI OUT -->
+    <div class="print-two-boxes">
+      <!-- KOTAK 1: PDI IN -->
+      <div class="print-box-half">
+        <div class="print-box-title-in">PEMERIKSAAN PDI IN (MASUK)</div>
+        <table class="print-table print-table-twocol">
+          <thead>
+            <tr>
+              <th>Parameter Pemeriksaan PDI IN</th>
+              <th style="width:28%; text-align:center;">Hasil</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${inBoxHtml}
+          </tbody>
+        </table>
       </div>
 
-      <div class="print-section-hdr">DAFTAR PEMERIKSAAN SISTEM, FITUR & UJI JALAN (BAGIAN 2)</div>
-      <table class="print-table">
-        <thead>
-          <tr>
-            <th style="text-align:center;">No</th>
-            <th>Item / Komponen Pemeriksaan</th>
-            <th style="text-align:center;">Hasil PDI IN (Masuk)</th>
-            <th style="text-align:center;">Hasil PDI OUT (Keluar)</th>
-            <th style="text-align:center;">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${evRows2}
-        </tbody>
-      </table>
-
-      <div class="print-signatures">
-        ${renderSigBox("Konsumen / Penerima", namaKonsumen !== "-" ? namaKonsumen : "( .................................. )", rawSigKonsumen, tglOut !== "(Belum Selesai PDI OUT)" ? tglOut : tglIn)}
-        ${renderSigBox("Teknisi (PDI IN)", tekIn, rawSigTekIn, tglIn)}
-        ${renderSigBox("Teknisi (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
+      <!-- KOTAK 2: PDI OUT -->
+      <div class="print-box-half">
+        <div class="print-box-title-out">PEMERIKSAAN PDI OUT (KELUAR)</div>
+        <table class="print-table print-table-twocol">
+          <thead>
+            <tr>
+              <th>Parameter Pemeriksaan PDI OUT</th>
+              <th style="width:28%; text-align:center;">Hasil</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${outBoxHtml}
+          </tbody>
+        </table>
       </div>
+    </div>
 
-      <div class="print-footer">
-        <div>Dokumen digital resmi diterbitkan oleh Sistem PDI Polytron Service Center | ID: PDI-${scl}</div>
-        <div>Halaman 2 dari 2 | Waktu Cetak: ${nowStr}</div>
-      </div>
-    </div>`;
-  }
+    <div class="print-signatures" style="margin-top:6px;">
+      ${renderSigBox("Konsumen / Penerima", namaKonsumen !== "-" ? namaKonsumen : "( .................................. )", rawSigKonsumen, tglOut !== "(Belum Selesai PDI OUT)" ? tglOut : tglIn)}
+      ${renderSigBox("Teknisi (PDI IN)", tekIn, rawSigTekIn, tglIn)}
+      ${renderSigBox("Teknisi (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
+    </div>
+
+    <div class="print-footer">
+      <div>Dokumen digital resmi diterbitkan oleh Sistem PDI Polytron Service Center | ID: PDI-${scl}</div>
+      <div>Waktu Cetak: ${nowStr}</div>
+    </div>
+  </div>`;
 
   area.innerHTML = htmlDoc;
+  const cleanDocTitle = String(scl).replace(/[\/\:*?"<>|]/g, "_").trim();
   return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDI - ${scl}</title>
+<title>${cleanDocTitle}</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -2564,28 +2710,15 @@ function renderPrintDocument(scl, inData, outData) {
   .print-page {
     width: 100%; max-width: 210mm;
     margin: 0 auto;
-    padding: 8mm 10mm 6mm 10mm;
+    padding: 6mm 8mm 6mm 8mm;
     background: #fff;
     box-sizing: border-box;
-    page-break-after: always;
-  }
-  .print-page:last-child {
     page-break-after: auto;
-  }
-  .print-page-break {
-    page-break-before: always;
-    break-before: page;
-    height: 0; display: block; visibility: hidden;
   }
   .print-header {
     border-bottom: 2px solid #C8102E;
     padding-bottom: 4px; margin-bottom: 6px;
     display: flex; justify-content: space-between; align-items: center;
-  }
-  .print-header-mini {
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 8pt; font-weight: 700; color: #444;
-    border-bottom: 1.5px solid #C8102E; padding-bottom: 3px; margin-bottom: 6px;
   }
   .print-brand-title {
     font-size: 13pt; font-weight: 900; color: #C8102E; letter-spacing: 0.5px;
@@ -2598,20 +2731,45 @@ function renderPrintDocument(scl, inData, outData) {
   .print-doc-sub { font-size: 7.5pt; color: #555; font-weight: 600; }
   .print-doc-no { font-size: 8pt; color: #0D47A1; margin-top: 2px; }
   .print-table {
-    width: 100%; border-collapse: collapse; margin-bottom: 5px;
-    font-size: 7.5pt; table-layout: fixed;
+    width: 100%; border-collapse: collapse; margin-bottom: 4px;
+    font-size: 7pt; table-layout: fixed;
   }
   .print-table th, .print-table td {
-    border: 1px solid #777; padding: 2.5px 4px;
+    border: 1px solid #777; padding: 2px 4px;
     vertical-align: middle; word-wrap: break-word;
   }
   .print-table th {
     background-color: #f2f2f2 !important; font-weight: 700; color: #222; text-align: left;
   }
-  .print-section-hdr {
-    background-color: #C8102E !important; color: #fff !important;
-    font-weight: 800; font-size: 8pt; padding: 3px 6px;
-    margin-top: 5px; margin-bottom: 3px; border-radius: 2px;
+  .print-two-boxes {
+    display: flex; justify-content: space-between; gap: 8px;
+    width: 100%; margin-top: 4px; margin-bottom: 4px;
+    page-break-inside: avoid;
+  }
+  .print-box-half {
+    flex: 1 1 50%; width: 49.5%; box-sizing: border-box;
+  }
+  .print-box-half .print-table {
+    width: 100%; margin: 0; border-collapse: collapse;
+  }
+  .print-box-title-in {
+    background: #C8102E !important; color: #fff !important;
+    font-weight: bold; font-size: 7.5pt; padding: 3px 6px;
+    text-align: center; border: 1px solid #C8102E; letter-spacing: 0.5px;
+  }
+  .print-box-title-out {
+    background: #1e293b !important; color: #fff !important;
+    font-weight: bold; font-size: 7.5pt; padding: 3px 6px;
+    text-align: center; border: 1px solid #1e293b; letter-spacing: 0.5px;
+  }
+  .print-cat-row {
+    background: #f1f5f9 !important; font-weight: bold; font-size: 7pt;
+    color: #0f172a !important; padding: 2px 4px !important;
+    border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;
+    text-transform: uppercase;
+  }
+  .print-item-row td {
+    padding: 2px 4px !important; font-size: 7pt !important; line-height: 1.2 !important;
   }
   .badge-ok {
     font-weight: 700; color: #1b5e20; background: #e8f5e9 !important;
@@ -2630,25 +2788,25 @@ function renderPrintDocument(scl, inData, outData) {
   .sig-col {
     flex: 1; text-align: center; border: 1px solid #ccc;
     background: #fafafa !important; padding: 3px; border-radius: 3px;
-    min-height: 72px; display: flex; flex-direction: column; justify-content: space-between;
+    min-height: 68px; display: flex; flex-direction: column; justify-content: space-between;
   }
   .sig-col-title {
     font-size: 7.5pt; font-weight: 700; color: #333;
     border-bottom: 1px solid #eee; padding-bottom: 1px; margin-bottom: 2px;
   }
   .sig-img-box {
-    min-height: 44px; display: flex; flex-direction: column;
+    min-height: 40px; display: flex; flex-direction: column;
     align-items: center; justify-content: center; margin-bottom: 2px;
   }
-  .sig-img-box img { max-height: 44px; max-width: 90%; object-fit: contain; }
-  .sig-name { font-size: 8.5pt; font-weight: 700; margin-top: 1px; }
+  .sig-img-box img { max-height: 40px; max-width: 90%; object-fit: contain; }
+  .sig-name { font-size: 8pt; font-weight: 700; margin-top: 1px; }
   .sig-date { font-size: 7pt; color: #555; }
   .print-footer {
     margin-top: 6px; padding-top: 3px; border-top: 1px dashed #999;
     font-size: 7pt; color: #666; display: flex; justify-content: space-between;
   }
   @media print {
-    @page { size: A4 portrait; margin: 8mm 6mm; }
+    @page { size: A4 portrait; margin: 6mm 8mm; }
   }
 </style>
 </head>
@@ -2657,6 +2815,7 @@ ${htmlDoc}
 </body>
 </html>`;
 }
+
 // ==========================================
 // PDI OUT SCL PAIRING & STRICT FILTER BY SITE
 // ==========================================
@@ -2750,16 +2909,22 @@ function renderSclDropdown(items, preselectSCL=""){
   const currentVal = preselectSCL || sel.value;
 
   if(items && items.length > 0){
-    sel.innerHTML = `<option value="">-- Pilih NO. CASE (${items.length} tersedia) --</option>` +
-      items.map(w => {
-        const s = String(w.scl || w.wo || w.caseNo || "").trim().toUpperCase();
-        const isSel = (s === String(currentVal).trim().toUpperCase());
-        return `<option value="${s}"${isSel ? " selected" : ""}>${s}</option>`;
-      }).join("");
+    sel.innerHTML = items.map((w, idx) => {
+      const s = String(w.scl || w.wo || w.caseNo || "").trim().toUpperCase();
+      const isSel = currentVal ? (s === String(currentVal).trim().toUpperCase()) : (idx === 0);
+      return `<option value="${s}"${isSel ? " selected" : ""}>${s}</option>`;
+    }).join("");
     sel.disabled = false;
     if(warn) warn.style.display = "none";
+
+    const targetVal = (currentVal && items.some(w => String(w.scl || w.wo || "").toUpperCase() === String(currentVal).toUpperCase()))
+      ? currentVal
+      : String(items[0].scl || items[0].wo || items[0].caseNo || "").trim().toUpperCase();
+    sel.value = targetVal;
+    onSCLChange();
   } else {
-    sel.innerHTML = `<option value="">-- Tidak ada No Case PDI IN (${currentSite || "Site"}) --</option>`;
+    sel.innerHTML = `<option value="-">-</option>`;
+    sel.value = "-";
     sel.disabled = false;
     if(warn){
       warn.style.display = "flex";
@@ -2769,11 +2934,6 @@ function renderSclDropdown(items, preselectSCL=""){
   }
 
   sel.onchange = () => onSCLChange();
-
-  if(currentVal && items.some(w => String(w.scl || w.wo || "").toUpperCase() === String(currentVal).toUpperCase())){
-    sel.value = currentVal;
-    onSCLChange();
-  }
 }
 
 // Memuat daftar No SCL Pending (dari PDI IN yang belum selesai di PDI OUT)
@@ -2796,7 +2956,7 @@ async function loadSCL(preselectSCL=""){
     if(isSclCompletedLocally(s)) return false;
     if(r.site && normalizeSite(r.site) !== siteCode) return false;
     return true;
-  });
+  }).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
   if(pendingSCLItems && pendingSCLItems.length > 0){
     renderSclDropdown(pendingSCLItems, preselectSCL);
@@ -2846,16 +3006,16 @@ async function loadSCL(preselectSCL=""){
 
         const model = String(r["Model Unit"] || "").trim();
         const vin = String(r["VIN"] || "").trim();
-        const layanan = String(r["Jenis Layanan"] || "").trim();
+        const layanan = String(r["Jenis Layanan"] || "").trim().toUpperCase();
         const teknisi = String(r["Teknisi"] || "").trim();
         const rawCat = String(r["Kategori Produk"] || "").trim();
 
-        let normCat = "Motor Listrik (EV)";
+        let normCat = "MOTOR LISTRIK (EV)";
         const rawLow = String(rawCat || "").toLowerCase();
         if(rawLow.includes("non-ev") || rawLow.includes("elektronik") || rawLow.includes("gen")){
-          normCat = "Non-EV / Elektronik";
+          normCat = "NON-EV / ELEKTRONIK";
         } else if(rawLow.includes("ev") || rawLow.includes("motor")){
-          normCat = "Motor Listrik (EV)";
+          normCat = "MOTOR LISTRIK (EV)";
         }
 
         serverItems.push({
@@ -2871,7 +3031,7 @@ async function loadSCL(preselectSCL=""){
           date: r["Tanggal"] || r["Waktu Submit"] || ""
         });
       });
-      serverItems.reverse();
+      // Pertahankan urutan kronologis tertua paling atas (FIFO) sesuai permintaan user
       loadedFromServer = true;
     }
 
@@ -2894,32 +3054,73 @@ async function loadSCL(preselectSCL=""){
     console.log("Error loading pending cases from server:", errFetch);
   }
 
-  // 4. GABUNGKAN DATA SERVER DENGAN DATA LOKAL (UNION, PRIORITASKAN DATA LOKAL)
-  const mergedMap = new Map();
+  // 4. GOOGLE SHEETS ADALAH SUMBER KEBENARAN TUNGGAL
+  let finalItems = [];
 
-  serverItems.forEach(it => {
-    const k = String(it.scl || it.wo || it.caseNo || "").trim().toUpperCase();
-    if(isValidScl(k) && !completedSet[k] && !isSclCompletedLocally(k)){
-      mergedMap.set(k, it);
+  if (loadedFromServer) {
+    // 4a. Saat server berhasil dimuat: Data dropdown HANYA mengikuti data resmi dari Google Sheets
+    // Cek apakah ada antrean offline lokal yang belum sempat terkirim ke server
+    let queueScls = new Set();
+    try {
+      const q = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || "[]");
+      if (Array.isArray(q)) {
+        q.forEach(item => {
+          if (item && item.data && item.action === "submit_pdi_in") {
+            const qs = String(item.data["No SCL"] || item.data["No CASE"] || item.data["No WO"] || "").trim().toUpperCase();
+            if (qs) queueScls.add(qs);
+          }
+        });
+      }
+    } catch(e){}
+
+    const serverMap = new Map();
+    serverItems.forEach(it => {
+      const k = String(it.scl || it.wo || it.caseNo || "").trim().toUpperCase();
+      if (isValidScl(k) && !completedSet[k] && !isSclCompletedLocally(k)) {
+        serverMap.set(k, it);
+      }
+    });
+
+    // Masukkan draft lokal HANYA jika draft tersebut belum terkirim (masih ada di antrean offline)
+    if (queueScls.size > 0) {
+      const curLoc = getLocalPdiInHistory();
+      curLoc.forEach(loc => {
+        const k = String(loc.scl || loc.wo || loc.caseNo || "").trim().toUpperCase();
+        if (queueScls.has(k) && !serverMap.has(k) && !completedSet[k] && !isSclCompletedLocally(k)) {
+          if (!loc.site || normalizeSite(loc.site) === siteCode) {
+            serverMap.set(k, loc);
+          }
+        }
+      });
     }
-  });
 
-  const freshLocal = getLocalPdiInHistory();
-  freshLocal.forEach(loc => {
-    const k = String(loc.scl || loc.wo || loc.caseNo || "").trim().toUpperCase();
-    if(!isValidScl(k)) return;
-    if(completedSet[k] || isSclCompletedLocally(k)) return;
-    if(loc.site && normalizeSite(loc.site) !== siteCode) return;
+    finalItems = Array.from(serverMap.values());
+    pendingSCLItems = finalItems;
 
-    if(mergedMap.has(k)){
-      mergedMap.set(k, Object.assign({}, mergedMap.get(k), loc));
-    } else {
-      mergedMap.set(k, loc);
+    // 4b. Perbarui cache localStorage (HISTORY_STORAGE_KEY) agar sinkron persis dengan Google Sheets
+    // Data lokal lama untuk site ini yang TIDAK ADA di Google Sheets (seperti No Case AA yang sudah diubah ke AAB atau dihapus)
+    // akan langsung dibersihkan dan dihapus dari cache
+    try {
+      const curLoc = getLocalPdiInHistory();
+      const otherSiteLoc = curLoc.filter(h => h.site && normalizeSite(h.site) !== siteCode);
+      const updatedHist = [...finalItems, ...otherSiteLoc];
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(updatedHist));
+    } catch(e) {
+      console.log("Error updating local history cache from server:", e);
     }
-  });
 
-  const finalItems = Array.from(mergedMap.values());
-  pendingSCLItems = finalItems;
+  } else {
+    // 4c. Fallback jika offline / server tidak dapat diakses
+    const localFallback = getLocalPdiInHistory().filter(r => {
+      const s = String(r.scl || r.wo || r.caseNo || "").trim().toUpperCase();
+      if (!isValidScl(s)) return false;
+      if (completedSet[s] || isSclCompletedLocally(s)) return false;
+      if (r.site && normalizeSite(r.site) !== siteCode) return false;
+      return true;
+    });
+    finalItems = localFallback;
+    pendingSCLItems = finalItems;
+  }
 
   // 5. RENDER DROPDOWN DENGAN DATA TERBARU
   renderSclDropdown(finalItems, preselectSCL);
@@ -2968,7 +3169,7 @@ function fillFieldsFromItem(item){
  // 1. Model Unit (Terisi otomatis dari PDI IN, readonly)
  const modelEl = f.querySelector('[name="Model Unit"]');
  if(modelEl){
-  modelEl.value = item.model || "";
+  modelEl.value = String(item.model || "").toUpperCase();
   modelEl.readOnly = true;
   modelEl.style.backgroundColor = "#e9ecef";
  }
@@ -2976,7 +3177,7 @@ function fillFieldsFromItem(item){
  // 2. VIN / No Seri (Terisi otomatis dari PDI IN, readonly)
  const seriEl = f.querySelector('[name="VIN"]');
  if(seriEl){
-  seriEl.value = item.vin || "";
+  seriEl.value = String(item.vin || "").toUpperCase();
   seriEl.readOnly = true;
   seriEl.style.backgroundColor = "#e9ecef";
  }
@@ -2984,7 +3185,22 @@ function fillFieldsFromItem(item){
  // 3. Jenis Layanan (Terisi otomatis dari PDI IN, terkunci)
  const layananEl = f.querySelector('[name="Jenis Layanan"]');
  if(layananEl){
-  layananEl.value = item.layanan || "";
+  const layVal = String(item.layanan || "").trim().toUpperCase();
+  let found = false;
+  for(let i=0; i < layananEl.options.length; i++){
+   if(layananEl.options[i].value.toUpperCase() === layVal || layananEl.options[i].textContent.toUpperCase() === layVal){
+    layananEl.selectedIndex = i;
+    found = true;
+    break;
+   }
+  }
+  if(!found && layVal){
+   const opt = document.createElement("option");
+   opt.value = layVal;
+   opt.textContent = layVal;
+   opt.selected = true;
+   layananEl.appendChild(opt);
+  }
   layananEl.style.pointerEvents = "none";
   layananEl.style.backgroundColor = "#e9ecef";
  }
@@ -3000,7 +3216,13 @@ function fillFieldsFromItem(item){
  // 5. Kategori Produk (Terisi otomatis, terkunci)
  const catOut = document.querySelector("#catOut");
  if(catOut && item.cat){
-  catOut.value = item.cat;
+  let targetCat = item.cat;
+  if(String(item.cat).toLowerCase().includes("non-ev") || String(item.cat).toLowerCase().includes("elektronik")){
+    targetCat = "NON-EV / ELEKTRONIK";
+  } else {
+    targetCat = "MOTOR LISTRIK (EV)";
+  }
+  catOut.value = targetCat;
   catOut.style.pointerEvents = "none";
   catOut.style.backgroundColor = "#e9ecef";
  }
@@ -3333,17 +3555,28 @@ async function submit(e){
   "NO. CASE": noSCL,
   "No WO": noSCL,
   "No SCL": noSCL,
-  "Jenis Layanan": d.get("Jenis Layanan") || (f.querySelector('[name="Jenis Layanan"]') ? f.querySelector('[name="Jenis Layanan"]').value : ""),
-  "Model Unit": d.get("Model Unit") || (f.querySelector('[name="Model Unit"]') ? f.querySelector('[name="Model Unit"]').value : ""),
-  "VIN": d.get("VIN") || (f.querySelector('[name="VIN"]') ? f.querySelector('[name="VIN"]').value : ""),
+  "Jenis Layanan": String(d.get("Jenis Layanan") || (f.querySelector('[name="Jenis Layanan"]') ? f.querySelector('[name="Jenis Layanan"]').value : "")).trim().toUpperCase(),
+  "Model Unit": String(d.get("Model Unit") || (f.querySelector('[name="Model Unit"]') ? f.querySelector('[name="Model Unit"]').value : "")).trim().toUpperCase(),
+  "VIN": String(d.get("VIN") || (f.querySelector('[name="VIN"]') ? f.querySelector('[name="VIN"]').value : "")).trim().toUpperCase(),
   "Site Service Center": activeSiteCode,
   "Teknisi": teknisiVal
  };
 
  const notes = [];
  items.forEach(it => {
-  const k = it.dataset.k, v = it.querySelector("input[type=radio]:checked").value, n = it.querySelector(".note").value.trim();
-  fields[k] = v; if(n) notes.push(k + ": " + n);
+  const k = it.dataset.k;
+  const radio = it.querySelector("input[type=radio]:checked");
+  const v = radio ? radio.value : "";
+  const noteInput = it.querySelector(".note");
+  const n = noteInput ? noteInput.value.trim() : "";
+  fields[k] = v;
+  if(n) {
+    notes.push(k + ": " + n);
+    fields["Catatan " + k] = n;
+    const nmEl = it.querySelector(".nm");
+    const nmClean = nmEl ? nmEl.textContent.replace(/^[0-9]+\.\s*/, "").trim() : "";
+    if(nmClean) fields["Catatan " + nmClean] = n;
+  }
  });
  fields["Catatan Per Item"] = notes.join(" | ");
  F.texts.forEach((t, i) => fields[t] = d.get("T" + i) || "");
@@ -3369,8 +3602,10 @@ async function submit(e){
    const fullFormSnapshot = Object.assign({}, fields);
    if (cur === "IN") {
      localStorage.setItem("pdi_in_data_" + cleanSclKey, JSON.stringify(fullFormSnapshot));
+     localStorage.setItem("pdi_in_data_" + noSCL, JSON.stringify(fullFormSnapshot));
    } else {
      localStorage.setItem("pdi_out_data_" + cleanSclKey, JSON.stringify(fullFormSnapshot));
+     localStorage.setItem("pdi_out_data_" + noSCL, JSON.stringify(fullFormSnapshot));
    }
  } catch(e){}
 
@@ -3817,12 +4052,13 @@ function onScanSuccess(code) {
   if (navigator.vibrate) navigator.vibrate(100);
   stopScanner();
 
+  const upperCode = cleanCode.toUpperCase();
   const seriEl = document.querySelector('#f input[name="VIN"]');
   if (seriEl) {
-    seriEl.value = cleanCode;
+    seriEl.value = upperCode;
   }
-  lookupModel(cleanCode);
-  toast("✓ Berhasil memindai: " + cleanCode, "#15803d", 1000);
+  lookupModel(upperCode);
+  toast("✓ Berhasil memindai: " + upperCode, "#15803d", 1000);
 }
 
 // Bersihkan riwayat lokal yang kotor / data uji coba lama pada startup
