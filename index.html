@@ -35,7 +35,8 @@ if (typeof Html5Qrcode === "undefined") {
   box-sizing:border-box;
 }
 html, body{
-  min-height:100%;
+  height:100%;
+  height:100dvh;
   margin:0;
   padding:0;
   background:var(--bg);
@@ -44,19 +45,22 @@ html, body{
   font-size:14px;
   -webkit-text-size-adjust:100%;
   -webkit-font-smoothing:antialiased;
+  overflow:hidden !important;
+  overscroll-behavior:none;
+}
+body{
+  display:flex;
+  flex-direction:column;
 }
 button, input, select, textarea, a, .btn, label{
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
 }
-/* Header & Tab Diam Permanen di Atas (Fixed / Pinned di puncak layar saat di-scroll) */
+/* Header & Tab Diam Permanen di Atas (Fixed App-Header, Tidak Pernah Ter-scroll) */
 .top-nav-bar{
-  position:fixed !important;
-  top:0 !important;
-  left:0 !important;
-  right:0 !important;
-  width:100% !important;
-  z-index:10000 !important;
+  flex-shrink:0;
+  width:100%;
+  z-index:1000;
   background:var(--ink);
   margin:0;
   box-shadow:0 3px 10px rgba(0,0,0,0.45);
@@ -155,7 +159,7 @@ header small{display:block;color:#bbb;margin-top:1px;font-size:11px}
   box-shadow:inset 0 -4px 0 0 #ffffff; /* Strip putih di bawah menu aktif */
 }
 
-main{max-width:100%;margin:0 auto;padding:calc(92px + max(6px,env(safe-area-inset-top,0px))) 1mm max(16px,env(safe-area-inset-bottom)) 1mm;width:100%;}
+main, #app{flex:1 1 auto;overflow-y:auto !important;overflow-x:hidden;-webkit-overflow-scrolling:touch;max-width:100%;margin:0 auto;padding:6px 1mm max(16px,env(safe-area-inset-bottom)) 1mm;width:100%;}
 fieldset{
   background:var(--card);
   border:1px solid var(--line);
@@ -2002,19 +2006,24 @@ async function loadPrintSclList() {
     if (resGIn) {
       const gInRows = parseGvizToDictList(resGIn);
       const serverScls = new Set();
-      gInRows.forEach(r => {
+      gInRows.forEach((r, rIdx) => {
         const rawSite = String(r["Site Service Center"] || "").trim();
         if (siteCode && normalizeSite(rawSite) !== siteCode) return;
         const s = String(r["No SCL"] || r["No CASE"] || r["NO. CASE"] || r["No WO"] || "").trim();
         if (!s || !isValidScl(s)) return;
         serverScls.add(s.toUpperCase());
-        if (!seenSCL[s.toUpperCase()]) {
+        const existing = sclList.find(x => x.scl.toUpperCase() === s.toUpperCase());
+        if (existing) {
+          existing.rowIdx = rIdx;
+          if (!existing.tglIn) existing.tglIn = r["Tanggal"] || r["Waktu Submit"] || "";
+        } else {
           seenSCL[s.toUpperCase()] = true;
           sclList.push({
             scl: s,
             model: r["Model Unit"] || "",
             vin: r["VIN"] || "",
             tglIn: r["Tanggal"] || r["Waktu Submit"] || "",
+            rowIdx: rIdx,
             hasOut: false
           });
         }
@@ -2031,6 +2040,26 @@ async function loadPrintSclList() {
   // Filter valid SCL
   sclList = sclList.filter(it => isValidScl(it.scl || it.wo));
 
+  // Sort data TERBARU ke TERLAMA (Descending)
+  sclList.sort((a, b) => {
+    if (a.rowIdx !== undefined && b.rowIdx !== undefined && a.rowIdx !== b.rowIdx) {
+      return b.rowIdx - a.rowIdx;
+    }
+    const tA = a.tglIn || a.tgl || a.time || "";
+    const tB = b.tglIn || b.tgl || b.time || "";
+    const dA = Date.parse(tA);
+    const dB = Date.parse(tB);
+    if (!isNaN(dA) && !isNaN(dB) && dA !== dB) {
+      return dB - dA;
+    }
+    if (tA && tB && tA !== tB) {
+      return String(tB).localeCompare(String(tA));
+    }
+    const sA = String(a.scl || a.wo || "");
+    const sB = String(b.scl || b.wo || "");
+    return sB.localeCompare(sA, undefined, { numeric: true, sensitivity: "base" });
+  });
+
   printSclCache = sclList;
   sel.disabled = false;
 
@@ -2038,18 +2067,24 @@ async function loadPrintSclList() {
   const currentFormSCL = String($("#sclSelect") ? $("#sclSelect").value : "").trim();
 
   if (sclList.length > 0) {
-    sel.innerHTML = '<option value="">-- Pilih No Case --</option>' +
-      sclList.map(it => {
-        const isSel = (it.scl.toUpperCase() === currentFormSCL.toUpperCase());
-        return `<option value="${it.scl}"${isSel ? " selected" : ""}>${it.scl}</option>`;
-      }).join("");
-
-    if (currentFormSCL) {
-      sel.value = currentFormSCL;
-      onPrintSCLSelected();
+    // Tentukan default: prioritaskan case yang sedang aktif di PDI OUT jika ada, jika tidak langsung pilih case paling pertama (terbaru)
+    let defaultSCL = "";
+    if (currentFormSCL && sclList.some(x => x.scl.toUpperCase() === currentFormSCL.toUpperCase())) {
+      defaultSCL = currentFormSCL;
+    } else {
+      defaultSCL = sclList[0].scl;
     }
+
+    sel.innerHTML = sclList.map(it => {
+      const isSel = (it.scl.toUpperCase() === defaultSCL.toUpperCase());
+      return `<option value="${it.scl}"${isSel ? " selected" : ""}>${it.scl}</option>`;
+    }).join("");
+
+    sel.value = defaultSCL;
+    onPrintSCLSelected();
   } else {
     sel.innerHTML = '<option value="">(Belum ada data No Case untuk site ini)</option>';
+    if (btnPrint) btnPrint.disabled = true;
   }
 }
 
@@ -3680,6 +3715,8 @@ async function submit(e){
  if(seriEl) seriEl.value = "";
 
  render();
+ const appEl = document.getElementById("app");
+ if(appEl) appEl.scrollTo({top:0, behavior:"smooth"});
  window.scrollTo({top:0, behavior:"smooth"});
  // Mulai pemrosesan antrian di latar belakang secara asinkron
  setTimeout(processSyncQueue, 100);
