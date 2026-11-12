@@ -35,20 +35,28 @@ if (typeof Html5Qrcode === "undefined") {
   box-sizing:border-box;
 }
 html, body{
-  min-height:100%;
-  margin:0;
-  padding:0;
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  width:100% !important;
+  height:100% !important;
+  height:100dvh !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
   background:var(--bg);
   color:var(--ink);
   font-family:"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,Roboto,sans-serif;
   font-size:14px;
   -webkit-text-size-adjust:100%;
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-  overflow-y:auto;
+  overscroll-behavior:none !important;
 }
 body{
-  display:block !important;
+  display:flex !important;
+  flex-direction:column !important;
 }
 button, input, select, textarea, a, .btn, label{
   touch-action:manipulation;
@@ -56,12 +64,10 @@ button, input, select, textarea, a, .btn, label{
 }
 /* Header & Tab Diam Permanen di Atas (Fixed App-Header, Tidak Pernah Ter-scroll) */
 .top-nav-bar{
-  position:fixed !important;
-  top:0 !important;
-  left:0 !important;
-  right:0 !important;
+  flex:0 0 auto !important;
+  position:relative !important;
   width:100% !important;
-  z-index:10000 !important;
+  z-index:1000 !important;
   background:var(--ink);
   margin:0;
   box-shadow:0 3px 10px rgba(0,0,0,0.45);
@@ -166,7 +172,20 @@ header small{display:block;color:#bbb;margin-top:1px;font-size:11px}
   box-shadow:inset 0 -4px 0 0 #ffffff; /* Strip putih di bawah menu aktif */
 }
 
-main, #app{display:block !important;max-width:100%;margin:0 auto;padding:105px 1mm max(36px,env(safe-area-inset-bottom,0px)) 1mm !important;width:100%;box-sizing:border-box;}
+main, #app{
+  flex:1 1 0px !important;
+  min-height:0 !important;
+  height:auto !important;
+  width:100% !important;
+  max-width:100%;
+  margin:0 auto;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+  overscroll-behavior-y:contain !important;
+  box-sizing:border-box !important;
+  padding:6px 1mm max(36px,env(safe-area-inset-bottom,0px)) 1mm !important;
+}
 fieldset{
   background:var(--card);
   border:1px solid var(--line);
@@ -1148,26 +1167,11 @@ if ('scrollRestoration' in history) {
   try { history.scrollRestoration = 'manual'; } catch(e){}
 }
 function syncTopNavSpacer() {
-  const bar = document.querySelector(".top-nav-bar");
-  const app = document.getElementById("app");
-  if (bar && app) {
-    const h = Math.ceil(bar.getBoundingClientRect().height);
-    if (h > 0) {
-      app.style.paddingTop = (h + 8) + "px";
-    }
-  }
+  // In modern App-Shell layout (#app flex sibling), padding-top is managed by flexbox
 }
-window.addEventListener("resize", syncTopNavSpacer);
-window.addEventListener("orientationchange", () => setTimeout(syncTopNavSpacer, 100));
 window.addEventListener("DOMContentLoaded", () => {
-  window.scrollTo(0, 0);
-  syncTopNavSpacer();
+  try { window.scrollTo(0, 0); } catch(e){}
 });
-setTimeout(() => {
-  window.scrollTo(0, 0);
-  syncTopNavSpacer();
-}, 50);
-setTimeout(syncTopNavSpacer, 300);
 
 
 function getSiteDisplayName(code){
@@ -3736,7 +3740,11 @@ async function submit(e){
  render();
  const appEl = document.getElementById("app");
  if(appEl) appEl.scrollTo({top:0, behavior:"smooth"});
- window.scrollTo({top:0, behavior:"smooth"});
+ try {
+  const appEl = document.getElementById("app");
+  if (appEl) appEl.scrollTo({top:0, behavior:"smooth"});
+  window.scrollTo(0, 0);
+ } catch(e){}
  // Mulai pemrosesan antrian di latar belakang secara asinkron
  setTimeout(processSyncQueue, 100);
 }
