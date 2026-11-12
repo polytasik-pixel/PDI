@@ -3737,7 +3737,7 @@ async function submit(e){
  });
 
  // PROSES TAMPILAN SELESAI INSTAN: Notifikasi sukses langsung muncul & form direset
- toast("✓ Data PDI Berhasil Disimpan!", "#15803d", 1000);
+ toast(cur === "OUT" ? "✓ Data PDI OUT Berhasil Disimpan!" : "✓ Data PDI IN Berhasil Disimpan!", "#15803d", 4000);
 
  if(document.activeElement && typeof document.activeElement.blur === "function"){
   document.activeElement.blur();
