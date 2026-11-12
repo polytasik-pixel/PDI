@@ -326,28 +326,49 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 .sig-row{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px;
+  gap:10px;
   margin-top:8px;
+  align-items:stretch;
 }
 .sig{
   margin-top:0;
   display:flex;
   flex-direction:column;
+  flex:1;
+  min-width:0;
 }
 .sig canvas{
   display:block;
   width:100%;
-  height:115px;
+  height:120px;
+  min-height:120px;
+  max-height:120px;
   border:1px dashed #888;
-  border-radius:3px;
+  border-radius:4px;
   background:#fff;
   touch-action:none;
   cursor:crosshair;
+  box-sizing:border-box;
 }
 .sig.miss canvas{border:2px solid var(--red);background:#fff1f1}
 .sig.miss::after{content:"⚠️ TTD wajib diisi";color:var(--red);font-weight:700;font-size:10px;display:block;margin-top:2px}
-.sig .bar{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mute);margin-bottom:3px}
-.sig .bar span{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sig .bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:11px;
+  color:var(--mute);
+  margin-bottom:4px;
+  height:24px;
+  min-height:24px;
+  box-sizing:border-box;
+}
+.sig .bar span{
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .sig button{
   border:1px solid var(--red);
   background:var(--red);
@@ -1431,7 +1452,7 @@ const FORMS = {
   title:"PDI IN", 
   no:"FR-SC-PDI-IN", 
   dateLabel:"Tanggal Masuk", 
-  tech:"Teknisi Penerima", 
+  tech:"Teknisi", 
   opts:S_IN, 
   bad:"Rusak",
   sections:{
@@ -1456,7 +1477,7 @@ const FORMS = {
   title:"PDI OUT", 
   no:"", // Dihilangkan draft suffix
   dateLabel:"Tanggal Keluar", 
-  tech:"Teknisi / QC Pemeriksa", 
+  tech:"Teknisi", 
   opts:S_OUT, 
   bad:"Tidak OK",
   sections:{
@@ -2318,8 +2339,8 @@ function renderPrintDocument(scl, inData, outData) {
 
       <div class="print-signatures">
         ${renderSigBox("Konsumen / Penerima", namaKonsumen !== "-" ? namaKonsumen : "( .................................. )", rawSigKonsumen, tglOut !== "(Belum Selesai PDI OUT)" ? tglOut : tglIn)}
-        ${renderSigBox("Teknisi Penerima (PDI IN)", tekIn, rawSigTekIn, tglIn)}
-        ${renderSigBox("Teknisi / QC (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
+        ${renderSigBox("Teknisi (PDI IN)", tekIn, rawSigTekIn, tglIn)}
+        ${renderSigBox("Teknisi (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
       </div>
 
       <div class="print-footer">
@@ -2498,8 +2519,8 @@ function renderPrintDocument(scl, inData, outData) {
 
       <div class="print-signatures">
         ${renderSigBox("Konsumen / Penerima", namaKonsumen !== "-" ? namaKonsumen : "( .................................. )", rawSigKonsumen, tglOut !== "(Belum Selesai PDI OUT)" ? tglOut : tglIn)}
-        ${renderSigBox("Teknisi Penerima (PDI IN)", tekIn, rawSigTekIn, tglIn)}
-        ${renderSigBox("Teknisi / QC (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
+        ${renderSigBox("Teknisi (PDI IN)", tekIn, rawSigTekIn, tglIn)}
+        ${renderSigBox("Teknisi (PDI OUT)", tekOut, rawSigTekOut, tglOut)}
       </div>
 
       <div class="print-footer">
