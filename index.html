@@ -65,6 +65,12 @@ button, input, select, textarea, a, .btn, label{
   background:var(--ink);
   margin:0;
   box-shadow:0 3px 10px rgba(0,0,0,0.45);
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
+.top-nav-bar button, .top-nav-bar a, .top-nav-bar .btn-change-site{
+  touch-action:manipulation;
 }
 header{
   background:var(--ink);
