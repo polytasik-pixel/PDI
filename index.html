@@ -1160,6 +1160,49 @@ function fetchGvizSheet(sheetName, timeoutMs = 15000) {
  });
 }
 
+// Helper parsing struktur GViz table ke Array of Object dictionaries
+function parseGvizToDictList(resGviz) {
+  if (!resGviz || !resGviz.table || !Array.isArray(resGviz.table.rows) || !Array.isArray(resGviz.table.cols)) {
+    return [];
+  }
+  const cols = resGviz.table.cols.map(c => (c && c.label) ? String(c.label).trim() : "");
+  const rows = [];
+  resGviz.table.rows.forEach(r => {
+    if (!r || !Array.isArray(r.c)) return;
+    const rowObj = {};
+    r.c.forEach((cell, idx) => {
+      const colName = cols[idx];
+      if (!colName) return;
+      if (cell !== null && cell !== undefined) {
+        if (cell.f) {
+          rowObj[colName] = String(cell.f).trim();
+        } else if (cell.v !== null && cell.v !== undefined) {
+          let val = cell.v;
+          if (typeof val === "string" && val.indexOf("Date(") === 0) {
+            const m = val.match(/Date\(([0-9]+),([0-9]+),([0-9]+)(?:,([0-9]+),([0-9]+),([0-9]+))?\)/);
+            if (m) {
+              const y = m[1];
+              const mo = String(parseInt(m[2], 10) + 1).padStart(2, "0");
+              const d = String(m[3]).padStart(2, "0");
+              if (m[4] !== undefined) {
+                const hh = String(m[4]).padStart(2, "0");
+                const mm = String(m[5]).padStart(2, "0");
+                const ss = String(m[6] || 0).padStart(2, "0");
+                val = `${y}-${mo}-${d} ${hh}:${mm}:${ss}`;
+              } else {
+                val = `${y}-${mo}-${d}`;
+              }
+            }
+          }
+          rowObj[colName] = val;
+        }
+      }
+    });
+    rows.push(rowObj);
+  });
+  return rows;
+}
+
 // Background Sync Data Produk dari Sheet BARANG
 async function syncProductMap() {
  try {
@@ -1790,6 +1833,30 @@ async function loadPrintSclList() {
     console.log("Apps Script print list fetch:", e);
   }
 
+  // 4. Tambahkan juga fallback ke GViz PDIIN jika ada case yang belum terdaftar di sclList
+  try {
+    const resGIn = await fetchGvizSheet(SHEET_NAME_IN, 6000).catch(() => null);
+    if (resGIn) {
+      const gInRows = parseGvizToDictList(resGIn);
+      gInRows.forEach(r => {
+        const rawSite = String(r["Site Service Center"] || "").trim();
+        if (siteCode && normalizeSite(rawSite) !== siteCode) return;
+        const s = String(r["No SCL"] || r["No CASE"] || r["NO. CASE"] || r["No WO"] || "").trim();
+        if (!s || seenSCL[s.toUpperCase()]) return;
+        seenSCL[s.toUpperCase()] = true;
+        sclList.push({
+          scl: s,
+          model: r["Model Unit"] || "",
+          vin: r["VIN"] || "",
+          tglIn: r["Tanggal"] || r["Waktu Submit"] || "",
+          hasOut: false
+        });
+      });
+    }
+  } catch(e) {
+    console.log("GViz print list fallback:", e);
+  }
+
   // Filter valid SCL
   sclList = sclList.filter(it => isValidScl(it.scl || it.wo));
 
@@ -1802,9 +1869,9 @@ async function loadPrintSclList() {
   if (sclList.length > 0) {
     sel.innerHTML = '<option value="">-- Pilih NO. CASE untuk Dicetak --</option>' +
       sclList.map(it => {
-        const badge = it.hasOut ? "✓ [Lengkap IN & OUT]" : "⏳ [PDI IN Saja]";
         const isSel = (it.scl.toUpperCase() === currentFormSCL.toUpperCase());
-        return `<option value="${it.scl}"${isSel ? " selected" : ""}>${it.scl} - ${it.model || ''} (${it.vin || ''}) ${badge}</option>`;
+        const desc = [it.model, it.vin ? `(${it.vin})` : ""].filter(Boolean).join(" ");
+        return `<option value="${it.scl}"${isSel ? " selected" : ""}>${it.scl}${desc ? " - " + desc : ""}</option>`;
       }).join("");
 
     if (currentFormSCL) {
@@ -1887,38 +1954,51 @@ async function executePrintPDF() {
         fetchGvizSheet(SHEET_NAME_OUT).catch(() => null)
       ]);
 
-      if (resGvizIn && resGvizIn.rows) {
-        for (let i = resGvizIn.rows.length - 1; i >= 0; i--) {
-          const r = resGvizIn.rows[i];
-          const s = String(r["No CASE"] || r["NO. CASE"] || r["No SCL"] || r["No WO"] || "").trim().toUpperCase();
-          if (s === targetSCL) {
-            Object.keys(r).forEach(k => {
-              if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
-                inData[k] = r[k];
-              }
-            });
-            break;
-          }
+      const rowsIn = parseGvizToDictList(resGvizIn);
+      const rowsOut = parseGvizToDictList(resGvizOut);
+
+      for (let i = rowsIn.length - 1; i >= 0; i--) {
+        const r = rowsIn[i];
+        const s = String(r["No SCL"] || r["No CASE"] || r["NO. CASE"] || r["No WO"] || "").trim().toUpperCase();
+        if (s === targetSCL) {
+          Object.keys(r).forEach(k => {
+            if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
+              inData[k] = r[k];
+            }
+          });
+          break;
         }
       }
 
-      if (resGvizOut && resGvizOut.rows) {
-        for (let j = resGvizOut.rows.length - 1; j >= 0; j--) {
-          const r = resGvizOut.rows[j];
-          const s = String(r["No CASE"] || r["NO. CASE"] || r["No SCL"] || r["No WO"] || "").trim().toUpperCase();
-          if (s === targetSCL) {
-            Object.keys(r).forEach(k => {
-              if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
-                outData[k] = r[k];
-              }
-            });
-            break;
-          }
+      for (let j = rowsOut.length - 1; j >= 0; j--) {
+        const r = rowsOut[j];
+        const s = String(r["No SCL"] || r["No CASE"] || r["NO. CASE"] || r["No WO"] || "").trim().toUpperCase();
+        if (s === targetSCL) {
+          Object.keys(r).forEach(k => {
+            if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
+              outData[k] = r[k];
+            }
+          });
+          break;
         }
       }
     } catch(errGviz) {
       console.warn("Gviz sync in executePrintPDF:", errGviz);
     }
+
+    // 4. Fallback ke getLocalPdiInHistory() jika ada field header PDI IN yang masih kosong
+    try {
+      const hist = getLocalPdiInHistory();
+      const hItem = hist.find(x => String(x.scl || x.wo || "").trim().toUpperCase() === targetSCL);
+      if (hItem) {
+        if (!inData["Model Unit"] && hItem.model) inData["Model Unit"] = hItem.model;
+        if (!inData["VIN"] && hItem.vin) inData["VIN"] = hItem.vin;
+        if (!inData["Teknisi"] && hItem.teknisi) inData["Teknisi"] = hItem.teknisi;
+        if (!inData["Jenis Layanan"] && hItem.layanan) inData["Jenis Layanan"] = hItem.layanan;
+        if (!inData["Site Service Center"] && hItem.site) inData["Site Service Center"] = hItem.site;
+        if (!inData["Tanggal"] && (hItem.date || hItem.tgl || hItem.tglIn)) inData["Tanggal"] = hItem.date || hItem.tgl || hItem.tglIn;
+      }
+    } catch(e) {}
 
     // 4. Susun Dokumen Cetak ke dalam container #printReportArea
     renderPrintDocument(targetSCL, inData, outData);
@@ -2031,6 +2111,30 @@ function renderPrintDocument(scl, inData, outData) {
 
   const isEV = !kat.includes("Elektronik") && !kat.includes("Non-EV");
 
+  // Helper pencocokan nilai checklist dengan fuzzy fallback
+  function findValueInDict(dict, primaryKey, itemName) {
+    if (!dict) return "";
+    if (primaryKey && dict[primaryKey] !== undefined && dict[primaryKey] !== null && String(dict[primaryKey]).trim() !== "") {
+      return String(dict[primaryKey]).trim();
+    }
+    const norm = s => String(s || "").toLowerCase().replace(/^[a-z]\.\s*/, "").replace(/[^a-z0-9]/g, "");
+    const targetNorm = norm(primaryKey || itemName);
+    const nameNorm = norm(itemName);
+
+    for (const k in dict) {
+      const val = dict[k];
+      if (val === undefined || val === null || String(val).trim() === "") continue;
+      const kNorm = norm(k);
+      if (targetNorm && (kNorm === targetNorm || kNorm.includes(targetNorm) || targetNorm.includes(kNorm))) {
+        return String(val).trim();
+      }
+      if (nameNorm && (kNorm === nameNorm || kNorm.includes(nameNorm) || nameNorm.includes(kNorm))) {
+        return String(val).trim();
+      }
+    }
+    return "";
+  }
+
   // Helper render baris tabel checklist
   function renderChecklistRows(groups, startNum = 1) {
     let rowsHtml = "";
@@ -2038,34 +2142,31 @@ function renderPrintDocument(scl, inData, outData) {
     groups.forEach(grp => {
       rowsHtml += `<tr><td colspan="5" style="background:#eef3f8; font-weight:bold; color:#0D47A1; padding:2px 5px; font-size:8pt;">${grp.cat}</td></tr>`;
       grp.items.forEach(it => {
-        let valIn = inData[it.inKey] || "";
-        if (!valIn) {
-          for (const k in inData) {
-            if (k.indexOf(it.name) !== -1 || (it.inKey && k.indexOf(it.inKey.replace(/^[A-Z]\.\s*/, "")) !== -1)) {
-              valIn = inData[k]; break;
-            }
-          }
-        }
+        let valIn = findValueInDict(inData, it.inKey, it.name);
         if (!valIn) valIn = "-";
 
-        let valOut = outData[it.outKey] || "";
-        if (!valOut) {
-          for (const k in outData) {
-            if (k.indexOf(it.name) !== -1 || (it.outKey && k.indexOf(it.outKey.replace(/^[A-Z]\.\s*/, "")) !== -1)) {
-              valOut = outData[k]; break;
-            }
-          }
-        }
+        let valOut = findValueInDict(outData, it.outKey, it.name);
         if (!valOut) valOut = "-";
 
         let badgeIn = valIn;
-        if (valIn === "Baik" || valIn === "Ada") badgeIn = `<span class="badge-ok">✓ ${valIn}</span>`;
-        else if (valIn === "Rusak" || valIn === "Tidak Ada") badgeIn = `<span class="badge-ng">✕ ${valIn}</span>`;
+        const vInLow = String(valIn).trim().toLowerCase();
+        if (vInLow === "bagus" || vInLow === "baik" || vInLow === "ada" || vInLow === "ok") {
+          badgeIn = `<span class="badge-ok">✓ ${valIn}</span>`;
+        } else if (vInLow === "rusak" || vInLow === "tidak ada" || vInLow === "tidak ok" || vInLow === "ng") {
+          badgeIn = `<span class="badge-ng">✕ ${valIn}</span>`;
+        } else if (vInLow === "n/a" || vInLow === "na") {
+          badgeIn = `<span class="badge-na">- N/A -</span>`;
+        }
 
         let badgeOut = valOut;
-        if (valOut === "OK" || valOut === "Ada" || valOut === "Baik") badgeOut = `<span class="badge-ok">✓ ${valOut}</span>`;
-        else if (valOut === "Tidak OK" || valOut === "Tidak Ada") badgeOut = `<span class="badge-ng">✕ ${valOut}</span>`;
-        else if (valOut === "N/A") badgeOut = `<span class="badge-na">- N/A -</span>`;
+        const vOutLow = String(valOut).trim().toLowerCase();
+        if (vOutLow === "ok" || vOutLow === "bagus" || vOutLow === "baik" || vOutLow === "ada") {
+          badgeOut = `<span class="badge-ok">✓ ${valOut}</span>`;
+        } else if (vOutLow === "tidak ok" || vOutLow === "rusak" || vOutLow === "tidak ada" || vOutLow === "ng") {
+          badgeOut = `<span class="badge-ng">✕ ${valOut}</span>`;
+        } else if (vOutLow === "n/a" || vOutLow === "na") {
+          badgeOut = `<span class="badge-na">- N/A -</span>`;
+        }
 
         rowsHtml += `
         <tr>
@@ -2212,11 +2313,11 @@ function renderPrintDocument(scl, inData, outData) {
     // ==========================================
     const evPart1 = [
       { cat: "A. Kelengkapan Unit & Dokumen", items: [
-        { name: "Kunci kontak / Smart key", inKey: "A. Kunci kontak / Smart key", outKey: "C. Fitur remote / smart key aktif" },
-        { name: "Charger & kabel charger", inKey: "A. Charger & kabel charger", outKey: "C. Port / konektor charging bersih & tertutup" },
-        { name: "Buku manual / kartu garansi", inKey: "A. Buku manual / kartu garansi", outKey: "D. Buku manual / buku servis diserahkan" },
-        { name: "Aksesoris standar bawaan", inKey: "A. Aksesoris standar bawaan (jika ada)", outKey: "B. Tidak ada kerusakan baru dibanding PDI IN" },
-        { name: "Spion kiri & kanan", inKey: "A. Spion kiri & kanan", outKey: "B. Spion kiri & kanan terpasang kencang" },
+        { name: "Kunci kontak / Smart key", inKey: "A. Kunci kontak / Smart key", outKey: "G. Kunci kontak / Smart key" },
+        { name: "Charger & kabel charger", inKey: "A. Charger & kabel charger", outKey: "G. Charger & kabel charger" },
+        { name: "Buku manual / kartu garansi", inKey: "A. Buku manual / kartu garansi", outKey: "G. Buku manual / kartu garansi" },
+        { name: "Aksesoris standar bawaan", inKey: "A. Aksesoris standar bawaan (jika ada)", outKey: "G. Aksesoris standar bawaan (jika ada)" },
+        { name: "Spion kiri & kanan", inKey: "A. Spion kiri & kanan", outKey: "B. Spion kiri & kanan" },
         { name: "Jok / seat", inKey: "A. Jok / seat", outKey: "B. Jok / box terpasang & terkunci baik" },
         { name: "Box / bagasi (jika ada)", inKey: "A. Box / bagasi (jika ada)", outKey: "B. Jok / box terpasang & terkunci baik" }
       ]},
@@ -2236,25 +2337,25 @@ function renderPrintDocument(scl, inData, outData) {
       { cat: "C. Sistem Kelistrikan & Fitur", items: [
         { name: "Kondisi fisik baterai & segel", inKey: "C. Kondisi fisik baterai & segel", outKey: "C. Baterai terpasang & segel utuh" },
         { name: "Panel instrumen / dashboard", inKey: "C. Panel instrumen / dashboard menyala normal", outKey: "C. Dashboard menyala normal, tanpa kode error" },
-        { name: "Klakson", inKey: "C. Klakson", outKey: "C. Klakson berfungsi normal" },
+        { name: "Klakson", inKey: "C. Klakson", outKey: "C. Klakson" },
         { name: "Speedometer / indikator kecepatan", inKey: "C. Speedometer / indikator kecepatan", outKey: "C. Dashboard menyala normal, tanpa kode error" },
-        { name: "Port / konektor charging", inKey: "C. Port / konektor charging", outKey: "C. Port / konektor charging bersih & tertutup" }
+        { name: "Port / konektor charging", inKey: "C. Port / konektor charging", outKey: "C. Port / konektor charging" }
       ]},
       { cat: "D. Sistem Pengereman & Roda", items: [
-        { name: "Rem depan", inKey: "D. Rem depan", outKey: "D. Rem depan & belakang berfungsi pakem" },
-        { name: "Rem belakang", inKey: "D. Rem belakang", outKey: "D. Rem depan & belakang berfungsi pakem" },
-        { name: "Kabel / hose rem", inKey: "D. Kabel / hose rem", outKey: "D. Lampu rem menyala saat tuas ditarik" },
-        { name: "Kondisi & tekanan ban depan", inKey: "E. Ban depan", outKey: "E. Tekanan angin ban depan & belakang sesuai standar" },
-        { name: "Kondisi & tekanan ban belakang", inKey: "E. Ban belakang", outKey: "E. Tekanan angin ban depan & belakang sesuai standar" },
-        { name: "Suspensi depan & belakang", inKey: "E. Suspensi depan", outKey: "E. Suspensi bekerja normal tanpa kebocoran oli" }
+        { name: "Rem depan", inKey: "D. Rem depan", outKey: "D. Rem depan" },
+        { name: "Rem belakang", inKey: "D. Rem belakang", outKey: "D. Rem belakang" },
+        { name: "Kabel / hose rem", inKey: "D. Kabel / hose rem", outKey: "D. Kabel / hose rem tidak kendor & tidak bocor" },
+        { name: "Kondisi & tekanan ban depan", inKey: "E. Ban depan", outKey: "E. Kondisi & tekanan ban depan" },
+        { name: "Kondisi & tekanan ban belakang", inKey: "E. Ban belakang", outKey: "E. Kondisi & tekanan ban belakang" },
+        { name: "Suspensi depan & belakang", inKey: "E. Suspensi depan", outKey: "E. Suspensi depan & belakang" }
       ]},
       { cat: "E. Verifikasi Akhir & Test Ride", items: [
         { name: "Keluhan konsumen teratasi", inKey: "Keluhan Konsumen", outKey: "A. Keluhan konsumen sudah teratasi" },
         { name: "Pekerjaan sesuai Work Order", inKey: "Jenis Layanan", outKey: "A. Pekerjaan sesuai Work Order" },
         { name: "Part bekas dikembalikan / dicatat", inKey: "Catatan Tambahan Teknisi", outKey: "A. Part bekas dikembalikan / dicatat (jika diminta)" },
-        { name: "Suara motor saat akselerasi", inKey: "F. Suara motor saat dihidupkan", outKey: "F. Suara motor halus saat akselerasi" },
-        { name: "Respon throttle / gas halus", inKey: "F. Respon handle gas / throttle", outKey: "F. Respon throttle / gas halus & responsif" },
-        { name: "Pengereman & handling seimbang", inKey: "F. Getaran tidak normal saat berjalan", outKey: "F. Handling stabil & lurus" }
+        { name: "Suara motor saat akselerasi", inKey: "F. Suara motor saat dihidupkan", outKey: "F. Suara motor normal" },
+        { name: "Respon throttle / gas halus", inKey: "F. Respon handle gas / throttle", outKey: "F. Respon throttle halus" },
+        { name: "Pengereman & handling seimbang", inKey: "F. Getaran tidak normal saat berjalan", outKey: "F. Pengereman saat test ride normal" }
       ]}
     ];
 
