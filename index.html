@@ -49,12 +49,14 @@ button, input, select, textarea, a, .btn, label{
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
 }
-/* Header & Tab Diam Permanen di Atas (Sticky di puncak layar saat di-scroll) */
+/* Header & Tab Diam Permanen di Atas (Fixed / Pinned di puncak layar saat di-scroll) */
 .top-nav-bar{
-  position:-webkit-sticky;
-  position:sticky;
-  top:0;
-  z-index:1000;
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:100% !important;
+  z-index:10000 !important;
   background:var(--ink);
   margin:0;
   box-shadow:0 3px 10px rgba(0,0,0,0.45);
@@ -153,7 +155,7 @@ header small{display:block;color:#bbb;margin-top:1px;font-size:11px}
   box-shadow:inset 0 -4px 0 0 #ffffff; /* Strip putih di bawah menu aktif */
 }
 
-main{max-width:100%;margin:0 auto;padding:6px 1mm max(16px,env(safe-area-inset-bottom)) 1mm;width:100%;}
+main{max-width:100%;margin:0 auto;padding:calc(92px + max(6px,env(safe-area-inset-top,0px))) 1mm max(16px,env(safe-area-inset-bottom)) 1mm;width:100%;}
 fieldset{
   background:var(--card);
   border:1px solid var(--line);
@@ -690,6 +692,7 @@ body.is-printing fieldset {
     overflow: visible !important;
     height: auto !important;
     display: none !important;
+    padding-top: 0 !important;
   }
 
   /* Sembunyikan SEMUA elemen body secara total kecuali #printReportArea */
@@ -1130,6 +1133,19 @@ function normalizeSite(s){
  const found = SITE_CODES.find(code => code === s || s.includes(code));
  return found || s;
 }
+function syncTopNavSpacer() {
+  const bar = document.querySelector(".top-nav-bar");
+  const app = document.getElementById("app");
+  if (bar && app) {
+    const h = Math.ceil(bar.getBoundingClientRect().height);
+    if (h > 0) {
+      app.style.paddingTop = (h + 4) + "px";
+    }
+  }
+}
+window.addEventListener("resize", syncTopNavSpacer);
+window.addEventListener("DOMContentLoaded", syncTopNavSpacer);
+
 
 function getSiteDisplayName(code){
  return code ? normalizeSite(code) : "- Belum Dipilih -";
@@ -2321,10 +2337,20 @@ async function executePrintPDF() {
     const cleanDocName = String(targetSCL).replace(/[\/\:*?"<>|]/g, "_").trim();
 
     // A. JIKA BERADA DI DALAM APLIKASI ANDROID (APK) -> Gunakan Android PrintManager Native
-    if (window.AndroidPrint && typeof window.AndroidPrint.printHtml === "function") {
+    if (window.AndroidPrint) {
       closePrintModal();
-      window.AndroidPrint.printHtml(fullHtml, cleanDocName);
       toast("✓ Membuka dialog Cetak / Simpan PDF...", "#15803d", 3500);
+      setTimeout(() => {
+        try {
+          if (typeof window.AndroidPrint.printHtml === "function") {
+            window.AndroidPrint.printHtml(fullHtml, cleanDocName);
+          } else if (typeof window.AndroidPrint.printCurrentPage === "function") {
+            window.AndroidPrint.printCurrentPage(cleanDocName);
+          }
+        } catch(ePrint) {
+          alert("Gagal memanggil cetak Android: " + ePrint.message);
+        }
+      }, 150);
       return;
     }
 
@@ -3681,6 +3707,7 @@ function tab(w, push=true){
   }
  }
  render();
+ syncTopNavSpacer();
  if(w === "OUT"){
   loadSCL();
  }
@@ -4070,6 +4097,7 @@ try {
 
 hideLoader();
 render();
+syncTopNavSpacer();
 updateSiteUI();
 if(!currentSite){
  openSiteModal(false);
