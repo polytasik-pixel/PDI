@@ -5402,18 +5402,106 @@ try {
   localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(hist));
 } catch(e){}
 
-hideLoader();
+// Daftarkan listener beforeunload untuk mendeteksi refresh / reload halaman
+window.addEventListener("beforeunload", () => {
+  try {
+    sessionStorage.setItem("pdi_page_is_reload", "true");
+  } catch(e) {}
+});
+
+// DETEKSI REFRESH HALAMAN:
+// Jika pengguna me-refresh halaman (F5, reload browser, pull-to-refresh),
+// bersihkan seluruh draft form, tombol-tombol checklist, foto, dan tanda tangan agar kembali bersih tanpa data.
+let isPageReload = false;
 try {
-  if (window.AndroidPrint && typeof window.AndroidPrint.getLastCapturedPhoto === "function") {
-    const p = window.AndroidPrint.getLastCapturedPhoto();
-    if (p) currentUploadedPhoto = p;
-  }
-  if (!currentUploadedPhoto) {
-    const sp = sessionStorage.getItem("pdi_temp_photo");
-    if (sp) currentUploadedPhoto = sp;
+  const isSessionReload = sessionStorage.getItem("pdi_page_is_reload") === "true";
+  sessionStorage.removeItem("pdi_page_is_reload");
+
+  const navEntries = (window.performance && typeof performance.getEntriesByType === "function")
+    ? performance.getEntriesByType("navigation")
+    : [];
+  const isNavReload = navEntries.length > 0 && navEntries[0].type === "reload";
+  const isLegacyReload = window.performance && window.performance.navigation && window.performance.navigation.type === 1;
+
+  if (isSessionReload || isNavReload || isLegacyReload) {
+    isPageReload = true;
   }
 } catch(e) {}
+
+if (isPageReload) {
+  // Halaman di-refresh: Bersihkan semua draft dan foto tersimpan
+  clearFormDraft();
+  try {
+    localStorage.removeItem(DRAFT_KEY_IN);
+    localStorage.removeItem(DRAFT_KEY_OUT);
+    sessionStorage.removeItem("pdi_temp_photo");
+    if (window.AndroidPrint && typeof window.AndroidPrint.clearLastCapturedPhoto === "function") {
+      window.AndroidPrint.clearLastCapturedPhoto();
+    }
+  } catch(e) {}
+  currentUploadedPhoto = "";
+} else {
+  // Hanya ambil foto terakhir jika BUKAN reload halaman
+  try {
+    if (window.AndroidPrint && typeof window.AndroidPrint.getLastCapturedPhoto === "function") {
+      const p = window.AndroidPrint.getLastCapturedPhoto();
+      if (p) currentUploadedPhoto = p;
+    }
+    if (!currentUploadedPhoto) {
+      const sp = sessionStorage.getItem("pdi_temp_photo");
+      if (sp) currentUploadedPhoto = sp;
+    }
+  } catch(e) {}
+}
+
+hideLoader();
 render();
+
+if (isPageReload) {
+  // Pastikan form benar-benar bersih seketika setelah render akibat reload
+  setTimeout(() => {
+    const f = $("#f");
+    if (f) {
+      try { f.reset(); } catch(e) {}
+      f.querySelectorAll('input[type="radio"]').forEach(r => {
+        r.checked = false;
+        r.removeAttribute("checked");
+      });
+      f.querySelectorAll('.opts label').forEach(l => {
+        l.classList.remove('sel');
+      });
+      f.querySelectorAll('input[name="agree"]').forEach(c => {
+        c.checked = false;
+        c.removeAttribute("checked");
+      });
+      f.querySelectorAll('.chk').forEach(c => {
+        c.classList.remove('miss');
+      });
+      f.querySelectorAll('.item').forEach(it => {
+        it.classList.remove('miss');
+      });
+      f.querySelectorAll('input[type="text"]').forEach(inp => {
+        inp.value = "";
+      });
+      f.querySelectorAll('textarea').forEach(tx => {
+        tx.value = "";
+      });
+      f.querySelectorAll('.note').forEach(nt => {
+        nt.value = "";
+      });
+    }
+    Object.keys(pads).forEach(k => {
+      if (pads[k]) {
+        pads[k].dirty = false;
+        if (pads[k].c) {
+          const ctx = pads[k].c.getContext("2d");
+          if (ctx) ctx.clearRect(0, 0, pads[k].c.width, pads[k].c.height);
+        }
+      }
+    });
+    updatePhotoPreviewUI();
+  }, 60);
+}
 if (currentUploadedPhoto) {
   setTimeout(() => {
     const box = document.querySelector(".photo-upload-box");
