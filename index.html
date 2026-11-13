@@ -897,6 +897,30 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   align-items:center;
   margin-bottom:10px;
 }
+.btn-flash{
+  background:rgba(255,255,255,0.15);
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.3);
+  border-radius:6px;
+  padding:4px 10px;
+  font-size:12px;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  cursor:pointer;
+  transition:all .2s ease;
+  user-select:none;
+}
+.btn-flash:hover{
+  background:rgba(255,255,255,0.25);
+}
+.btn-flash.active{
+  background:#eab308 !important;
+  color:#000 !important;
+  border-color:#ca8a04 !important;
+  box-shadow:0 0 10px rgba(234,179,8,0.6);
+}
 .scanner-top h3{margin:0;font-size:16px;color:#fff}
 .btn-close-scanner, .btn-modal-x{
   background:var(--red);
@@ -1526,7 +1550,15 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 <div id="scannerModal">
   <div class="scanner-box">
     <div class="scanner-top">
-      <h3>📷 Scan Barcode</h3>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <h3>📷 Scan Barcode</h3>
+        <button type="button" id="btnToggleFlash" class="btn-flash" onclick="toggleScannerFlash()" title="Nyalakan / Matikan Lampu Flash">
+          <svg id="flashIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span id="flashText">Flash</span>
+        </button>
+      </div>
       <button type="button" class="btn-modal-x" onclick="stopScanner()" title="Tutup">✕</button>
     </div>
     <div id="reader"></div>
@@ -5137,6 +5169,97 @@ document.addEventListener("change", e => {
 
 // Logic Barcode Scanner Terintegrasi (Dual-Engine: Html5Qrcode + Native Stream Fallback)
 let html5QrScanner = null;
+let isFlashlightOn = false;
+
+function resetFlashUI() {
+  isFlashlightOn = false;
+  const btn = document.getElementById("btnToggleFlash");
+  if (btn) {
+    btn.classList.remove("active");
+    btn.style.background = "rgba(255,255,255,0.15)";
+    btn.style.color = "#fff";
+    btn.style.borderColor = "rgba(255,255,255,0.3)";
+  }
+  const icon = document.getElementById("flashIcon");
+  if (icon) icon.setAttribute("fill", "none");
+  const txt = document.getElementById("flashText");
+  if (txt) txt.textContent = "Flash";
+}
+
+async function toggleScannerFlash() {
+  const btn = document.getElementById("btnToggleFlash");
+  const icon = document.getElementById("flashIcon");
+  const txt = document.getElementById("flashText");
+
+  isFlashlightOn = !isFlashlightOn;
+
+  let applied = false;
+
+  // 1. Coba via MediaStreamTrack aktif (WebRTC / Camera Stream)
+  let videoTrack = null;
+  if (nativeMediaStream && nativeMediaStream.getVideoTracks().length > 0) {
+    videoTrack = nativeMediaStream.getVideoTracks()[0];
+  }
+  if (!videoTrack) {
+    const v = document.querySelector("#reader video");
+    if (v && v.srcObject && typeof v.srcObject.getVideoTracks === "function") {
+      videoTrack = v.srcObject.getVideoTracks()[0];
+    }
+  }
+
+  if (videoTrack) {
+    try {
+      await videoTrack.applyConstraints({
+        advanced: [{ torch: isFlashlightOn }]
+      });
+      applied = true;
+    } catch(errTrack) {
+      console.warn("Gagal set torch via MediaStreamTrack:", errTrack);
+    }
+  }
+
+  // 2. Coba via Html5Qrcode API jika tersedia
+  if (!applied && html5QrScanner) {
+    try {
+      if (typeof html5QrScanner.applyVideoConstraints === "function") {
+        await html5QrScanner.applyVideoConstraints({
+          advanced: [{ torch: isFlashlightOn }]
+        });
+        applied = true;
+      }
+    } catch(errH5) {
+      console.warn("Gagal set torch via Html5Qrcode:", errH5);
+    }
+  }
+
+  // 3. Fallback ke Android Native Bridge (MainActivity) jika berjalan di APK
+  if (window.AndroidPrint && typeof window.AndroidPrint.toggleTorch === "function") {
+    try {
+      const res = window.AndroidPrint.toggleTorch(isFlashlightOn);
+      if (res) applied = true;
+    } catch(e) {}
+  }
+
+  // Update Tampilan Tombol Flash
+  if (isFlashlightOn) {
+    if (btn) {
+      btn.classList.add("active");
+      btn.style.background = "#eab308";
+      btn.style.color = "#000";
+      btn.style.borderColor = "#ca8a04";
+    }
+    if (icon) {
+      icon.setAttribute("fill", "currentColor");
+    }
+    if (txt) {
+      txt.textContent = "Flash ON";
+    }
+    toast("⚡ Lampu Flash Dinyalakan", "#15803d", 1000);
+  } else {
+    resetFlashUI();
+    toast("Lampu Flash Dimatikan", "#334155", 1000);
+  }
+}
 let nativeMediaStream = null;
 let nativeScanLoopId = null;
 let isScannerStarting = false;
@@ -5407,6 +5530,27 @@ async function startScanner(push = true) {
 }
 
 async function stopScanner(fromBack = false) {
+  if (isFlashlightOn) {
+    try {
+      let videoTrack = null;
+      if (nativeMediaStream && nativeMediaStream.getVideoTracks().length > 0) {
+        videoTrack = nativeMediaStream.getVideoTracks()[0];
+      }
+      if (!videoTrack) {
+        const v = document.querySelector("#reader video");
+        if (v && v.srcObject && typeof v.srcObject.getVideoTracks === "function") {
+          videoTrack = v.srcObject.getVideoTracks()[0];
+        }
+      }
+      if (videoTrack) {
+        await videoTrack.applyConstraints({ advanced: [{ torch: false }] });
+      }
+      if (window.AndroidPrint && typeof window.AndroidPrint.toggleTorch === "function") {
+        window.AndroidPrint.toggleTorch(false);
+      }
+    } catch(e) {}
+    resetFlashUI();
+  }
   const modal = $("#scannerModal");
   modal.style.display = "none";
   hideScannerStatus();
