@@ -1529,6 +1529,7 @@ const DRAFT_KEY_OUT = "pdi_form_draft_out";
 
 // Autosave form draft ke localStorage agar data tidak hilang saat buka kamera, back, atau reload
 function saveFormDraft() {
+  if (isSubmittingForm) return;
   try {
     const f = $("#f");
     if (!f) return;
@@ -1581,6 +1582,7 @@ function saveFormDraft() {
 
 // Pulihkan data draft formulir secara otomatis
 function restoreFormDraft() {
+  if (isSubmittingForm) return;
   try {
     const f = $("#f");
     if (!f) return;
@@ -1653,9 +1655,13 @@ function restoreFormDraft() {
 
 function clearFormDraft(which) {
   try {
-    const w = which || cur;
-    const key = w === "OUT" ? DRAFT_KEY_OUT : DRAFT_KEY_IN;
-    localStorage.removeItem(key);
+    if (which) {
+      const key = which === "OUT" ? DRAFT_KEY_OUT : DRAFT_KEY_IN;
+      localStorage.removeItem(key);
+    } else {
+      localStorage.removeItem(DRAFT_KEY_IN);
+      localStorage.removeItem(DRAFT_KEY_OUT);
+    }
   } catch(e) {}
 }
 
@@ -2075,7 +2081,8 @@ function renderTechField(siteName){
  if(techs.length > 0){
   box.innerHTML = `
    <select name="Teknisi" id="techSelect" required>
-     ${techs.map((t, idx)=>`<option value="${t}"${idx===0?" selected":""}>${t}</option>`).join("")}
+     <option value="">-- PILIH TEKNISI --</option>
+     ${techs.map(t=>`<option value="${t}">${t}</option>`).join("")}
      <option value="__OTHER__">+ Ketik Nama Lain...</option>
    </select>
    <input type="text" id="customTechInput" placeholder="Ketik nama teknisi..." style="display:none;margin-top:4px;">
@@ -2312,7 +2319,8 @@ function render(preserveSCL=""){
   h += `
      <label class="f">Jenis Layanan
        <select name="Jenis Layanan" required style="text-transform:uppercase;">
-         ${LAYANAN.map((x, idx)=>`<option value="${x}"${idx===0?" selected":""}>${x}</option>`).join("")}
+         <option value="">-- PILIH JENIS LAYANAN --</option>
+         ${LAYANAN.map(x=>`<option value="${x}">${x}</option>`).join("")}
        </select>
      </label>
      <label class="f">NO. CASE
@@ -2351,7 +2359,8 @@ function render(preserveSCL=""){
      </label>
      <label class="f">Jenis Layanan
        <select name="Jenis Layanan" id="layananInput" required style="text-transform:uppercase;">
-         ${LAYANAN.map((x, idx)=>`<option value="${x}"${idx===0?" selected":""}>${x}</option>`).join("")}
+         <option value="">-- PILIH JENIS LAYANAN --</option>
+         ${LAYANAN.map(x=>`<option value="${x}">${x}</option>`).join("")}
        </select>
      </label>
      <label class="f">${ev ? "No. Rangka / VIN" : "No. Seri (Serial Number)"}
@@ -4251,7 +4260,6 @@ function triggerPhotoSelect() {
 }
 
 function clearUploadedPhoto() {
-  saveFormDraft();
   currentUploadedPhoto = "";
   try {
     sessionStorage.removeItem("pdi_temp_photo");
@@ -4264,6 +4272,9 @@ function clearUploadedPhoto() {
   const gal = document.getElementById("photoInputGallery");
   if (gal) gal.value = "";
   updatePhotoPreviewUI();
+  if (!isSubmittingForm) {
+    saveFormDraft();
+  }
 }
 
 function handlePhotoSelected(event) {
@@ -4841,26 +4852,102 @@ async function submit(e){
   document.activeElement.blur();
  }
 
- // Kosongkan draft dan kolom input
- clearFormDraft(cur);
- const modelEl = document.querySelector('#f input[name="Model Unit"]');
- if(modelEl) modelEl.value = "";
- const seriEl = document.querySelector('#f input[name="VIN"]');
- if(seriEl) seriEl.value = "";
+ // 1. Kosongkan seluruh draft form dari localStorage & sessionStorage
+ clearFormDraft();
+ try {
+  localStorage.removeItem(DRAFT_KEY_IN);
+  localStorage.removeItem(DRAFT_KEY_OUT);
+  sessionStorage.removeItem("pdi_temp_photo");
+  if (window.AndroidPrint && typeof window.AndroidPrint.clearLastCapturedPhoto === "function") {
+    window.AndroidPrint.clearLastCapturedPhoto();
+  }
+ } catch(e) {}
 
- // Hapus foto yang ada di kotaknya agar bersih kembali (reset)
- clearUploadedPhoto();
+ // 2. Hapus foto yang tersimpan agar kotak foto bersih kembali
+ currentUploadedPhoto = "";
+ const cam = document.getElementById("photoInputCamera");
+ if (cam) cam.value = "";
+ const gal = document.getElementById("photoInputGallery");
+ if (gal) gal.value = "";
 
+ // 3. Jika PDI OUT, kosongkan pilihan No Case yang baru saja diselesaikan
+ if (cur === "OUT") {
+  selectedSCL = "";
+ }
+
+ // 4. Reset form lama jika ada sebelum render form baru yang bersih
+ const oldForm = $("#f");
+ if (oldForm) {
+  try { oldForm.reset(); } catch(e) {}
+ }
+
+ // 5. Render ulang tampilan form dari awal
  render();
- const appEl = document.getElementById("app");
- if(appEl) appEl.scrollTo({top:0, behavior:"smooth"});
+ updatePhotoPreviewUI();
+
+ // 6. Pastikan secara eksplisit seluruh tombol checklist (radio) TIDAK ADA YANG TERPILIH, dan semua input kosong
+ const freshForm = $("#f");
+ if (freshForm) {
+  try { freshForm.reset(); } catch(e) {}
+  freshForm.querySelectorAll('input[type="radio"]').forEach(r => {
+   r.checked = false;
+   r.removeAttribute("checked");
+  });
+  freshForm.querySelectorAll('.opts label').forEach(l => {
+   l.classList.remove('sel');
+  });
+  freshForm.querySelectorAll('input[name="agree"]').forEach(c => {
+   c.checked = false;
+   c.removeAttribute("checked");
+  });
+  freshForm.querySelectorAll('.chk').forEach(c => {
+   c.classList.remove('miss');
+  });
+  freshForm.querySelectorAll('.item').forEach(it => {
+   it.classList.remove('miss');
+  });
+  freshForm.querySelectorAll('input[type="text"]').forEach(inp => {
+   inp.value = "";
+  });
+  freshForm.querySelectorAll('textarea').forEach(tx => {
+   tx.value = "";
+  });
+  freshForm.querySelectorAll('.note').forEach(nt => {
+   nt.value = "";
+  });
+  const layEl = freshForm.querySelector('[name="Jenis Layanan"]');
+  if (layEl) layEl.selectedIndex = 0;
+  const techEl = freshForm.querySelector('#techSelect');
+  if (techEl) techEl.selectedIndex = 0;
+  const custTech = freshForm.querySelector('#customTechInput');
+  if (custTech) {
+   custTech.value = "";
+   custTech.style.display = "none";
+  }
+ }
+
+ // Bersihkan kanvas tanda tangan secara menyeluruh
+ Object.keys(pads).forEach(k => {
+  if (pads[k]) {
+   pads[k].dirty = false;
+   if (pads[k].c) {
+    const ctx = pads[k].c.getContext("2d");
+    if (ctx) ctx.clearRect(0, 0, pads[k].c.width, pads[k].c.height);
+   }
+   if (pads[k].box) {
+    pads[k].box.classList.remove("miss");
+   }
+  }
+ });
+
+ // 7. Scroll layar kembali ke bagian paling atas
  try {
   const appEl = document.getElementById("app");
   if (appEl) appEl.scrollTo({top:0, behavior:"smooth"});
   window.scrollTo(0, 0);
  } catch(e){}
 
- setTimeout(() => { isSubmittingForm = false; }, 3000);
+ setTimeout(() => { isSubmittingForm = false; }, 1000);
 
  // Mulai pemrosesan antrian di latar belakang secara asinkron
  setTimeout(processSyncQueue, 150);
@@ -4876,7 +4963,11 @@ function tab(w, push=true){
  if(document.activeElement && typeof document.activeElement.blur === "function"){
   document.activeElement.blur();
  }
+ if(!isSubmittingForm) {
+  saveFormDraft();
+ }
  cur = w;
+ currentUploadedPhoto = "";
  $("#t-in").classList.toggle("on", w === "IN");
  $("#t-out").classList.toggle("on", w === "OUT");
  if(push){
