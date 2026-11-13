@@ -190,40 +190,38 @@ main, #app{
   padding:8px 8px 8px 8px !important;
   padding:8px 8px calc(8px + env(safe-area-inset-bottom, 0px)) 8px !important;
 }
-fieldset{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-left:4px solid var(--red);
-  margin:0 0 8px;
-  padding:8px 8px 10px;
-  border-radius:2px;
-}
-/* BAGIAN HEADER FORMULIR: BIRU SANGAT PUDAR, KIRI KOTAK TETAP MERAH, DATA TETAP PUTIH */
-.header-box {
-  background: #f7fafe !important; /* Biru sangat pudar / ultra-faded soft blue */
-  border: 1px solid #e2e8f0 !important;
-  border-left: 4px solid var(--red) !important; /* Garis samping kiri TETAP MERAH */
+/* SEMUA KOTAK (FIELDSET): LATAR BELAKANG BIRU MUDA PUDAR, GARIS MERAH KIRI HILANG SEMUA */
+fieldset, .header-box, .photo-upload-box {
+  background: #f7fafe !important; /* Biru muda sangat pudar lembut untuk semua kotak */
+  border: 1px solid #dce8f5 !important; /* Border bersih tanpa garis merah di kiri */
+  border-left: 1px solid #dce8f5 !important; /* Garis merah di sebelah kiri kotak hilang semua */
+  margin: 0 0 8px;
+  padding: 8px 8px 10px;
   border-radius: 4px !important;
 }
-.header-box legend {
+.header-box legend, fieldset legend {
   color: var(--ink) !important;
   font-weight: 700 !important;
 }
-.header-box label.f {
+.header-box label.f, fieldset label.f {
   color: var(--mute) !important;
   font-weight: 600 !important;
 }
-.header-box input[type=text],
-.header-box input[type=tel],
-.header-box input[type=date],
-.header-box input[type=number],
-.header-box select {
+/* SEMUA KOTAK DATA (INPUT, SELECT, TEXTAREA, NOTE): TETAP PUTIH BERSIH */
+input[type=text],
+input[type=tel],
+input[type=date],
+input[type=number],
+select,
+textarea,
+.note {
   background: #ffffff !important; /* Kotak-kotak data tetap putih bersih */
   border: 1px solid #cbd5e1 !important;
   color: #0f172a !important;
 }
-.header-box input:focus,
-.header-box select:focus {
+input:focus,
+select:focus,
+textarea:focus {
   border-color: #0284c7 !important;
   outline: 2px solid #bae6fd !important;
 }
@@ -494,10 +492,10 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 /* Kotak Upload Foto (Opsional di bawah Keluhan) */
 .photo-upload-box {
   margin: 0 0 8px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--red);
-  border-radius: 4px;
+  background: #f7fafe !important;
+  border: 1px solid #dce8f5 !important;
+  border-left: 1px solid #dce8f5 !important;
+  border-radius: 4px !important;
   padding: 8px 8px 10px;
 }
 .photo-upload-box legend {
