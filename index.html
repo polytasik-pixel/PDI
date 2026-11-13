@@ -198,6 +198,35 @@ fieldset{
   padding:8px 8px 10px;
   border-radius:2px;
 }
+/* BAGIAN HEADER FORMULIR: BIRU SANGAT PUDAR, KIRI KOTAK TETAP MERAH, DATA TETAP PUTIH */
+.header-box {
+  background: #f7fafe !important; /* Biru sangat pudar / ultra-faded soft blue */
+  border: 1px solid #e2e8f0 !important;
+  border-left: 4px solid var(--red) !important; /* Garis samping kiri TETAP MERAH */
+  border-radius: 4px !important;
+}
+.header-box legend {
+  color: var(--ink) !important;
+  font-weight: 700 !important;
+}
+.header-box label.f {
+  color: var(--mute) !important;
+  font-weight: 600 !important;
+}
+.header-box input[type=text],
+.header-box input[type=tel],
+.header-box input[type=date],
+.header-box input[type=number],
+.header-box select {
+  background: #ffffff !important; /* Kotak-kotak data tetap putih bersih */
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+.header-box input:focus,
+.header-box select:focus {
+  border-color: #0284c7 !important;
+  outline: 2px solid #bae6fd !important;
+}
 legend{font-weight:700;font-size:12.5px;padding:0 4px;color:var(--ink)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
@@ -479,9 +508,9 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 }
 .photo-preview-area {
   width: 100%;
-  min-height: 190px;
+  min-height: 110px;
   background: #f8fafc;
-  border: 2px dashed #94a3b8;
+  border: 1.5px dashed #94a3b8;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -498,8 +527,8 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 }
 .photo-preview-container {
   width: 100%;
-  min-height: 190px;
-  padding: 8px;
+  min-height: 110px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -508,7 +537,7 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 }
 .photo-preview-img {
   max-width: 100%;
-  max-height: 280px;
+  max-height: 190px;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -520,8 +549,8 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
-  min-height: 190px;
+  padding: 10px 8px;
+  min-height: 110px;
   box-sizing: border-box;
   cursor: pointer;
   width: 100%;
@@ -532,22 +561,22 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   background: #f1f5f9;
 }
 .photo-icon {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   color: #64748b;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .photo-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 2px;
 }
 .photo-sub {
-  font-size: 12px;
-  font-weight: 600;
-  color: #475569;
-  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 1px;
 }
 .btn-photo-action {
   background: #0284c7;
@@ -655,24 +684,24 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   width: 100%;
 }
 .photo-icon-box {
-  width: 52px;
-  height: 52px;
+  width: 38px;
+  height: 38px;
   background: #e0f2fe;
   border: 1.5px solid #bae6fd;
-  border-radius: 6px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #0284c7;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   transition: transform 0.15s ease;
 }
 .photo-placeholder:hover .photo-icon-box {
   transform: scale(1.05);
 }
 .photo-icon-box svg {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
 }
 .btn-shutter {
   width: 58px;
@@ -2337,7 +2366,7 @@ function render(preserveSCL=""){
  // ==========================================
  if(cur === "IN"){
   h += `
-  <fieldset>
+  <fieldset class="header-box">
     <legend>Kategori Produk</legend>
     <label class="f">Pilih kategori produk
       <select id="cat" style="text-transform:uppercase;">
@@ -2348,7 +2377,7 @@ function render(preserveSCL=""){
  } else {
   // PDI OUT: NO SCL DITUKAR KE ATAS (FILTER SESUAI KODE SITE AKTIF)
   h += `
-  <fieldset class="wo-box" id="sclBox">
+  <fieldset class="header-box wo-box" id="sclBox">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
       <legend style="margin:0; padding:0 4px; font-weight:bold; color:var(--red);">NO. CASE - Pilih dari PDI IN</legend>
       <button type="button" id="btnRefreshScl" onclick="loadSCL()" title="Segarkan Data PDI IN" style="background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:3px 8px; font-size:11px; font-weight:600; color:#1e293b; display:inline-flex; align-items:center; gap:4px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
@@ -2376,7 +2405,7 @@ function render(preserveSCL=""){
  // ==========================================
  h += `
  <form id="f" novalidate>
- <fieldset>
+ <fieldset class="header-box">
    <legend>${F.title}${F.no ? ' - ' + F.no : ''}</legend>
    <div class="grid">
      <label class="f">${F.dateLabel}
