@@ -2081,8 +2081,7 @@ function renderTechField(siteName){
  if(techs.length > 0){
   box.innerHTML = `
    <select name="Teknisi" id="techSelect" required>
-     <option value="">-- PILIH TEKNISI --</option>
-     ${techs.map(t=>`<option value="${t}">${t}</option>`).join("")}
+     ${techs.map((t, idx)=>`<option value="${t}"${idx===0?" selected":""}>${t}</option>`).join("")}
      <option value="__OTHER__">+ Ketik Nama Lain...</option>
    </select>
    <input type="text" id="customTechInput" placeholder="Ketik nama teknisi..." style="display:none;margin-top:4px;">
@@ -2319,8 +2318,7 @@ function render(preserveSCL=""){
   h += `
      <label class="f">Jenis Layanan
        <select name="Jenis Layanan" required style="text-transform:uppercase;">
-         <option value="">-- PILIH JENIS LAYANAN --</option>
-         ${LAYANAN.map(x=>`<option value="${x}">${x}</option>`).join("")}
+         ${LAYANAN.map((x, idx)=>`<option value="${x}"${idx===0?" selected":""}>${x}</option>`).join("")}
        </select>
      </label>
      <label class="f">NO. CASE
@@ -2359,8 +2357,7 @@ function render(preserveSCL=""){
      </label>
      <label class="f">Jenis Layanan
        <select name="Jenis Layanan" id="layananInput" required style="text-transform:uppercase;">
-         <option value="">-- PILIH JENIS LAYANAN --</option>
-         ${LAYANAN.map(x=>`<option value="${x}">${x}</option>`).join("")}
+         ${LAYANAN.map((x, idx)=>`<option value="${x}"${idx===0?" selected":""}>${x}</option>`).join("")}
        </select>
      </label>
      <label class="f">${ev ? "No. Rangka / VIN" : "No. Seri (Serial Number)"}
