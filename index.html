@@ -1728,10 +1728,10 @@ function getSiteDisplayName(code){
 }
 
 const CATS = [
-  "Home Appliances",
-  "EV 2 Wheels",
-  "Audio/Video",
-  "EV 4 Wheels"
+  "HOME APPLIANCES",
+  "EV 2 WHEELS",
+  "AUDIO/VIDEO",
+  "EV 4 WHEELS"
 ];
 
 function isEvCategory(c) {
@@ -1743,19 +1743,19 @@ function isEvCategory(c) {
 function normalizeCategory(raw) {
   if (!raw) return CATS[0];
   const s = String(raw).trim();
-  const exact = CATS.find(c => c.toLowerCase() === s.toLowerCase());
+  const exact = CATS.find(c => c.toUpperCase() === s.toUpperCase());
   if (exact) return exact;
 
   const low = s.toLowerCase();
-  if (low.includes("4 wheel") || low.includes("4w") || low.includes("mobil")) return "EV 4 Wheels";
-  if (low.includes("2 wheel") || low.includes("2w") || low.includes("motor listrik") || low.includes("sepeda listrik")) return "EV 2 Wheels";
-  if (low.includes("audio") || low.includes("video") || low.includes("av") || low.includes("speaker") || low.includes("tv")) return "Audio/Video";
-  if (low.includes("home") || low.includes("appliance") || low.includes("kulkas") || low.includes("mesin cuci") || low.includes("ac")) return "Home Appliances";
+  if (low.includes("4 wheel") || low.includes("4w") || low.includes("mobil")) return "EV 4 WHEELS";
+  if (low.includes("2 wheel") || low.includes("2w") || low.includes("motor listrik") || low.includes("sepeda listrik")) return "EV 2 WHEELS";
+  if (low.includes("audio") || low.includes("video") || low.includes("av") || low.includes("speaker") || low.includes("tv")) return "AUDIO/VIDEO";
+  if (low.includes("home") || low.includes("appliance") || low.includes("kulkas") || low.includes("mesin cuci") || low.includes("ac")) return "HOME APPLIANCES";
 
-  if (low.includes("ev")) return "EV 2 Wheels";
-  if (low.includes("non-ev") || low.includes("elektronik")) return "Home Appliances";
+  if (low.includes("ev")) return "EV 2 WHEELS";
+  if (low.includes("non-ev") || low.includes("elektronik")) return "HOME APPLIANCES";
 
-  return s;
+  return s.toUpperCase();
 }
 const LAYANAN = ["WALK-IN", "HOME", "DEALER", "OUT OF TOWN"];
 const S_IN = ["Baik", "Rusak", "Tdk Ada"];
@@ -2257,7 +2257,7 @@ function render(preserveSCL=""){
   <fieldset>
     <legend>Kategori Produk</legend>
     <label class="f">Pilih kategori produk
-      <select id="cat">
+      <select id="cat" style="text-transform:uppercase;">
         ${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}
       </select>
     </label>
@@ -2345,7 +2345,7 @@ function render(preserveSCL=""){
   // Semua kotak terisi otomatis dan BISA DIUBAH / DIEDIT (tidak readonly, tidak ada gembok)
   h += `
      <label class="f">Kategori Produk
-       <select id="catOut" name="Kategori Produk">
+       <select id="catOut" name="Kategori Produk" style="text-transform:uppercase;">
          ${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}
        </select>
      </label>
