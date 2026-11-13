@@ -187,7 +187,8 @@ main, #app{
   -webkit-overflow-scrolling:touch !important;
   overscroll-behavior-y:contain !important;
   box-sizing:border-box !important;
-  padding:6px 1mm max(36px,env(safe-area-inset-bottom,0px)) 1mm !important;
+  padding:8px 8px 8px 8px !important;
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom, 0px)) 8px !important;
 }
 fieldset{
   background:var(--card);
@@ -342,6 +343,8 @@ textarea{
 /* TOMBOL SIMPAN / KIRIM BAWAH: HIJAU TUA & TEKS PUTIH */
 button.send{
   width:100%;
+  box-sizing:border-box !important;
+  display:block;
   padding:14px;
   background:var(--green-dark) !important; /* Hijau Tua */
   color:#FFFFFF !important;              /* Teks Putih */
@@ -350,7 +353,7 @@ button.send{
   font-size:16px;
   font-weight:800;
   cursor:pointer;
-  margin-top:6px;
+  margin:8px 0 0 0 !important;
   letter-spacing:.3px;
   text-transform:uppercase;              /* Tombol Simpan Huruf Kapital */
   box-shadow:0 2px 6px rgba(0,0,0,.15);
@@ -476,60 +479,74 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 }
 .photo-preview-area {
   width: 100%;
-  min-height: 95px;
-  background: #fff;
-  border: 1.5px dashed #94a3b8;
-  border-radius: 4px;
+  min-height: 190px;
+  background: #f8fafc;
+  border: 2px dashed #94a3b8;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
   box-sizing: border-box;
-  margin-top: 2px;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+.photo-preview-area:hover {
+  background: #f1f5f9;
+  border-color: #64748b;
 }
 .photo-preview-container {
   width: 100%;
-  padding: 6px;
+  min-height: 190px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   box-sizing: border-box;
 }
 .photo-preview-img {
   max-width: 100%;
-  max-height: 200px;
+  max-height: 280px;
+  width: auto;
+  height: auto;
   object-fit: contain;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 .photo-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px 8px;
+  padding: 24px 16px;
+  min-height: 190px;
+  box-sizing: border-box;
   cursor: pointer;
   width: 100%;
   text-align: center;
+  user-select: none;
 }
 .photo-placeholder:hover {
   background: #f1f5f9;
 }
 .photo-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   color: #64748b;
   margin-bottom: 6px;
 }
 .photo-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2px;
 }
 .photo-sub {
-  font-size: 10px;
-  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
   margin-top: 2px;
 }
 .btn-photo-action {
@@ -537,13 +554,15 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   color: #fff;
   border: none;
   border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 11px;
-  font-weight: 600;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  transition: background 0.15s ease;
 }
 .btn-photo-action:hover {
   background: #0369a1;
@@ -636,20 +655,24 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   width: 100%;
 }
 .photo-icon-box {
-  width: 44px;
-  height: 44px;
-  background: #e2e8f0;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 4px; /* Kotak, bukan bulat */
+  width: 52px;
+  height: 52px;
+  background: #e0f2fe;
+  border: 1.5px solid #bae6fd;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #0284c7;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  transition: transform 0.15s ease;
+}
+.photo-placeholder:hover .photo-icon-box {
+  transform: scale(1.05);
 }
 .photo-icon-box svg {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
 }
 .btn-shutter {
   width: 58px;
@@ -2469,13 +2492,13 @@ function render(preserveSCL=""){
        ` : `
          <div class="photo-placeholder" onclick="triggerPhotoSelect()">
            <div class="photo-icon-box">
-             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-               <rect x="2" y="6" width="20" height="15" rx="2" ry="2"/>
-               <path d="M7 6V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2"/>
-               <rect x="8" y="10" width="8" height="7" rx="1"/>
+             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+               <circle cx="12" cy="13" r="4"></circle>
              </svg>
            </div>
-           <span class="photo-sub">${cur === "OUT" ? "Foto Serah Terima (Opsional)" : "Foto Unit (Opsional)"}</span>
+           <span class="photo-label">Ketuk untuk Ambil Foto</span>
+           <span class="photo-sub">${cur === "OUT" ? "Foto Serah Terima Unit (Opsional)" : "Foto Fisik Unit / Keluhan (Opsional)"}</span>
          </div>
        `}
      </div>
@@ -4386,13 +4409,13 @@ function updatePhotoPreviewUI() {
     area.innerHTML = `
       <div class="photo-placeholder" onclick="triggerPhotoSelect()">
         <div class="photo-icon-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="6" width="20" height="15" rx="2" ry="2"/>
-            <path d="M7 6V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2"/>
-            <rect x="8" y="10" width="8" height="7" rx="1"/>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
           </svg>
         </div>
-        <span class="photo-sub">${cur === "OUT" ? "Foto Serah Terima (Opsional)" : "Foto Unit (Opsional)"}</span>
+        <span class="photo-label">Ketuk untuk Ambil Foto</span>
+        <span class="photo-sub">${cur === "OUT" ? "Foto Serah Terima Unit (Opsional)" : "Foto Fisik Unit / Keluhan (Opsional)"}</span>
       </div>
     `;
     const btnWrap = document.getElementById("photoBtnWrap");
