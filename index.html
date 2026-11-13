@@ -456,6 +456,369 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 .chk input{margin-top:3px;min-width:20px;height:20px}
 @media(min-width:900px){.grid{grid-template-columns:1fr 1fr 1fr}main{max-width:960px}}
 
+/* Kotak Upload Foto (Opsional di bawah Keluhan) */
+.photo-upload-box {
+  margin-top: 10px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.photo-upload-box legend {
+  font-weight: 700;
+  font-size: 12px;
+  color: #334155;
+  padding: 0 4px;
+}
+.photo-preview-area {
+  width: 100%;
+  min-height: 100px;
+  background: #fff;
+  border: 2px dashed #94a3b8;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+.photo-preview-container {
+  width: 100%;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+.photo-preview-img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+.photo-placeholder:hover {
+  background: #f1f5f9;
+}
+.photo-icon {
+  width: 32px;
+  height: 32px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+.photo-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+}
+.photo-sub {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+}
+.btn-photo-action {
+  background: #0284c7;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-photo-action:hover {
+  background: #0369a1;
+}
+.btn-photo-del {
+  background: #ef4444;
+}
+.btn-photo-del:hover {
+  background: #dc2626;
+}
+
+
+/* Modal Live Camera Foto Unit */
+#cameraPhotoModal {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: none;
+  flex-direction: column;
+  z-index: 10001;
+}
+.camera-photo-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.95);
+  color: #fff;
+  z-index: 2;
+}
+.camera-photo-title {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-camera-close {
+  background: #334155;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-camera-close:hover {
+  background: #475569;
+}
+.camera-photo-body {
+  flex: 1;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#photoCameraVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#photoCapturedPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  display: none;
+}
+.camera-photo-bottom {
+  padding: 14px 20px;
+  background: rgba(15, 23, 42, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 2;
+  min-height: 80px;
+  box-sizing: border-box;
+}
+.camera-live-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+.photo-icon-box {
+  width: 44px;
+  height: 44px;
+  background: #e2e8f0;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 4px; /* Kotak, bukan bulat */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0284c7;
+  margin-bottom: 4px;
+}
+.photo-icon-box svg {
+  width: 24px;
+  height: 24px;
+}
+.btn-shutter {
+  width: 58px;
+  height: 58px;
+  border-radius: 4px; /* Kotak, bukan bulat */
+  background: #0284c7;
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease;
+}
+.btn-shutter:active {
+  transform: scale(0.92);
+}
+.btn-cam-tool {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.camera-preview-actions {
+  display: none;
+  width: 100%;
+  gap: 12px;
+}
+.btn-accept-photo {
+  flex: 1;
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-accept-photo:hover {
+  background: #15803d;
+}
+.btn-retake-photo {
+  flex: 1;
+  background: #475569;
+  color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-retake-photo:hover {
+  background: #334155;
+}
+
+/* Modal Sumber Foto (Kamera / Galeri) */
+#photoSourceModal {
+  display: none !important;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+  backdrop-filter: blur(2px);
+}
+.photo-modal-card {
+  background: #fff;
+  border-radius: 3px;
+  width: 100%;
+  max-width: 320px;
+  padding: 22px 18px 20px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  text-align: center;
+  animation: photoModalIn 0.2s ease-out;
+  box-sizing: border-box;
+}
+@keyframes photoModalIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+.photo-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.photo-modal-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+.photo-modal-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.btn-source-cam {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 5px rgba(2, 132, 199, 0.3);
+  transition: background 0.15s ease;
+}
+.btn-source-cam:hover, .btn-source-cam:active {
+  background: #0369a1;
+}
+.btn-source-gal {
+  background: #f8fafc;
+  color: #1e293b;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 3px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s ease;
+}
+.btn-source-gal:hover, .btn-source-gal:active {
+  background: #e2e8f0;
+}
+.btn-source-cancel {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 2px;
+}
+.btn-source-cancel:hover {
+  color: #334155;
+  background: #f1f5f9;
+}
+
+
 /* Modal Login Site Popup */
 #siteModal{
   position:fixed;
@@ -1109,6 +1472,28 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   </div>
 </div>
 
+
+<!-- Modal Live Camera Foto Unit -->
+<!-- Modal Live Camera Foto Unit -->
+<div id="cameraPhotoModal">
+  <div class="camera-photo-top">
+    <div class="camera-photo-title">📷 Kamera Unit PDI</div>
+  </div>
+  <div class="camera-photo-body">
+    <video id="photoCameraVideo" autoplay playsinline muted></video>
+    <img id="photoCapturedPreview" alt="Hasil Foto">
+  </div>
+  <div class="camera-photo-bottom">
+    <div id="cameraLiveTools" class="camera-live-tools" style="justify-content:center;">
+      <button type="button" class="btn-shutter" id="btnShutterPhoto" onclick="takePhotoSnapshot()" title="Ambil Foto">📷</button>
+    </div>
+    <div id="cameraPreviewActions" class="camera-preview-actions">
+      <button type="button" class="btn-retake-photo" onclick="retakePhoto()">🔄 Foto Ulang</button>
+      <button type="button" class="btn-accept-photo" id="btnAcceptPhoto" onclick="acceptCapturedPhoto()">✓ Gunakan Foto Ini</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Barcode / QR Scanner Kamera -->
 <div id="scannerModal">
   <div class="scanner-box">
@@ -1130,7 +1515,7 @@ const SHEET_NAME_IN = "PDIIN";
 const SHEET_NAME_OUT = "PDOUT";
 
 // URL Google Apps Script Endpoint
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzliDfvM4-GNTZRXRwkwCrlvyzmJmoSXzaoCJq9VtEf-1B8tkoioS_PCJo1kJ0S7E2S/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyK7GFVtj9YuU7hdQzBueoPxlM9ayWhSy2Wb2LWV6CT6cRdkKgBaA2naITKQ1GztShK/exec";
 const SITE_STORAGE_KEY = "pdi_user_site";
 const HISTORY_STORAGE_KEY = "pdi_in_history";
 
@@ -1199,7 +1584,36 @@ function getSiteDisplayName(code){
  return code ? normalizeSite(code) : "- Belum Dipilih -";
 }
 
-const CATS = ["MOTOR LISTRIK (EV)", "NON-EV / ELEKTRONIK"];
+const CATS = [
+  "Home Appliances",
+  "EV 2 Wheels",
+  "Audio/Video",
+  "EV 4 Wheels"
+];
+
+function isEvCategory(c) {
+  if (!c) return false;
+  const s = String(c).trim().toUpperCase();
+  return s.includes("EV") || s.includes("WHEEL") || s.includes("MOTOR") || s.includes("MOBIL") || s.includes("SEPEDA");
+}
+
+function normalizeCategory(raw) {
+  if (!raw) return CATS[0];
+  const s = String(raw).trim();
+  const exact = CATS.find(c => c.toLowerCase() === s.toLowerCase());
+  if (exact) return exact;
+
+  const low = s.toLowerCase();
+  if (low.includes("4 wheel") || low.includes("4w") || low.includes("mobil")) return "EV 4 Wheels";
+  if (low.includes("2 wheel") || low.includes("2w") || low.includes("motor listrik") || low.includes("sepeda listrik")) return "EV 2 Wheels";
+  if (low.includes("audio") || low.includes("video") || low.includes("av") || low.includes("speaker") || low.includes("tv")) return "Audio/Video";
+  if (low.includes("home") || low.includes("appliance") || low.includes("kulkas") || low.includes("mesin cuci") || low.includes("ac")) return "Home Appliances";
+
+  if (low.includes("ev")) return "EV 2 Wheels";
+  if (low.includes("non-ev") || low.includes("elektronik")) return "Home Appliances";
+
+  return s;
+}
 const LAYANAN = ["WALK-IN", "HOME", "DEALER", "OUT OF TOWN"];
 const S_IN = ["Bagus", "Rusak", "Tidak Ada"];
 const S_OUT = ["Ya", "Tidak", "Tidak Ada"];
@@ -1687,7 +2101,7 @@ function render(preserveSCL=""){
  if(btnChangeSite) {
    btnChangeSite.style.display = (cur === "IN") ? "inline-block" : "none";
  }
- const ev = cat === CATS[0];
+ const ev = isEvCategory(cat);
  const secs = F.sections[ev ? "EV" : "GEN"];
  const today = new Date().toISOString().slice(0, 10);
  
@@ -1703,7 +2117,7 @@ function render(preserveSCL=""){
   <fieldset>
     <legend>Kategori Produk</legend>
     <label class="f">Pilih kategori produk
-      <select id="cat" style="text-transform:uppercase;">
+      <select id="cat">
         ${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}
       </select>
     </label>
@@ -1842,6 +2256,39 @@ function render(preserveSCL=""){
  // Texts / Textareas
  F.texts.forEach((t, i) => {
   h += `<fieldset><legend>${String.fromCharCode(65 + secs.length + i)}. ${t}</legend><textarea name="T${i}" rows="3" placeholder="Tulis catatan di sini..."></textarea></fieldset>`;
+  if (i === 0) {
+   // Kotak Upload Foto Unit di bawah keluhan / ringkasan pekerjaan (Opsional)
+   h += `
+   <fieldset class="photo-upload-box">
+     <legend>📷 Foto Unit / Keluhan (Opsional)</legend>
+     <div id="photoPreviewArea" class="photo-preview-area">
+       ${currentUploadedPhoto ? `
+         <div class="photo-preview-container">
+           <img src="${currentUploadedPhoto}" class="photo-preview-img" alt="Foto Unit">
+         </div>
+       ` : `
+         <div class="photo-placeholder" onclick="triggerPhotoSelect()">
+           <div class="photo-icon-box">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <rect x="2" y="6" width="20" height="15" rx="2" ry="2"/>
+               <path d="M7 6V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2"/>
+               <rect x="8" y="10" width="8" height="7" rx="1"/>
+             </svg>
+           </div>
+           <span class="photo-sub">Foto Unit (Opsional)</span>
+         </div>
+       `}
+     </div>
+     <input type="file" id="photoInputCamera" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoSelected(event)">
+     <input type="file" id="photoInputGallery" accept="image/*" style="display:none;" onchange="handlePhotoSelected(event)">
+     <div id="photoBtnWrap" style="display:flex; gap:8px; margin-top:8px;">
+       ${currentUploadedPhoto ? `
+         <button type="button" class="btn-photo-action" onclick="triggerPhotoSelect()">📷 Ganti Foto</button>
+         <button type="button" class="btn-photo-action btn-photo-del" onclick="clearUploadedPhoto()">✕ Hapus Foto</button>
+       ` : ``}
+     </div>
+   </fieldset>`;
+  }
  });
 
  // Pernyataan & Tanda Tangan
@@ -2379,16 +2826,22 @@ async function executePrintPDF() {
       }
     } catch(e) {}
 
-    // 3b. Ambil TTD dan konversi Google Drive link ke Base64 secara paralel
+    // 3b. Ambil TTD dan Foto secara paralel
     const rawSigKons = localStorage.getItem("pdi_sig_konsumen_" + targetSCL) || findSigInDict(outData, "Konsumen") || findSigInDict(inData, "Konsumen") || "";
     const rawSigIn = localStorage.getItem("pdi_sig_tek_in_" + targetSCL) || findSigInDict(inData, "Teknisi") || "";
     const rawSigOut = localStorage.getItem("pdi_sig_tek_out_" + targetSCL) || findSigInDict(outData, "Teknisi") || "";
+    const rawPhoto = localStorage.getItem("pdi_photo_" + targetSCL) || (inData && (inData["Foto Unit (link)"] || inData["Foto"])) || (outData && (outData["Foto Unit (link)"] || outData["Foto"])) || "";
 
-    const [b64Kons, b64TekIn, b64TekOut] = await Promise.all([
+    const [b64Kons, b64TekIn, b64TekOut, b64Photo] = await Promise.all([
       convertDriveUrlToBase64(rawSigKons).catch(() => rawSigKons),
       convertDriveUrlToBase64(rawSigIn).catch(() => rawSigIn),
-      convertDriveUrlToBase64(rawSigOut).catch(() => rawSigOut)
+      convertDriveUrlToBase64(rawSigOut).catch(() => rawSigOut),
+      convertDriveUrlToBase64(rawPhoto).catch(() => rawPhoto)
     ]);
+
+    if (b64Photo && b64Photo.indexOf("data:") === 0) {
+      try { localStorage.setItem("pdi_photo_" + targetSCL, b64Photo); } catch(e){}
+    }
 
     if (b64Kons && b64Kons.indexOf("data:") === 0) {
       try { localStorage.setItem("pdi_sig_konsumen_" + targetSCL, b64Kons); } catch(e){}
@@ -2403,7 +2856,8 @@ async function executePrintPDF() {
     const prefetchedSigs = {
       konsumen: b64Kons || rawSigKons,
       tekIn: b64TekIn || rawSigIn,
-      tekOut: b64TekOut || rawSigOut
+      tekOut: b64TekOut || rawSigOut,
+      photo: b64Photo || rawPhoto
     };
 
     // 4. Susun Dokumen Cetak ke dalam container #printReportArea dengan TTD Base64 tertanam
@@ -2461,7 +2915,7 @@ function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
 
   const cleanSclKey = String(scl).trim().toUpperCase();
   const site = String(inData["Site Service Center"] || outData["Site Service Center"] || currentSite || "-").trim().toUpperCase();
-  const kat = String(inData["Kategori Produk"] || outData["Kategori Produk"] || "Motor Listrik (EV)").trim().toUpperCase();
+  const kat = normalizeCategory(inData["Kategori Produk"] || outData["Kategori Produk"] || "Home Appliances");
   const model = String(inData["Model Unit"] || outData["Model Unit"] || "-").trim().toUpperCase();
   const vin = String(inData["VIN"] || outData["VIN"] || inData["No. Seri (Serial Number)"] || inData["No. Rangka / VIN"] || "-").trim().toUpperCase();
   const layanan = String(inData["Jenis Layanan"] || outData["Jenis Layanan"] || "-").trim().toUpperCase();
@@ -2497,6 +2951,7 @@ function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
   const rawSigKonsumen = pSigs.konsumen || localStorage.getItem("pdi_sig_konsumen_" + cleanSclKey) || findSigInDict(outData, "Konsumen") || findSigInDict(inData, "Konsumen") || "";
   const rawSigTekIn = pSigs.tekIn || localStorage.getItem("pdi_sig_tek_in_" + cleanSclKey) || findSigInDict(inData, "Teknisi") || "";
   const rawSigTekOut = pSigs.tekOut || localStorage.getItem("pdi_sig_tek_out_" + cleanSclKey) || findSigInDict(outData, "Teknisi") || "";
+  const rawPhotoDoc = pSigs.photo || localStorage.getItem("pdi_photo_" + cleanSclKey) || localStorage.getItem("pdi_photo_" + scl) || (inData && (inData["Foto Unit (link)"] || inData["Foto"])) || (outData && (outData["Foto Unit (link)"] || outData["Foto"])) || "";
 
   function resolveSigImage(sigVal) {
     if (!sigVal || typeof sigVal !== "string") return { src: "", driveLink: "" };
@@ -2540,7 +2995,7 @@ function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
     </div>`;
   }
 
-  const isEV = !String(kat).toLowerCase().includes("non-ev") && !String(kat).toLowerCase().includes("elektronik");
+  const isEV = isEvCategory(kat);
 
   function findValueInDict(dict, primaryKey, itemName) {
     if (!dict) return "";
@@ -2729,6 +3184,14 @@ function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
           <div style="margin-bottom:5px; color:#111; padding-left:3px; white-space:pre-wrap;">${keluhanIn}</div>
           <div style="font-weight:bold; color:#1e293b; margin-bottom:1px;">D. Catatan Tambahan Teknisi:</div>
           <div style="color:#111; padding-left:3px; white-space:pre-wrap;">${catatanIn}</div>
+          ${rawPhotoDoc ? `
+            <div style="margin-top:6px; padding-top:4px; border-top:1px dashed #cbd5e1;">
+              <div style="font-weight:bold; color:#1e293b; margin-bottom:2px;">Foto Unit / Keluhan:</div>
+              <div style="display:inline-block; border:1px solid #cbd5e1; border-radius:4px; overflow:hidden; background:#fafafa; padding:2px;">
+                <img src="${rawPhotoDoc}" style="max-height:85px; max-width:140px; display:block; object-fit:contain;" alt="Foto Unit">
+              </div>
+            </div>
+          ` : ''}
         </td>
         <td style="vertical-align:top; font-size:7.5pt; padding:4px 6px; line-height:1.35;">
           <div style="font-weight:bold; color:#1e293b; margin-bottom:1px;">E. Ringkasan Pekerjaan:</div>
@@ -3106,13 +3569,7 @@ async function loadSCL(preselectSCL=""){
         const teknisi = String(r["Teknisi"] || "").trim();
         const rawCat = String(r["Kategori Produk"] || "").trim();
 
-        let normCat = "MOTOR LISTRIK (EV)";
-        const rawLow = String(rawCat || "").toLowerCase();
-        if(rawLow.includes("non-ev") || rawLow.includes("elektronik") || rawLow.includes("gen")){
-          normCat = "NON-EV / ELEKTRONIK";
-        } else if(rawLow.includes("ev") || rawLow.includes("motor")){
-          normCat = "MOTOR LISTRIK (EV)";
-        }
+        let normCat = normalizeCategory(rawCat);
 
         serverItems.push({
           scl: cleanSCL,
@@ -3312,13 +3769,9 @@ function fillFieldsFromItem(item){
  // 5. Kategori Produk (Terisi otomatis, terkunci)
  const catOut = document.querySelector("#catOut");
  if(catOut && item.cat){
-  let targetCat = item.cat;
-  if(String(item.cat).toLowerCase().includes("non-ev") || String(item.cat).toLowerCase().includes("elektronik")){
-    targetCat = "NON-EV / ELEKTRONIK";
-  } else {
-    targetCat = "MOTOR LISTRIK (EV)";
-  }
+  const targetCat = normalizeCategory(item.cat);
   catOut.value = targetCat;
+  cat = targetCat;
   catOut.style.pointerEvents = "none";
   catOut.style.backgroundColor = "#e9ecef";
  }
@@ -3368,6 +3821,284 @@ function jsonp(url, ms){
   sc.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
   document.head.appendChild(sc);
  });
+}
+
+// Upload & Kompresi Foto Unit (Opsional)
+let currentUploadedPhoto = "";
+
+function openPhotoSourceModal() {
+  const modal = document.getElementById("photoSourceModal");
+  if (modal) {
+    modal.style.display = "flex";
+  }
+}
+
+function closePhotoSourceModal() {
+  const modal = document.getElementById("photoSourceModal");
+  if (modal) modal.style.display = "none";
+}
+
+let photoCameraStream = null;
+let photoCameraFacing = "environment";
+let tempCapturedPhoto = "";
+
+async function openPhotoCameraModal() {
+  closePhotoSourceModal();
+  const modal = document.getElementById("cameraPhotoModal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  await startPhotoCameraStream();
+}
+
+async function startPhotoCameraStream() {
+  tempCapturedPhoto = "";
+  const video = document.getElementById("photoCameraVideo");
+  const preview = document.getElementById("photoCapturedPreview");
+  const liveTools = document.getElementById("cameraLiveTools");
+  const previewActions = document.getElementById("cameraPreviewActions");
+
+  if (preview) preview.style.display = "none";
+  if (video) video.style.display = "block";
+  if (liveTools) liveTools.style.display = "flex";
+  if (previewActions) previewActions.style.display = "none";
+
+  await stopPhotoCameraStream();
+
+  try {
+    let constraints = {
+      video: {
+        facingMode: { ideal: photoCameraFacing },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      },
+      audio: false
+    };
+
+    try {
+      photoCameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (e1) {
+      photoCameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    }
+
+    if (video) {
+      video.srcObject = photoCameraStream;
+      video.setAttribute("playsinline", "true");
+      video.setAttribute("webkit-playsinline", "true");
+      await video.play().catch(() => {});
+    }
+  } catch (err) {
+    console.error("Camera access error:", err);
+    if (window.AndroidPrint && typeof window.AndroidPrint.takePhoto === "function") {
+      closePhotoCameraModal();
+      window.AndroidPrint.takePhoto();
+    } else {
+      alert("Tidak dapat mengakses kamera: " + (err.message || err));
+      closePhotoCameraModal();
+      const inp = document.getElementById("photoInputCamera");
+      if (inp) { inp.value = ""; inp.click(); }
+    }
+  }
+}
+
+async function stopPhotoCameraStream() {
+  if (photoCameraStream) {
+    try {
+      photoCameraStream.getTracks().forEach(t => t.stop());
+    } catch (e) {}
+    photoCameraStream = null;
+  }
+  const video = document.getElementById("photoCameraVideo");
+  if (video) {
+    try { video.pause(); } catch (e) {}
+    video.srcObject = null;
+  }
+}
+
+function closePhotoCameraModal() {
+  stopPhotoCameraStream();
+  const modal = document.getElementById("cameraPhotoModal");
+  if (modal) modal.style.display = "none";
+}
+
+function flipPhotoCamera() {
+  photoCameraFacing = (photoCameraFacing === "environment") ? "user" : "environment";
+  startPhotoCameraStream();
+}
+
+function takePhotoSnapshot() {
+  const video = document.getElementById("photoCameraVideo");
+  const preview = document.getElementById("photoCapturedPreview");
+  const liveTools = document.getElementById("cameraLiveTools");
+  const previewActions = document.getElementById("cameraPreviewActions");
+
+  if (!video || !video.videoWidth) return;
+
+  const canvas = document.createElement("canvas");
+  const maxDim = 1200;
+  let w = video.videoWidth;
+  let h = video.videoHeight;
+  if (w > maxDim || h > maxDim) {
+    if (w > h) {
+      h = Math.round((h * maxDim) / w);
+      w = maxDim;
+    } else {
+      w = Math.round((w * maxDim) / h);
+      h = maxDim;
+    }
+  }
+
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, w, h);
+
+  tempCapturedPhoto = canvas.toDataURL("image/jpeg", 0.75);
+
+  if (preview) {
+    preview.src = tempCapturedPhoto;
+    preview.style.display = "block";
+  }
+  if (video) video.style.display = "none";
+  if (liveTools) liveTools.style.display = "none";
+  if (previewActions) previewActions.style.display = "flex";
+
+  stopPhotoCameraStream();
+}
+
+function acceptCapturedPhoto() {
+  if (tempCapturedPhoto) {
+    currentUploadedPhoto = tempCapturedPhoto;
+    updatePhotoPreviewUI();
+  }
+  closePhotoCameraModal();
+}
+
+function retakePhoto() {
+  startPhotoCameraStream();
+}
+
+function selectPhotoSource(source) {
+  closePhotoSourceModal();
+  if (source === "camera") {
+    openPhotoCameraModal();
+  } else {
+    if (window.AndroidPrint && typeof window.AndroidPrint.chooseGallery === "function") {
+      window.AndroidPrint.chooseGallery();
+      return;
+    }
+    const input = document.getElementById("photoInputGallery");
+    if (input) {
+      input.value = "";
+      input.click();
+    }
+  }
+}
+
+window.handleNativePhotoReceived = function(dataUrl) {
+  if (!dataUrl) return;
+  currentUploadedPhoto = dataUrl;
+  updatePhotoPreviewUI();
+};
+
+function triggerPhotoSelect() {
+  // Langsung buka kamera HP native tanpa modal popup
+  if (window.AndroidPrint && typeof window.AndroidPrint.takePhoto === "function") {
+    window.AndroidPrint.takePhoto();
+    return;
+  }
+  if (window.AndroidBridge && typeof window.AndroidBridge.takePhoto === "function") {
+    window.AndroidBridge.takePhoto();
+    return;
+  }
+  const cam = document.getElementById("photoInputCamera");
+  if (cam) {
+    cam.value = "";
+    cam.click();
+    return;
+  }
+}
+
+function clearUploadedPhoto() {
+  currentUploadedPhoto = "";
+  const cam = document.getElementById("photoInputCamera");
+  if (cam) cam.value = "";
+  const gal = document.getElementById("photoInputGallery");
+  if (gal) gal.value = "";
+  updatePhotoPreviewUI();
+}
+
+function handlePhotoSelected(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      // Kompresi resolusi: batas dimensi maksimal 1200px
+      const maxDim = 1200;
+      let w = img.width;
+      let h = img.height;
+
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Kompresi ke JPEG kualitas 0.72 (~80-120 KB)
+      currentUploadedPhoto = canvas.toDataURL("image/jpeg", 0.72);
+      updatePhotoPreviewUI();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updatePhotoPreviewUI() {
+  const area = document.getElementById("photoPreviewArea");
+  if (!area) return;
+  if (currentUploadedPhoto) {
+    area.innerHTML = `
+      <div class="photo-preview-container">
+        <img src="${currentUploadedPhoto}" class="photo-preview-img" alt="Foto Unit">
+      </div>
+    `;
+    const btnWrap = document.getElementById("photoBtnWrap");
+    if (btnWrap) {
+      btnWrap.innerHTML = `
+        <button type="button" class="btn-photo-action" onclick="triggerPhotoSelect()">📷 Ganti Foto</button>
+        <button type="button" class="btn-photo-action btn-photo-del" onclick="clearUploadedPhoto()">✕ Hapus Foto</button>
+      `;
+    }
+  } else {
+    area.innerHTML = `
+      <div class="photo-placeholder" onclick="triggerPhotoSelect()">
+        <div class="photo-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="6" width="20" height="15" rx="2" ry="2"/>
+            <path d="M7 6V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2"/>
+            <rect x="8" y="10" width="8" height="7" rx="1"/>
+          </svg>
+        </div>
+        <span class="photo-sub">Foto Unit (Opsional)</span>
+      </div>
+    `;
+    const btnWrap = document.getElementById("photoBtnWrap");
+    if (btnWrap) {
+      btnWrap.innerHTML = ``;
+    }
+  }
 }
 
 // Canvas Tanda Tangan
@@ -3435,6 +4166,16 @@ function saveSyncQueue(queue) {
 
 function enqueueSyncItem(item) {
   const q = getSyncQueue();
+  // Cegah duplikasi item identik dalam antrean (NO. CASE yang sama untuk form yang sama dalam 30 detik)
+  const isDup = q.some(existing => 
+    existing.form === item.form && 
+    String(existing.caseNo || "").trim().toUpperCase() === String(item.caseNo || "").trim().toUpperCase() &&
+    (Date.now() - (existing.createdAt || 0)) < 30000
+  );
+  if (isDup) {
+    console.log("Item dengan NO. CASE ini sudah ada di antrean:", item.caseNo);
+    return;
+  }
   q.push(item);
   saveSyncQueue(q);
 }
@@ -3461,7 +4202,8 @@ async function processSyncQueue() {
     const payload = {
       form: item.form,
       fields: item.fields,
-      signatures: item.signatures
+      signatures: item.signatures,
+      photo: item.photo || (item.fields && item.fields["Foto Unit (link)"]) || ""
     };
 
     if (SCRIPT_URL && !SCRIPT_URL.startsWith("PASTE")) {
@@ -3524,8 +4266,15 @@ window.addEventListener("online", () => {
 setTimeout(processSyncQueue, 2500);
 
 // Submit Form: LANGSUNG SELESAI & PENGIRIMAN DI LATAR BELAKANG
+let isSubmittingForm = false;
+
 async function submit(e){
  e.preventDefault();
+ if(isSubmittingForm) {
+   console.log("Submit sedang diproses, pengiriman duplikat diabaikan.");
+   return;
+ }
+ isSubmittingForm = true;
  const f = $("#f");
  const F = FORMS[cur];
  
@@ -3544,6 +4293,7 @@ async function submit(e){
      warn.querySelector("span").textContent = "No Case PDI IN tidak ditemukan";
    }
    toast("No Case PDI IN tidak ditemukan", "#C8102E", 2500);
+   isSubmittingForm = false;
    return;
   }
  }
@@ -3616,6 +4366,7 @@ async function submit(e){
  if(firstBad){
   firstBad.scrollIntoView({behavior:"smooth", block:"center"});
   toast("Harap lengkapi semua kolom bertanda merah & tanda tangan", "#C8102E");
+  isSubmittingForm = false;
   return;
  }
 
@@ -3683,6 +4434,12 @@ async function submit(e){
 
  // SIMPAN LOKAL SECARA INSTAN (Tanda tangan & form snapshot untuk cetak PDF)
  const cleanSclKey = String(noSCL || "").trim().toUpperCase();
+ if (currentUploadedPhoto) {
+   try {
+     localStorage.setItem("pdi_photo_" + cleanSclKey, currentUploadedPhoto);
+     localStorage.setItem("pdi_photo_" + noSCL, currentUploadedPhoto);
+   } catch(e){}
+ }
  if (signatures && signatures.konsumen) {
    try { localStorage.setItem("pdi_sig_konsumen_" + cleanSclKey, signatures.konsumen); } catch(e){}
  }
@@ -3696,6 +4453,9 @@ async function submit(e){
 
  try {
    const fullFormSnapshot = Object.assign({}, fields);
+   if (currentUploadedPhoto) {
+     fullFormSnapshot["Foto Unit (link)"] = currentUploadedPhoto;
+   }
    if (cur === "IN") {
      localStorage.setItem("pdi_in_data_" + cleanSclKey, JSON.stringify(fullFormSnapshot));
      localStorage.setItem("pdi_in_data_" + noSCL, JSON.stringify(fullFormSnapshot));
@@ -3704,6 +4464,12 @@ async function submit(e){
      localStorage.setItem("pdi_out_data_" + noSCL, JSON.stringify(fullFormSnapshot));
    }
  } catch(e){}
+
+ // Pastikan data Base64 TIDAK ikut di fields agar tidak masuk ke Google Sheet sebagai string base64.
+ // Base64 foto hanya dikirimkan via properti photo agar Google Apps Script menyimpannya ke Google Drive dan menempelkan link resminya.
+ delete fields["Foto Unit (link)"];
+ delete fields["Foto"];
+ delete fields["Link Foto"];
 
  // Perbarui history lokal langsung agar seketika tersedia di PDI OUT & Cetak
  if(cur === "IN"){
@@ -3730,6 +4496,7 @@ async function submit(e){
    form: cur === "OUT" ? "PDOUT" : "PDIIN",
    fields: fields,
    signatures: signatures,
+   photo: currentUploadedPhoto,
    caseNo: noSCL,
    retryCount: 0,
    createdAt: Date.now(),
@@ -3749,6 +4516,9 @@ async function submit(e){
  const seriEl = document.querySelector('#f input[name="VIN"]');
  if(seriEl) seriEl.value = "";
 
+ // Hapus foto yang ada di kotaknya agar bersih kembali (reset)
+ clearUploadedPhoto();
+
  render();
  const appEl = document.getElementById("app");
  if(appEl) appEl.scrollTo({top:0, behavior:"smooth"});
@@ -3757,6 +4527,9 @@ async function submit(e){
   if (appEl) appEl.scrollTo({top:0, behavior:"smooth"});
   window.scrollTo(0, 0);
  } catch(e){}
+
+ setTimeout(() => { isSubmittingForm = false; }, 2000);
+
  // Mulai pemrosesan antrian di latar belakang secara asinkron
  setTimeout(processSyncQueue, 100);
 }
@@ -3796,7 +4569,45 @@ function isModalOpen(selector) {
 }
 
 // Tangani tombol Back HP & Chrome: Menutup popup otomatis jika ada yang terbuka
+function handleAndroidBack() {
+  if (isModalOpen("#cameraPhotoModal")) {
+    closePhotoCameraModal(true);
+    return true;
+  }
+  if (isModalOpen("#photoSourceModal")) {
+    closePhotoSourceModal(true);
+    return true;
+  }
+  if (isModalOpen("#scannerModal")) {
+    stopScanner(true);
+    return true;
+  }
+  if (isModalOpen("#printModal")) {
+    closePrintModal(true);
+    return true;
+  }
+  if (isModalOpen("#siteModal") && currentSite) {
+    closeSiteModal(true);
+    return true;
+  }
+  if (location.hash === "#pdi-out") {
+    tab("IN");
+    return true;
+  }
+  return false;
+}
+window.handleAndroidBack = handleAndroidBack;
+
 window.addEventListener("popstate", e => {
+ if (isModalOpen("#cameraPhotoModal")) {
+  closePhotoCameraModal(true);
+  return;
+ }
+ // 0. Tutup popup Sumber Foto jika sedang terbuka
+ if (isModalOpen("#photoSourceModal")) {
+  closePhotoSourceModal(true);
+  return;
+ }
  // 1. Tutup popup Scanner Kamera jika sedang terbuka
  if (isModalOpen("#scannerModal")) {
   stopScanner(true);
