@@ -458,11 +458,12 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 
 /* Kotak Upload Foto (Opsional di bawah Keluhan) */
 .photo-upload-box {
-  margin-top: 10px;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 10px 12px;
+  margin: 0 0 8px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--red);
+  border-radius: 4px;
+  padding: 8px 8px 10px;
 }
 .photo-upload-box legend {
   font-weight: 700;
@@ -472,16 +473,17 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 }
 .photo-preview-area {
   width: 100%;
-  min-height: 100px;
+  min-height: 95px;
   background: #fff;
-  border: 2px dashed #94a3b8;
-  border-radius: 6px;
+  border: 1.5px dashed #94a3b8;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
   box-sizing: border-box;
+  margin-top: 2px;
 }
 .photo-preview-container {
   width: 100%;
@@ -1515,7 +1517,7 @@ const SHEET_NAME_IN = "PDIIN";
 const SHEET_NAME_OUT = "PDOUT";
 
 // URL Google Apps Script Endpoint
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyK7GFVtj9YuU7hdQzBueoPxlM9ayWhSy2Wb2LWV6CT6cRdkKgBaA2naITKQ1GztShK/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPhZ9Ae2ytYI_6TLLSJsERtAR-X7Ra5hgJaQ8H1YLjsZjNgcDzS0Ya2PV2oi7gx6R1lQ/exec";
 const SITE_STORAGE_KEY = "pdi_user_site";
 const HISTORY_STORAGE_KEY = "pdi_in_history";
 
@@ -2260,7 +2262,7 @@ function render(preserveSCL=""){
    // Kotak Upload Foto Unit di bawah keluhan / ringkasan pekerjaan (Opsional)
    h += `
    <fieldset class="photo-upload-box">
-     <legend>📷 Foto Unit / Keluhan (Opsional)</legend>
+     <legend>📷 ${cur === "OUT" ? "Foto Unit / Serah Terima (Opsional)" : "Foto Unit / Keluhan (Opsional)"}</legend>
      <div id="photoPreviewArea" class="photo-preview-area">
        ${currentUploadedPhoto ? `
          <div class="photo-preview-container">
@@ -2275,7 +2277,7 @@ function render(preserveSCL=""){
                <rect x="8" y="10" width="8" height="7" rx="1"/>
              </svg>
            </div>
-           <span class="photo-sub">Foto Unit (Opsional)</span>
+           <span class="photo-sub">${cur === "OUT" ? "Foto Serah Terima (Opsional)" : "Foto Unit (Opsional)"}</span>
          </div>
        `}
      </div>
@@ -2830,17 +2832,42 @@ async function executePrintPDF() {
     const rawSigKons = localStorage.getItem("pdi_sig_konsumen_" + targetSCL) || findSigInDict(outData, "Konsumen") || findSigInDict(inData, "Konsumen") || "";
     const rawSigIn = localStorage.getItem("pdi_sig_tek_in_" + targetSCL) || findSigInDict(inData, "Teknisi") || "";
     const rawSigOut = localStorage.getItem("pdi_sig_tek_out_" + targetSCL) || findSigInDict(outData, "Teknisi") || "";
-    const rawPhoto = localStorage.getItem("pdi_photo_" + targetSCL) || (inData && (inData["Foto Unit (link)"] || inData["Foto"])) || (outData && (outData["Foto Unit (link)"] || outData["Foto"])) || "";
 
-    const [b64Kons, b64TekIn, b64TekOut, b64Photo] = await Promise.all([
+    // Foto PDI IN (Masuk)
+    let rawPhotoIn = localStorage.getItem("pdi_photo_in_" + targetSCL) || (inData && (inData["Foto Unit (link)"] || inData["Foto"])) || "";
+    if (!rawPhotoIn) {
+      rawPhotoIn = localStorage.getItem("pdi_photo_" + targetSCL) || "";
+    }
+
+    // Foto PDI OUT (Keluar / Serah Terima)
+    let rawPhotoOut = localStorage.getItem("pdi_photo_out_" + targetSCL) || (outData && (outData["Foto Unit (link)"] || outData["Foto"])) || "";
+
+    // Ambil foto live dari form jika form yang sedang terbuka sesuai targetSCL
+    if (cur === "OUT") {
+      const curFormSCL = String($("#sclSelect") ? $("#sclSelect").value : "").trim().toUpperCase();
+      if (curFormSCL === targetSCL && currentUploadedPhoto) {
+        rawPhotoOut = currentUploadedPhoto;
+      }
+    } else if (cur === "IN") {
+      const curFormSCL = String($("#sclInput") ? $("#sclInput").value : "").trim().toUpperCase();
+      if (curFormSCL === targetSCL && currentUploadedPhoto) {
+        rawPhotoIn = currentUploadedPhoto;
+      }
+    }
+
+    const [b64Kons, b64TekIn, b64TekOut, b64PhotoIn, b64PhotoOut] = await Promise.all([
       convertDriveUrlToBase64(rawSigKons).catch(() => rawSigKons),
       convertDriveUrlToBase64(rawSigIn).catch(() => rawSigIn),
       convertDriveUrlToBase64(rawSigOut).catch(() => rawSigOut),
-      convertDriveUrlToBase64(rawPhoto).catch(() => rawPhoto)
+      convertDriveUrlToBase64(rawPhotoIn).catch(() => rawPhotoIn),
+      convertDriveUrlToBase64(rawPhotoOut).catch(() => rawPhotoOut)
     ]);
 
-    if (b64Photo && b64Photo.indexOf("data:") === 0) {
-      try { localStorage.setItem("pdi_photo_" + targetSCL, b64Photo); } catch(e){}
+    if (b64PhotoIn && b64PhotoIn.indexOf("data:") === 0) {
+      try { localStorage.setItem("pdi_photo_in_" + targetSCL, b64PhotoIn); } catch(e){}
+    }
+    if (b64PhotoOut && b64PhotoOut.indexOf("data:") === 0) {
+      try { localStorage.setItem("pdi_photo_out_" + targetSCL, b64PhotoOut); } catch(e){}
     }
 
     if (b64Kons && b64Kons.indexOf("data:") === 0) {
@@ -2857,7 +2884,9 @@ async function executePrintPDF() {
       konsumen: b64Kons || rawSigKons,
       tekIn: b64TekIn || rawSigIn,
       tekOut: b64TekOut || rawSigOut,
-      photo: b64Photo || rawPhoto
+      photoIn: b64PhotoIn || rawPhotoIn,
+      photoOut: b64PhotoOut || rawPhotoOut,
+      photo: b64PhotoIn || rawPhotoIn
     };
 
     // 4. Susun Dokumen Cetak ke dalam container #printReportArea dengan TTD Base64 tertanam
@@ -2951,7 +2980,28 @@ function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
   const rawSigKonsumen = pSigs.konsumen || localStorage.getItem("pdi_sig_konsumen_" + cleanSclKey) || findSigInDict(outData, "Konsumen") || findSigInDict(inData, "Konsumen") || "";
   const rawSigTekIn = pSigs.tekIn || localStorage.getItem("pdi_sig_tek_in_" + cleanSclKey) || findSigInDict(inData, "Teknisi") || "";
   const rawSigTekOut = pSigs.tekOut || localStorage.getItem("pdi_sig_tek_out_" + cleanSclKey) || findSigInDict(outData, "Teknisi") || "";
-  const rawPhotoDoc = pSigs.photo || localStorage.getItem("pdi_photo_" + cleanSclKey) || localStorage.getItem("pdi_photo_" + scl) || (inData && (inData["Foto Unit (link)"] || inData["Foto"])) || (outData && (outData["Foto Unit (link)"] || outData["Foto"])) || "";
+
+  const rawPhotoInDoc = pSigs.photoIn || pSigs.photo || localStorage.getItem("pdi_photo_in_" + cleanSclKey) || (inData && (inData["Foto Unit (link)"] || inData["Foto"])) || localStorage.getItem("pdi_photo_" + cleanSclKey) || "";
+  const rawPhotoOutDoc = pSigs.photoOut || localStorage.getItem("pdi_photo_out_" + cleanSclKey) || (outData && (outData["Foto Unit (link)"] || outData["Foto"])) || "";
+
+  function resolvePhotoSrc(photoVal) {
+    if (!photoVal || typeof photoVal !== "string") return "";
+    const v = photoVal.trim();
+    if (v.indexOf("data:image") === 0) return v;
+    if (v.indexOf("http") === 0) {
+      const m1 = v.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      const m2 = v.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      const fileId = (m1 && m1[1]) ? m1[1] : ((m2 && m2[1]) ? m2[1] : "");
+      if (fileId) {
+        return "https://lh3.googleusercontent.com/d/" + fileId + "=w600";
+      }
+      return v;
+    }
+    return "";
+  }
+
+  const finalPhotoInSrc = resolvePhotoSrc(rawPhotoInDoc);
+  const finalPhotoOutSrc = resolvePhotoSrc(rawPhotoOutDoc);
 
   function resolveSigImage(sigVal) {
     if (!sigVal || typeof sigVal !== "string") return { src: "", driveLink: "" };
@@ -3184,11 +3234,11 @@ function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
           <div style="margin-bottom:5px; color:#111; padding-left:3px; white-space:pre-wrap;">${keluhanIn}</div>
           <div style="font-weight:bold; color:#1e293b; margin-bottom:1px;">D. Catatan Tambahan Teknisi:</div>
           <div style="color:#111; padding-left:3px; white-space:pre-wrap;">${catatanIn}</div>
-          ${rawPhotoDoc ? `
+          ${finalPhotoInSrc ? `
             <div style="margin-top:6px; padding-top:4px; border-top:1px dashed #cbd5e1;">
-              <div style="font-weight:bold; color:#1e293b; margin-bottom:2px;">Foto Unit / Keluhan:</div>
+              <div style="font-weight:bold; color:#1e293b; margin-bottom:2px;">Foto Unit (PDI IN):</div>
               <div style="display:inline-block; border:1px solid #cbd5e1; border-radius:4px; overflow:hidden; background:#fafafa; padding:2px;">
-                <img src="${rawPhotoDoc}" style="max-height:85px; max-width:140px; display:block; object-fit:contain;" alt="Foto Unit">
+                <img src="${finalPhotoInSrc}" style="max-height:85px; max-width:140px; display:block; object-fit:contain;" alt="Foto Unit PDI IN">
               </div>
             </div>
           ` : ''}
@@ -3198,6 +3248,14 @@ function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
           <div style="margin-bottom:5px; color:#111; padding-left:3px; white-space:pre-wrap;">${ringkasanOut}</div>
           <div style="font-weight:bold; color:#1e293b; margin-bottom:1px;">F. Catatan Tambahan Teknisi:</div>
           <div style="color:#111; padding-left:3px; white-space:pre-wrap;">${catatanOut}</div>
+          ${finalPhotoOutSrc ? `
+            <div style="margin-top:6px; padding-top:4px; border-top:1px dashed #cbd5e1;">
+              <div style="font-weight:bold; color:#1e293b; margin-bottom:2px;">Foto Unit (PDI OUT):</div>
+              <div style="display:inline-block; border:1px solid #cbd5e1; border-radius:4px; overflow:hidden; background:#fafafa; padding:2px;">
+                <img src="${finalPhotoOutSrc}" style="max-height:85px; max-width:140px; display:block; object-fit:contain;" alt="Foto Unit PDI OUT">
+              </div>
+            </div>
+          ` : ''}
         </td>
       </tr>
     </table>
@@ -3952,7 +4010,7 @@ function takePhotoSnapshot() {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video, 0, 0, w, h);
 
-  tempCapturedPhoto = canvas.toDataURL("image/jpeg", 0.75);
+  tempCapturedPhoto = canvas.toDataURL("image/jpeg", 0.55);
 
   if (preview) {
     preview.src = tempCapturedPhoto;
@@ -3997,7 +4055,16 @@ function selectPhotoSource(source) {
 window.handleNativePhotoReceived = function(dataUrl) {
   if (!dataUrl) return;
   currentUploadedPhoto = dataUrl;
+  try {
+    sessionStorage.setItem("pdi_temp_photo", dataUrl);
+  } catch(e) {}
   updatePhotoPreviewUI();
+  setTimeout(() => {
+    const box = document.querySelector(".photo-upload-box");
+    if (box && typeof box.scrollIntoView === "function") {
+      box.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, 100);
 };
 
 function triggerPhotoSelect() {
@@ -4020,6 +4087,12 @@ function triggerPhotoSelect() {
 
 function clearUploadedPhoto() {
   currentUploadedPhoto = "";
+  try {
+    sessionStorage.removeItem("pdi_temp_photo");
+    if (window.AndroidPrint && typeof window.AndroidPrint.clearLastCapturedPhoto === "function") {
+      window.AndroidPrint.clearLastCapturedPhoto();
+    }
+  } catch(e) {}
   const cam = document.getElementById("photoInputCamera");
   if (cam) cam.value = "";
   const gal = document.getElementById("photoInputGallery");
@@ -4035,8 +4108,8 @@ function handlePhotoSelected(event) {
   reader.onload = function(e) {
     const img = new Image();
     img.onload = function() {
-      // Kompresi resolusi: batas dimensi maksimal 1200px
-      const maxDim = 1200;
+      // Kompresi resolusi optimal: 720px untuk kecepatan upload & cegah timeout
+      const maxDim = 720;
       let w = img.width;
       let h = img.height;
 
@@ -4056,8 +4129,8 @@ function handlePhotoSelected(event) {
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, w, h);
 
-      // Kompresi ke JPEG kualitas 0.72 (~80-120 KB)
-      currentUploadedPhoto = canvas.toDataURL("image/jpeg", 0.72);
+      // Kompresi ke JPEG kualitas 0.55 (~35-50 KB, sangat ringan & jernih)
+      currentUploadedPhoto = canvas.toDataURL("image/jpeg", 0.55);
       updatePhotoPreviewUI();
     };
     img.src = e.target.result;
@@ -4091,7 +4164,7 @@ function updatePhotoPreviewUI() {
             <rect x="8" y="10" width="8" height="7" rx="1"/>
           </svg>
         </div>
-        <span class="photo-sub">Foto Unit (Opsional)</span>
+        <span class="photo-sub">${cur === "OUT" ? "Foto Serah Terima (Opsional)" : "Foto Unit (Opsional)"}</span>
       </div>
     `;
     const btnWrap = document.getElementById("photoBtnWrap");
@@ -4129,26 +4202,65 @@ function initPads(){
 }
 
 // ==========================================
-// BACKGROUND SYNC QUEUE DENGAN 10x RETRY BERBEDA
+// ==========================================
+// BACKGROUND SYNC QUEUE & ANTI-DUPLIKASI KETAT
 // ==========================================
 const SYNC_QUEUE_KEY = "pdi_sync_queue";
 const SYNC_FAILED_KEY = "pdi_failed_queue";
+const RECENT_SUBMITS_KEY = "pdi_recent_submits";
 
-// 10 kali percobaan dengan interval waktu yang berbeda (meningkat secara eksponensial)
+// Waktu jeda percobaan pengiriman latar belakang:
+// Beri jeda 2 menit dan 5 menit (maksimal 2x percobaan saja agar tidak spam Google Sheet)
 const RETRY_DELAYS_MS = [
-  5 * 1000,        // Percobaan 1: 5 detik
-  15 * 1000,       // Percobaan 2: 15 detik
-  30 * 1000,       // Percobaan 3: 30 detik
-  60 * 1000,       // Percobaan 4: 1 menit
-  2 * 60 * 1000,   // Percobaan 5: 2 menit
-  5 * 60 * 1000,   // Percobaan 6: 5 menit
-  10 * 60 * 1000,  // Percobaan 7: 10 menit
-  15 * 60 * 1000,  // Percobaan 8: 15 menit
-  30 * 60 * 1000,  // Percobaan 9: 30 menit
-  60 * 60 * 1000   // Percobaan 10: 1 jam (60 menit)
+  120 * 1000, // Percobaan 1 gagal: coba lagi setelah 2 menit
+  300 * 1000  // Percobaan 2 gagal: coba lagi setelah 5 menit
 ];
 
 let isProcessingQueue = false;
+
+// Bersihkan cache foto lama di localStorage agar kapasitas memori selalu lega
+function cleanupOldPhotosStorage() {
+  try {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && (k.startsWith("pdi_photo_") || k.startsWith("pdi_sig_") || k.startsWith("pdi_in_data_") || k.startsWith("pdi_out_data_"))) {
+        keys.push(k);
+      }
+    }
+    // Jika lebih dari 15 snapshot tersimpan, hapus yang paling awal
+    if (keys.length > 15) {
+      for (let i = 0; i < keys.length - 15; i++) {
+        localStorage.removeItem(keys[i]);
+      }
+    }
+  } catch(e) {}
+}
+
+// Cek apakah No Case ini baru saja berhasil disimpan dalam 5 menit terakhir
+function isCaseRecentlySubmitted(form, caseNo) {
+  if (!caseNo) return false;
+  try {
+    const list = JSON.parse(localStorage.getItem(RECENT_SUBMITS_KEY) || "[]");
+    const key = (form + "_" + String(caseNo).trim()).toUpperCase();
+    const now = Date.now();
+    return list.some(entry => entry.key === key && (now - entry.time) < 300000); // 5 menit
+  } catch(e) {
+    return false;
+  }
+}
+
+// Catat riwayat No Case yang sudah disimpan
+function markCaseSubmitted(form, caseNo) {
+  if (!caseNo) return;
+  try {
+    let list = JSON.parse(localStorage.getItem(RECENT_SUBMITS_KEY) || "[]");
+    const key = (form + "_" + String(caseNo).trim()).toUpperCase();
+    list.push({ key: key, time: Date.now() });
+    list = list.filter(entry => (Date.now() - entry.time) < 3600000).slice(-50);
+    localStorage.setItem(RECENT_SUBMITS_KEY, JSON.stringify(list));
+  } catch(e) {}
+}
 
 function getSyncQueue() {
   try {
@@ -4166,21 +4278,24 @@ function saveSyncQueue(queue) {
 
 function enqueueSyncItem(item) {
   const q = getSyncQueue();
-  // Cegah duplikasi item identik dalam antrean (NO. CASE yang sama untuk form yang sama dalam 30 detik)
+  const caseKey = String(item.caseNo || "").trim().toUpperCase();
+  // Cegah duplikasi item identik dalam antrean (NO. CASE yang sama untuk form yang sama dalam 5 menit)
   const isDup = q.some(existing => 
     existing.form === item.form && 
-    String(existing.caseNo || "").trim().toUpperCase() === String(item.caseNo || "").trim().toUpperCase() &&
-    (Date.now() - (existing.createdAt || 0)) < 30000
+    String(existing.caseNo || "").trim().toUpperCase() === caseKey &&
+    (Date.now() - (existing.createdAt || 0)) < 300000
   );
   if (isDup) {
     console.log("Item dengan NO. CASE ini sudah ada di antrean:", item.caseNo);
-    return;
+    return false;
   }
   q.push(item);
   saveSyncQueue(q);
+  markCaseSubmitted(item.form, item.caseNo);
+  return true;
 }
 
-// Pemrosesan antrian berurutan (FIFO) agar tidak saling bentrok
+// Pemrosesan antrian berurutan (FIFO)
 async function processSyncQueue() {
   if (isProcessingQueue) return; // Mutex lock: Hanya 1 pengiriman aktif pada satu waktu
   if (!navigator.onLine) return; // Tunda jika perangkat offline
@@ -4191,19 +4306,29 @@ async function processSyncQueue() {
   const now = Date.now();
   const item = q[0];
 
+  // Periksa apakah item sedang dikirim ke server (in-flight lock 90 detik)
+  if (item.inFlight && (now - (item.inFlightTime || 0) < 90000)) {
+    return;
+  }
+
   // Periksa apakah item terdepan sudah mencapai waktu jadwal retry berikutnya
   if (item.nextRetryTime && now < item.nextRetryTime) {
     return;
   }
 
   isProcessingQueue = true;
+  item.inFlight = true;
+  item.inFlightTime = now;
+  saveSyncQueue(q);
 
   try {
     const payload = {
+      id: item.id,
+      submitId: item.id,
       form: item.form,
       fields: item.fields,
       signatures: item.signatures,
-      photo: item.photo || (item.fields && item.fields["Foto Unit (link)"]) || ""
+      photo: item.photo || ""
     };
 
     if (SCRIPT_URL && !SCRIPT_URL.startsWith("PASTE")) {
@@ -4219,9 +4344,14 @@ async function processSyncQueue() {
       }
     }
 
-    // Pengiriman BERHASIL! Keluarkan item dari antrian
+    // Pengiriman BERHASIL! Keluarkan item dari antrian berdasarkan item.id
     const curQ = getSyncQueue();
-    curQ.shift();
+    const itemIdx = curQ.findIndex(it => it.id === item.id);
+    if (itemIdx >= 0) {
+      curQ.splice(itemIdx, 1);
+    } else {
+      curQ.shift();
+    }
     saveSyncQueue(curQ);
     console.log("Pengiriman latar belakang berhasil untuk NO. CASE:", item.caseNo || item.id);
 
@@ -4234,16 +4364,18 @@ async function processSyncQueue() {
     console.warn("Pengiriman latar belakang gagal, menjadwalkan ulang:", err);
     const curQ = getSyncQueue();
     if (curQ.length > 0) {
-      const currentItem = curQ[0];
+      const currentItem = curQ.find(it => it.id === item.id) || curQ[0];
+      currentItem.inFlight = false;
       currentItem.retryCount = (currentItem.retryCount || 0) + 1;
 
+      // Maksimal retry hanya 2x agar tidak berulang kali membuat entri di spreadsheet
       if (currentItem.retryCount <= RETRY_DELAYS_MS.length) {
         const delay = RETRY_DELAYS_MS[currentItem.retryCount - 1];
         currentItem.nextRetryTime = Date.now() + delay;
-        console.log(`Percobaan ke-${currentItem.retryCount}/10 untuk ${currentItem.caseNo} gagal. Dicoba lagi dalam ${delay / 1000} detik.`);
+        console.log(`Percobaan ke-${currentItem.retryCount}/${RETRY_DELAYS_MS.length} untuk ${currentItem.caseNo} dijadwalkan dalam ${delay / 1000}s.`);
       } else {
-        // Sudah 10x gagal pengiriman, arsipkan ke failed queue agar tidak memblokir antrian baru
-        console.error(`10x percobaan pengiriman gagal untuk ${currentItem.caseNo}. Dipindahkan ke arsip failed queue.`);
+        // Sudah mencapai batas retry, arsipkan ke failed queue agar tidak memblokir antrian baru
+        console.warn(`Batas maksimal percobaan pengiriman untuk ${currentItem.caseNo} tercapai. Dikeluarkan dari antrean aktif.`);
         try {
           const failedQ = JSON.parse(localStorage.getItem(SYNC_FAILED_KEY) || "[]");
           failedQ.push(currentItem);
@@ -4258,27 +4390,37 @@ async function processSyncQueue() {
   }
 }
 
-// Runner background: Cek antrian setiap 10 detik dan saat internet kembali online
-setInterval(processSyncQueue, 10000);
+// Runner background: Cek antrian setiap 15 detik dan saat internet kembali online
+setInterval(processSyncQueue, 15000);
 window.addEventListener("online", () => {
   setTimeout(processSyncQueue, 500);
 });
 setTimeout(processSyncQueue, 2500);
 
-// Submit Form: LANGSUNG SELESAI & PENGIRIMAN DI LATAR BELAKANG
+// Bersihkan antrean lama pada startup (> 24 jam)
+try {
+  let initQ = JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || "[]");
+  initQ = initQ.filter(it => (Date.now() - (it.createdAt || 0)) < 86400000);
+  localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(initQ));
+} catch(e) {}
+
+// Submit Form: LANGSUNG SELESAI & PENGIRIMAN DI LATAR BELAKANG DENGAN ANTI-DUPLIKASI
 let isSubmittingForm = false;
 
 async function submit(e){
  e.preventDefault();
+ if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+
  if(isSubmittingForm) {
    console.log("Submit sedang diproses, pengiriman duplikat diabaikan.");
    return;
  }
- isSubmittingForm = true;
+ 
  const f = $("#f");
  const F = FORMS[cur];
- 
- // Validasi khusus PDI OUT: Wajib memilih No Case dari PDI IN (tidak boleh kosong / tidak punya pasangan)
+ const sendBtn = f ? f.querySelector('button[type="submit"].send') : null;
+
+ // Validasi khusus PDI OUT: Wajib memilih No Case dari PDI IN
  if(cur === "OUT"){
   const sclSel = $("#sclSelect");
   const sclVal = String(sclSel ? sclSel.value : "").trim().toUpperCase();
@@ -4293,7 +4435,6 @@ async function submit(e){
      warn.querySelector("span").textContent = "No Case PDI IN tidak ditemukan";
    }
    toast("No Case PDI IN tidak ditemukan", "#C8102E", 2500);
-   isSubmittingForm = false;
    return;
   }
  }
@@ -4366,12 +4507,10 @@ async function submit(e){
  if(firstBad){
   firstBad.scrollIntoView({behavior:"smooth", block:"center"});
   toast("Harap lengkapi semua kolom bertanda merah & tanda tangan", "#C8102E");
-  isSubmittingForm = false;
   return;
  }
 
- // Ekstraksi Form Data
- const d = serialize(f);
+ // Ekstraksi NO. CASE
  let noSCL = "";
  if(cur === "OUT"){
   const sclSel = $("#sclSelect");
@@ -4380,6 +4519,24 @@ async function submit(e){
   noSCL = (f.querySelector('[name="No WO"]') ? f.querySelector('[name="No WO"]').value : "").trim();
  }
  noSCL = String(noSCL || "").trim().toUpperCase();
+
+ // CEK ANTI-DUPLIKASI: Jika No Case ini sudah disimpan dalam 5 menit terakhir, cegah submit ulang
+ if (isCaseRecentlySubmitted(cur === "OUT" ? "PDOUT" : "PDIIN", noSCL)) {
+   toast(`NO. CASE ${noSCL} baru saja disimpan! Harap tunggu beberapa saat.`, "#f59e0b", 3500);
+   return;
+ }
+
+ // Kunci status submit & nonaktifkan tombol simpan seketika
+ isSubmittingForm = true;
+ if (sendBtn) {
+   sendBtn.disabled = true;
+   sendBtn.style.opacity = "0.5";
+   sendBtn.style.pointerEvents = "none";
+   sendBtn.textContent = "Menyimpan Data...";
+ }
+
+ // Ekstraksi Form Data
+ const d = serialize(f);
 
  // Penanganan Teknisi
  let teknisiVal = "";
@@ -4432,12 +4589,22 @@ async function submit(e){
  const total = items.length, issues = items.filter(it => it.querySelector("input:checked").value === F.bad).length;
  fields["Jumlah Item Bermasalah"] = issues;
 
- // SIMPAN LOKAL SECARA INSTAN (Tanda tangan & form snapshot untuk cetak PDF)
+ // Simpan foto lokal yang sedang aktif sebelum di-clear
+ const photoToSave = currentUploadedPhoto || "";
+
+ // Bersihkan memori localStorage dari snapshot foto lama agar tidak overload
+ cleanupOldPhotosStorage();
+
+ // SIMPAN LOKAL SECARA RINGAN (Tanda tangan & form snapshot untuk cetak PDF)
  const cleanSclKey = String(noSCL || "").trim().toUpperCase();
- if (currentUploadedPhoto) {
+ if (photoToSave) {
    try {
-     localStorage.setItem("pdi_photo_" + cleanSclKey, currentUploadedPhoto);
-     localStorage.setItem("pdi_photo_" + noSCL, currentUploadedPhoto);
+     if (cur === "IN") {
+       localStorage.setItem("pdi_photo_in_" + cleanSclKey, photoToSave);
+     } else {
+       localStorage.setItem("pdi_photo_out_" + cleanSclKey, photoToSave);
+     }
+     localStorage.setItem("pdi_photo_" + cleanSclKey, photoToSave);
    } catch(e){}
  }
  if (signatures && signatures.konsumen) {
@@ -4451,17 +4618,13 @@ async function submit(e){
    }
  }
 
+ // Simpan teks form tanpa menduplikat string Base64 foto di fullFormSnapshot
  try {
-   const fullFormSnapshot = Object.assign({}, fields);
-   if (currentUploadedPhoto) {
-     fullFormSnapshot["Foto Unit (link)"] = currentUploadedPhoto;
-   }
+   const formSnapshot = Object.assign({}, fields);
    if (cur === "IN") {
-     localStorage.setItem("pdi_in_data_" + cleanSclKey, JSON.stringify(fullFormSnapshot));
-     localStorage.setItem("pdi_in_data_" + noSCL, JSON.stringify(fullFormSnapshot));
+     localStorage.setItem("pdi_in_data_" + cleanSclKey, JSON.stringify(formSnapshot));
    } else {
-     localStorage.setItem("pdi_out_data_" + cleanSclKey, JSON.stringify(fullFormSnapshot));
-     localStorage.setItem("pdi_out_data_" + noSCL, JSON.stringify(fullFormSnapshot));
+     localStorage.setItem("pdi_out_data_" + cleanSclKey, JSON.stringify(formSnapshot));
    }
  } catch(e){}
 
@@ -4490,13 +4653,13 @@ async function submit(e){
   markSclCompletedLocally(noSCL);
  }
 
- // ENQUEUE KE ANTRIAN PENGIRIMAN LATAR BELAKANG (FIFO DENGAN 10x RETRY)
+ // ENQUEUE KE ANTRIAN PENGIRIMAN LATAR BELAKANG (DENGAN ANTI-DUPLIKASI DAN RETRY TERBATAS)
  enqueueSyncItem({
    id: "pdi_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6),
    form: cur === "OUT" ? "PDOUT" : "PDIIN",
    fields: fields,
    signatures: signatures,
-   photo: currentUploadedPhoto,
+   photo: photoToSave,
    caseNo: noSCL,
    retryCount: 0,
    createdAt: Date.now(),
@@ -4528,13 +4691,12 @@ async function submit(e){
   window.scrollTo(0, 0);
  } catch(e){}
 
- setTimeout(() => { isSubmittingForm = false; }, 2000);
+ setTimeout(() => { isSubmittingForm = false; }, 3000);
 
  // Mulai pemrosesan antrian di latar belakang secara asinkron
- setTimeout(processSyncQueue, 100);
+ setTimeout(processSyncQueue, 150);
 }
 
-// Navigasi Tabs & Integrasi Tombol Back HP
 history.replaceState({tab:"IN"}, "", "#pdi-in");
 
 function tab(w, push=true){
@@ -4983,7 +5145,25 @@ try {
 } catch(e){}
 
 hideLoader();
+try {
+  if (window.AndroidPrint && typeof window.AndroidPrint.getLastCapturedPhoto === "function") {
+    const p = window.AndroidPrint.getLastCapturedPhoto();
+    if (p) currentUploadedPhoto = p;
+  }
+  if (!currentUploadedPhoto) {
+    const sp = sessionStorage.getItem("pdi_temp_photo");
+    if (sp) currentUploadedPhoto = sp;
+  }
+} catch(e) {}
 render();
+if (currentUploadedPhoto) {
+  setTimeout(() => {
+    const box = document.querySelector(".photo-upload-box");
+    if (box && typeof box.scrollIntoView === "function") {
+      box.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, 150);
+}
 syncTopNavSpacer();
 updateSiteUI();
 if(!currentSite){
