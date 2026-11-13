@@ -1765,7 +1765,7 @@ function normalizeCategory(raw) {
 }
 const LAYANAN = ["WALK-IN", "HOME", "DEALER", "OUT OF TOWN"];
 const S_IN = ["Baik", "Rusak", "Tdk Ada"];
-const S_OUT = ["OK", "Tidak OK", "N/A"];
+const S_OUT = ["Ya", "Tidak", "Tidak Ada"];
 const KG = ["Kunci kontak / Smart key", "Charger & kabel charger", "Buku manual / kartu garansi", "Aksesoris standar bawaan (jika ada)"];
 
 // Peta Produk Awal (Offline cache)
@@ -2193,7 +2193,7 @@ const FORMS = {
   dateLabel:"Tanggal Keluar", 
   tech:"Teknisi", 
   opts:S_OUT, 
-  bad:"Tidak OK",
+  bad:"Tidak",
   sections:{
    EV:[
     ["A. Verifikasi Pekerjaan",["Keluhan konsumen sudah teratasi","Pekerjaan sesuai Work Order","Part bekas dikembalikan / dicatat (jika diminta)","Tidak ada baut / komponen longgar"]],
