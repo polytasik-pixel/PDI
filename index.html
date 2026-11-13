@@ -922,13 +922,36 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 }
 #reader{
   width:100%;
-  min-height:280px;
-  height:280px;
+  min-height:310px;
+  height:310px;
   background:#000;
   border-radius:6px;
   overflow:hidden;
   position:relative;
   display:block;
+}
+.native-scan-viewfinder{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  width:92%;
+  max-width:380px;
+  height:165px;
+  border:2px solid #00e676;
+  border-radius:8px;
+  box-shadow:0 0 0 4000px rgba(0,0,0,0.45);
+  pointer-events:none;
+  z-index:10;
+}
+.native-scan-line{
+  position:absolute;
+  top:50%;
+  left:5%;
+  right:5%;
+  height:2px;
+  background:rgba(239,68,68,0.85);
+  box-shadow:0 0 6px #ef4444;
 }
 #reader video{
   width:100%!important;
@@ -5247,8 +5270,18 @@ async function startScanner(push = true) {
     try {
       html5QrScanner = new Html5Qrcode("reader");
       const qrConfig = {
-        fps: 20,
-        qrbox: { width: 250, height: 160 }
+        fps: 25,
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+          // Kotak titik scan dibuat lebih lebar (92% lebar layar, maks 380px) agar sangat mudah membaca barcode 1D panjang & QR code
+          const maxWidth = Math.max(viewfinderWidth - 20, 200);
+          const maxHeight = Math.max(viewfinderHeight - 20, 100);
+          const targetW = Math.min(Math.floor(viewfinderWidth * 0.92), 380);
+          const targetH = Math.min(Math.floor(viewfinderHeight * 0.55), 180);
+          return {
+            width: Math.min(targetW, maxWidth),
+            height: Math.min(targetH, maxHeight)
+          };
+        }
       };
 
       // Coba 1A: Langsung start dengan kamera belakang (facingMode: environment)
@@ -5319,6 +5352,11 @@ async function startScanner(push = true) {
       nativeVideo.style.objectFit = "cover";
       nativeVideo.style.borderRadius = "6px";
       readerEl.appendChild(nativeVideo);
+      
+      const vfOverlay = document.createElement("div");
+      vfOverlay.className = "native-scan-viewfinder";
+      vfOverlay.innerHTML = '<div class="native-scan-line"></div>';
+      readerEl.appendChild(vfOverlay);
       
       nativeVideo.onloadedmetadata = () => {
         nativeVideo.play().catch(e => console.log("Play error:", e));
