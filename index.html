@@ -1759,8 +1759,7 @@ function getSiteDisplayName(code){
 const CATS = [
   "HOME APPLIANCES",
   "EV 2 WHEELS",
-  "AUDIO/VIDEO",
-  "EV 4 WHEELS"
+  "AUDIO/VIDEO"
 ];
 
 function isEvCategory(c) {
@@ -1776,7 +1775,7 @@ function normalizeCategory(raw) {
   if (exact) return exact;
 
   const low = s.toLowerCase();
-  if (low.includes("4 wheel") || low.includes("4w") || low.includes("mobil")) return "EV 4 WHEELS";
+  if (low.includes("4 wheel") || low.includes("4w") || low.includes("mobil")) return "EV 2 WHEELS";
   if (low.includes("2 wheel") || low.includes("2w") || low.includes("motor listrik") || low.includes("sepeda listrik")) return "EV 2 WHEELS";
   if (low.includes("audio") || low.includes("video") || low.includes("av") || low.includes("speaker") || low.includes("tv")) return "AUDIO/VIDEO";
   if (low.includes("home") || low.includes("appliance") || low.includes("kulkas") || low.includes("mesin cuci") || low.includes("ac")) return "HOME APPLIANCES";
