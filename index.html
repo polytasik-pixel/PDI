@@ -952,14 +952,15 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   color:#fff;
   border:1px solid rgba(255,255,255,0.3);
   border-radius:6px;
-  width:32px;
   height:32px;
-  min-width:32px;
-  min-height:32px;
-  padding:0;
+  padding:0 10px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.5px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
+  gap:5px;
   cursor:pointer;
   transition:all .2s ease;
   user-select:none;
@@ -968,7 +969,7 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   background:rgba(255,255,255,0.25);
 }
 .btn-flash:active{
-  transform:scale(0.94);
+  transform:scale(0.96);
 }
 .btn-flash.active{
   background:#eab308 !important;
@@ -1608,9 +1609,10 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
       <div style="display:flex; align-items:center; gap:8px;">
         <h3 style="margin:0; font-size:16px; color:#fff;">Scan</h3>
         <button type="button" id="btnToggleFlash" class="btn-flash" onclick="toggleScannerFlash()" title="Nyalakan / Matikan Lampu Flash">
-          <svg id="flashIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg id="flashIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
+          <span id="flashText">FLASH</span>
         </button>
       </div>
       <button type="button" class="btn-modal-x" onclick="stopScanner()" title="Tutup">✕</button>
@@ -2476,7 +2478,7 @@ function render(preserveSCL=""){
     </div>
     <div class="f">
       <select id="sclSelect" name="No SCL" required disabled style="opacity:0.65; cursor:not-allowed;">
-        <option value="" disabled selected>⏳ Menyegarkan data case...</option>
+        <option value="" disabled selected>Memuat data...</option>
       </select>
     </div>
     <div id="noCaseWarning" class="warn-msg" style="display:none; margin-top:5px; font-size:12px;">
@@ -4000,7 +4002,7 @@ async function loadSCL(preselectSCL=""){
     pendingSCLItems = localRecords;
     renderSclDropdown(pendingSCLItems, preselectSCL, true);
   } else {
-    sel.innerHTML = '<option value="" disabled selected>⏳ Menyegarkan data case...</option>';
+    sel.innerHTML = '<option value="" disabled selected>Memuat data...</option>';
     sel.disabled = true;
     sel.style.opacity = "0.65";
     sel.style.cursor = "not-allowed";
@@ -5427,7 +5429,7 @@ function resetFlashUI() {
   const icon = document.getElementById("flashIcon");
   if (icon) icon.setAttribute("fill", "none");
   const txt = document.getElementById("flashText");
-  if (txt) txt.textContent = "Flash";
+  if (txt) txt.textContent = "FLASH";
 }
 
 async function toggleScannerFlash() {
@@ -5496,7 +5498,7 @@ async function toggleScannerFlash() {
       icon.setAttribute("fill", "currentColor");
     }
     if (txt) {
-      txt.textContent = "Flash";
+      txt.textContent = "FLASH";
     }
     toast("⚡ Lampu Flash Dinyalakan", "#15803d", 1000);
   } else {
