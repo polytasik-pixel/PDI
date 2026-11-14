@@ -5531,6 +5531,7 @@ async function stopActiveStreams() {
 
 async function startScanner(push = true) {
   saveFormDraft();
+  resetScanCandidates();
   if (isScannerStarting) return;
   isScannerStarting = true;
 
@@ -5583,13 +5584,21 @@ async function startScanner(push = true) {
     if (v) forceVideoElementPlay(v);
   };
 
-  // STRATEGI 1: Gunakan Html5Qrcode dengan deteksi kamera cerdas
+  // STRATEGI 1: Gunakan Html5Qrcode dengan deteksi hardware cerdas & BarcodeDetector
   let started = false;
   if (typeof Html5Qrcode !== "undefined") {
     try {
-      html5QrScanner = new Html5Qrcode("reader");
+      html5QrScanner = new Html5Qrcode("reader", {
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        },
+        verbose: false
+      });
       const qrConfig = {
         fps: 25,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        },
         qrbox: function(viewfinderWidth, viewfinderHeight) {
           // Kotak titik scan dibuat lebih lebar (92% lebar layar, maks 380px) agar sangat mudah membaca barcode 1D panjang & QR code
           const maxWidth = Math.max(viewfinderWidth - 20, 200);
@@ -5603,16 +5612,20 @@ async function startScanner(push = true) {
         }
       };
 
-      // Coba 1A: Langsung start dengan kamera belakang (facingMode: environment)
+      // Coba 1A: Langsung start dengan kamera belakang (facingMode: environment) & resolusi tajam
       try {
         await html5QrScanner.start(
-          { facingMode: "environment" },
+          {
+            facingMode: "environment",
+            width: { ideal: 1280 }
+          },
           qrConfig,
           (decodedText) => onScanSuccess(decodedText),
           () => {}
         );
         started = true;
         hideScannerStatus();
+        tryApplyContinuousFocus();
       } catch(envErr) {
         console.warn("Kamera belakang (environment) gagal, mencoba kamera user/default:", envErr);
         // Coba 1B: Jika gagal, gunakan kamera user atau default
@@ -5620,7 +5633,12 @@ async function startScanner(push = true) {
           if (html5QrScanner) {
             try { html5QrScanner.clear(); } catch(e){}
           }
-          html5QrScanner = new Html5Qrcode("reader");
+          html5QrScanner = new Html5Qrcode("reader", {
+            experimentalFeatures: {
+              useBarCodeDetectorIfSupported: true
+            },
+            verbose: false
+          });
           await html5QrScanner.start(
             { facingMode: "user" },
             qrConfig,
@@ -5629,6 +5647,7 @@ async function startScanner(push = true) {
           );
           started = true;
           hideScannerStatus();
+          tryApplyContinuousFocus();
         } catch(userErr) {
           console.warn("Kamera depan (user) juga gagal:", userErr);
         }
@@ -5725,7 +5744,23 @@ async function startScanner(push = true) {
   isScannerStarting = false;
 }
 
+function tryApplyContinuousFocus() {
+  try {
+    const v = document.querySelector("#reader video");
+    if (v && v.srcObject && typeof v.srcObject.getVideoTracks === "function") {
+      const track = v.srcObject.getVideoTracks()[0];
+      if (track && track.applyConstraints) {
+        const caps = track.getCapabilities ? track.getCapabilities() : {};
+        if (caps.focusMode && caps.focusMode.includes("continuous")) {
+          track.applyConstraints({ advanced: [{ focusMode: "continuous" }] }).catch(() => {});
+        }
+      }
+    }
+  } catch(e) {}
+}
+
 async function stopScanner(fromBack = false) {
+  resetScanCandidates();
   if (isFlashlightOn) {
     try {
       let videoTrack = null;
@@ -5757,6 +5792,16 @@ async function stopScanner(fromBack = false) {
   }
 }
 
+let lastScannedCandidate = "";
+let candidateMatchCount = 0;
+let lastCandidateTime = 0;
+
+function resetScanCandidates() {
+  lastScannedCandidate = "";
+  candidateMatchCount = 0;
+  lastCandidateTime = 0;
+}
+
 function onScanSuccess(code) {
   if (!code) return false;
   const cleanCode = String(code || "").trim();
@@ -5775,6 +5820,35 @@ function onScanSuccess(code) {
   }
 
   const upperCode = targetCode.toUpperCase();
+  const now = Date.now();
+
+  // Verifikasi Konsistensi Frame (Double-Check / Read Redundancy = 2)
+  // Mencegah salah baca digit (misal 'A' terbaca 'B') akibat motion blur / goyangan kamera pada 1 frame saja
+  if (now - lastCandidateTime > 750) {
+    // Jika jeda antar frame > 750ms, mulai penghitungan kandidat baru
+    lastScannedCandidate = upperCode;
+    candidateMatchCount = 1;
+    lastCandidateTime = now;
+    return false;
+  }
+  lastCandidateTime = now;
+
+  if (upperCode === lastScannedCandidate) {
+    candidateMatchCount++;
+  } else {
+    // Karakter berbeda dari frame sebelumnya (misal goyang), ganti kandidat
+    lastScannedCandidate = upperCode;
+    candidateMatchCount = 1;
+    return false;
+  }
+
+  // Wajib minimal 2 frame berturut-turut membaca teks yang SAMA PERSIS sebelum diterima
+  if (candidateMatchCount < 2) {
+    return false;
+  }
+
+  // Lolos verifikasi konsistensi 2 frame!
+  resetScanCandidates();
 
   if (navigator.vibrate) navigator.vibrate(100);
   stopScanner();
