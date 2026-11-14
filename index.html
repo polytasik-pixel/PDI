@@ -947,23 +947,28 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   align-items:center;
   margin-bottom:10px;
 }
-.btn-flash{
+.btn-flash, .btn-flip-cam{
   background:rgba(255,255,255,0.15);
   color:#fff;
   border:1px solid rgba(255,255,255,0.3);
   border-radius:6px;
-  padding:4px 10px;
-  font-size:12px;
-  font-weight:600;
+  width:32px;
+  height:32px;
+  min-width:32px;
+  min-height:32px;
+  padding:0;
   display:inline-flex;
   align-items:center;
-  gap:5px;
+  justify-content:center;
   cursor:pointer;
   transition:all .2s ease;
   user-select:none;
 }
-.btn-flash:hover{
+.btn-flash:hover, .btn-flip-cam:hover{
   background:rgba(255,255,255,0.25);
+}
+.btn-flash:active, .btn-flip-cam:active{
+  transform:scale(0.94);
 }
 .btn-flash.active{
   background:#eab308 !important;
@@ -1600,13 +1605,21 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 <div id="scannerModal">
   <div class="scanner-box">
     <div class="scanner-top">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <h3>📷 Scan Barcode</h3>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <h3 style="margin:0; font-size:16px; color:#fff;">Scan</h3>
         <button type="button" id="btnToggleFlash" class="btn-flash" onclick="toggleScannerFlash()" title="Nyalakan / Matikan Lampu Flash">
-          <svg id="flashIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg id="flashIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
-          <span id="flashText">Flash</span>
+        </button>
+        <button type="button" id="btnFlipCamera" class="btn-flip-cam" onclick="flipScannerCamera()" title="Balik Kamera (Depan / Belakang)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <path d="M8.5 13.5a3.5 3.5 0 0 0 5.5 1.5l1.5-1.5"></path>
+            <path d="M15.5 12.5a3.5 3.5 0 0 0-5.5-1.5l-1.5 1.5"></path>
+            <polyline points="8 10 8 13 11 13"></polyline>
+            <polyline points="16 16 16 13 13 13"></polyline>
+          </svg>
         </button>
       </div>
       <button type="button" class="btn-modal-x" onclick="stopScanner()" title="Tutup">✕</button>
@@ -2471,8 +2484,8 @@ function render(preserveSCL=""){
       </button>
     </div>
     <div class="f">
-      <select id="sclSelect" name="No SCL" required>
-        <option value="">Memuat data...</option>
+      <select id="sclSelect" name="No SCL" required disabled style="opacity:0.65; cursor:not-allowed;">
+        <option value="" disabled selected>⏳ Menyegarkan data case...</option>
       </select>
     </div>
     <div id="noCaseWarning" class="warn-msg" style="display:none; margin-top:5px; font-size:12px;">
@@ -3889,14 +3902,37 @@ function markSclCompletedLocally(sclVal){
 
 function showSclLoadingNotification(isLoading, loadedFromServer = true, count = 0){
   const btnSpin = $("#refreshSclIcon");
+  const btnRefresh = $("#btnRefreshScl");
+  const sel = $("#sclSelect");
+
   if(isLoading){
     if(btnSpin) btnSpin.style.animation = "spin 1s linear infinite";
+    if(btnRefresh){
+      btnRefresh.disabled = true;
+      btnRefresh.style.opacity = "0.6";
+      btnRefresh.style.cursor = "not-allowed";
+    }
+    if(sel){
+      sel.disabled = true;
+      sel.style.opacity = "0.65";
+      sel.style.cursor = "not-allowed";
+    }
   } else {
     if(btnSpin) btnSpin.style.animation = "";
+    if(btnRefresh){
+      btnRefresh.disabled = false;
+      btnRefresh.style.opacity = "1";
+      btnRefresh.style.cursor = "pointer";
+    }
+    if(sel){
+      sel.disabled = false;
+      sel.style.opacity = "1";
+      sel.style.cursor = "pointer";
+    }
   }
 }
 
-function renderSclDropdown(items, preselectSCL=""){
+function renderSclDropdown(items, preselectSCL="", forceDisabled = false){
   const sel = $("#sclSelect");
   if(!sel) return;
   const warn = $("#noCaseWarning");
@@ -3908,18 +3944,24 @@ function renderSclDropdown(items, preselectSCL=""){
       const isSel = currentVal ? (s === String(currentVal).trim().toUpperCase()) : (idx === 0);
       return `<option value="${s}"${isSel ? " selected" : ""}>${s}</option>`;
     }).join("");
-    sel.disabled = false;
+    sel.disabled = forceDisabled;
+    sel.style.opacity = forceDisabled ? "0.65" : "1";
+    sel.style.cursor = forceDisabled ? "not-allowed" : "pointer";
     if(warn) warn.style.display = "none";
 
     const targetVal = (currentVal && items.some(w => String(w.scl || w.wo || "").toUpperCase() === String(currentVal).toUpperCase()))
       ? currentVal
       : String(items[0].scl || items[0].wo || items[0].caseNo || "").trim().toUpperCase();
     sel.value = targetVal;
-    onSCLChange();
+    if(!forceDisabled){
+      onSCLChange();
+    }
   } else {
     sel.innerHTML = `<option value="-">-</option>`;
     sel.value = "-";
-    sel.disabled = false;
+    sel.disabled = forceDisabled;
+    sel.style.opacity = forceDisabled ? "0.65" : "1";
+    sel.style.cursor = forceDisabled ? "not-allowed" : "pointer";
     if(warn){
       warn.style.display = "flex";
       const warnSpan = warn.querySelector("span");
@@ -3927,7 +3969,9 @@ function renderSclDropdown(items, preselectSCL=""){
     }
   }
 
-  sel.onchange = () => onSCLChange();
+  sel.onchange = () => {
+    if(!sel.disabled) onSCLChange();
+  };
 }
 
 // Memuat daftar No SCL Pending (dari PDI IN yang belum selesai di PDI OUT)
@@ -3939,11 +3983,18 @@ async function loadSCL(preselectSCL=""){
   if(!siteCode){
     sel.innerHTML = '<option value="">-- Pilih Site Dulu --</option>';
     sel.disabled = false;
+    sel.style.opacity = "1";
+    sel.style.cursor = "pointer";
     return;
   }
 
+  // Wajib disable dropdown case saat proses refresh / sinkronisasi sedang berjalan
+  sel.disabled = true;
+  sel.style.opacity = "0.65";
+  sel.style.cursor = "not-allowed";
+
   // 1. LANGKAH CEPAT (INSTAN LOKAL):
-  // Tampilkan seketika data lokal PDI IN yang belum selesai di PDI OUT tanpa menunggu jaringan
+  // Render opsi lokal tetapi TETAP KUNCI (disabled=true) agar user tidak memilih sebelum refresh selesai
   const localRecords = getLocalPdiInHistory().filter(r => {
     const s = String(r.scl || r.wo || r.caseNo || "").trim().toUpperCase();
     if(!isValidScl(s)) return false;
@@ -3953,13 +4004,18 @@ async function loadSCL(preselectSCL=""){
   }).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
   if(pendingSCLItems && pendingSCLItems.length > 0){
-    renderSclDropdown(pendingSCLItems, preselectSCL);
+    renderSclDropdown(pendingSCLItems, preselectSCL, true);
   } else if(localRecords.length > 0){
     pendingSCLItems = localRecords;
-    renderSclDropdown(pendingSCLItems, preselectSCL);
+    renderSclDropdown(pendingSCLItems, preselectSCL, true);
+  } else {
+    sel.innerHTML = '<option value="" disabled selected>⏳ Menyegarkan data case...</option>';
+    sel.disabled = true;
+    sel.style.opacity = "0.65";
+    sel.style.cursor = "not-allowed";
   }
 
-  // 2. MUNCULKAN NOTIFIKASI LOADING
+  // 2. MUNCULKAN NOTIFIKASI LOADING & KUNCI TOMBOL REFRESH
   showSclLoadingNotification(true);
 
   let serverItems = [];
@@ -4110,10 +4166,10 @@ async function loadSCL(preselectSCL=""){
     pendingSCLItems = finalItems;
   }
 
-  // 5. RENDER DROPDOWN DENGAN DATA TERBARU
-  renderSclDropdown(finalItems, preselectSCL);
+  // 5. RENDER DROPDOWN DENGAN DATA TERBARU & BUKA KUNCI (disabled = false) KARENA REFRESH SUDAH SELESAI
+  renderSclDropdown(finalItems, preselectSCL, false);
 
-  // 6. SELESAIKAN NOTIFIKASI LOADING
+  // 6. SELESAIKAN NOTIFIKASI LOADING & AKTIFKAN KEMBALI DROPDOWN
   showSclLoadingNotification(false, loadedFromServer, finalItems.length);
 
   if(preselectSCL){
@@ -5529,6 +5585,43 @@ async function stopActiveStreams() {
   }
 }
 
+let currentCameraFacingMode = "environment"; // default kamera belakang
+
+async function flipScannerCamera() {
+  if (isScannerStarting) return;
+  currentCameraFacingMode = (currentCameraFacingMode === "environment") ? "user" : "environment";
+
+  const flipBtn = document.getElementById("btnFlipCamera");
+  if (flipBtn) {
+    flipBtn.style.opacity = "0.5";
+    flipBtn.style.pointerEvents = "none";
+  }
+
+  try {
+    // Matikan flash jika sedang aktif sebelum beralih kamera
+    if (isFlashlightOn) {
+      try {
+        if (window.AndroidPrint && typeof window.AndroidPrint.toggleTorch === "function") {
+          window.AndroidPrint.toggleTorch(false);
+        }
+      } catch(e){}
+      resetFlashUI();
+    }
+
+    await stopActiveStreams();
+    resetScanCandidates();
+    await startScannerStream(currentCameraFacingMode);
+    toast("Kamera: " + (currentCameraFacingMode === "user" ? "Depan" : "Belakang"), "#2563eb", 1000);
+  } catch(err) {
+    console.error("Gagal membalik kamera:", err);
+  } finally {
+    if (flipBtn) {
+      flipBtn.style.opacity = "1";
+      flipBtn.style.pointerEvents = "auto";
+    }
+  }
+}
+
 async function startScanner(push = true) {
   saveFormDraft();
   resetScanCandidates();
@@ -5540,7 +5633,6 @@ async function startScanner(push = true) {
   if (push) {
     history.pushState({modal:"scanner", tab:cur}, "", "#modal-scanner");
   }
-  // Status 'Membuka kamera...' dihilangkan sesuai permintaan
 
   // 1. Cek keamanan protokol HTTPS jika di web browser umum
   if (window.location.protocol === "http:" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
@@ -5552,6 +5644,12 @@ async function startScanner(push = true) {
   // 2. Bersihkan stream sebelumnya
   await stopActiveStreams();
 
+  // 3. Mulai stream kamera sesuai facingMode aktif
+  await startScannerStream(currentCameraFacingMode);
+}
+
+async function startScannerStream(facingMode = "environment") {
+  isScannerStarting = true;
   const readerEl = document.getElementById("reader");
   if (!readerEl) {
     isScannerStarting = false;
@@ -5612,11 +5710,11 @@ async function startScanner(push = true) {
         }
       };
 
-      // Coba 1A: Langsung start dengan kamera belakang (facingMode: environment) & resolusi tajam
+      // Coba 1A: Start dengan facingMode yang diminta & resolusi tajam
       try {
         await html5QrScanner.start(
           {
-            facingMode: "environment",
+            facingMode: facingMode,
             width: { ideal: 1280 }
           },
           qrConfig,
@@ -5626,9 +5724,9 @@ async function startScanner(push = true) {
         started = true;
         hideScannerStatus();
         tryApplyContinuousFocus();
-      } catch(envErr) {
-        console.warn("Kamera belakang (environment) gagal, mencoba kamera user/default:", envErr);
-        // Coba 1B: Jika gagal, gunakan kamera user atau default
+      } catch(primaryErr) {
+        console.warn("Kamera " + facingMode + " gagal, mencoba mode alternatif:", primaryErr);
+        const altMode = (facingMode === "environment") ? "user" : "environment";
         try {
           if (html5QrScanner) {
             try { html5QrScanner.clear(); } catch(e){}
@@ -5640,16 +5738,17 @@ async function startScanner(push = true) {
             verbose: false
           });
           await html5QrScanner.start(
-            { facingMode: "user" },
+            { facingMode: altMode },
             qrConfig,
             (decodedText) => onScanSuccess(decodedText),
             () => {}
           );
+          currentCameraFacingMode = altMode;
           started = true;
           hideScannerStatus();
           tryApplyContinuousFocus();
-        } catch(userErr) {
-          console.warn("Kamera depan (user) juga gagal:", userErr);
+        } catch(altErr) {
+          console.warn("Kamera alternatif juga gagal:", altErr);
         }
       }
     } catch(err1) {
@@ -5662,11 +5761,10 @@ async function startScanner(push = true) {
   // STRATEGI 2: NATIVE STREAM FALLBACK (WebRTC getUserMedia)
   if (!started) {
     try {
-      // Status langsung dihilangkan sesuai permintaan
       readerEl.innerHTML = "";
       
       let constraints = {
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 } },
+        video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 } },
         audio: false
       };
       
@@ -5760,6 +5858,7 @@ function tryApplyContinuousFocus() {
 }
 
 async function stopScanner(fromBack = false) {
+  currentCameraFacingMode = "environment";
   resetScanCandidates();
   if (isFlashlightOn) {
     try {
