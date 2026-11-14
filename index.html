@@ -5715,8 +5715,7 @@ async function stopScanner(fromBack = false) {
 
 function onScanSuccess(code) {
   if (!code) return false;
-  const cleanCode = String(code).trim().replace(/[
-	\s]+/g, "");
+  const cleanCode = String(code || "").trim();
   const alphaNum = cleanCode.replace(/[^A-Za-z0-9]/g, "");
 
   // Validasi: Hasil scan nomor seri harus tepat 12 digit / karakter
