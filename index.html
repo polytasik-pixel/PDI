@@ -1909,15 +1909,6 @@ try {
 let currentSite = normalizeSite(localStorage.getItem(SITE_STORAGE_KEY) || "");
 let cur = "IN";
 let cat = "";
-try {
-  const dRaw = localStorage.getItem(DRAFT_KEY_IN);
-  if (dRaw) {
-    const dObj = JSON.parse(dRaw);
-    if (dObj && dObj.cat && CATS.includes(dObj.cat)) {
-      cat = dObj.cat;
-    }
-  }
-} catch(e){}
 let selectedSCL = "";
 let pendingSCLItems = [];
 
@@ -2461,7 +2452,7 @@ function render(preserveSCL=""){
     <legend>Kategori Produk</legend>
     <label class="f">Pilih kategori produk
       <select id="cat" style="text-transform:uppercase;">
-        <option value=""${!cat ? " selected" : ""}>Pilih kategori</option>
+        <option value=""${!cat ? " selected" : ""}>Pilih Kategori</option>
         ${CATS.map(c=>`<option value="${c}"${c===cat?" selected":""}>${c}</option>`).join("")}
       </select>
     </label>
@@ -2673,8 +2664,8 @@ function render(preserveSCL=""){
  // Event Listeners
  if($("#cat")){
   $("#cat").onchange = e => { 
-    saveFormDraft();
     cat = e.target.value; 
+    saveFormDraft();
     render(); 
   };
  }
@@ -5242,8 +5233,12 @@ async function submit(e){
 history.replaceState({tab:"IN"}, "", "#pdi-in");
 
 function tab(w, push=true){
+ if(w === "IN"){
+   cat = "";
+ }
  if(cur === w) {
   if(w === "OUT") loadSCL();
+  if(w === "IN") render();
   return;
  }
  if(document.activeElement && typeof document.activeElement.blur === "function"){
@@ -5264,15 +5259,7 @@ function tab(w, push=true){
   }
  }
  if(w === "IN"){
-   try {
-     const dRaw = localStorage.getItem(DRAFT_KEY_IN);
-     if (dRaw) {
-       const dObj = JSON.parse(dRaw);
-       cat = (dObj && dObj.cat && CATS.includes(dObj.cat)) ? dObj.cat : "";
-     } else {
-       cat = "";
-     }
-   } catch(e){ cat = ""; }
+   cat = "";
  }
  render();
  syncTopNavSpacer();
