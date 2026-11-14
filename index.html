@@ -5652,8 +5652,7 @@ async function startScanner(push = true) {
               const codes = await detector.detect(nativeVideo);
               if (codes && codes.length > 0) {
                 const raw = codes[0].rawValue;
-                if (raw) {
-                  onScanSuccess(raw);
+                if (raw && onScanSuccess(raw)) {
                   return;
                 }
               }
@@ -5715,18 +5714,38 @@ async function stopScanner(fromBack = false) {
 }
 
 function onScanSuccess(code) {
-  if (!code) return;
-  const cleanCode = code.trim();
+  if (!code) return false;
+  const cleanCode = String(code).trim().replace(/[
+	\s]+/g, "");
+  const alphaNum = cleanCode.replace(/[^A-Za-z0-9]/g, "");
+
+  // Validasi: Hasil scan nomor seri harus tepat 12 digit / karakter
+  // Jika belum 12 digit, abaikan tanpa notifikasi apapun dan biarkan scanner terus berjalan
+  let targetCode = "";
+  if (alphaNum.length === 12) {
+    targetCode = alphaNum;
+  } else if (cleanCode.length === 12) {
+    targetCode = cleanCode;
+  } else {
+    // Belum / bukan 12 digit: jangan tempel ke kotak & jangan munculkan notif/informasi apapun
+    return false;
+  }
+
+  const upperCode = targetCode.toUpperCase();
+
   if (navigator.vibrate) navigator.vibrate(100);
   stopScanner();
 
-  const upperCode = cleanCode.toUpperCase();
   const seriEl = document.querySelector('#f input[name="VIN"]');
   if (seriEl) {
     seriEl.value = upperCode;
+    seriEl.dispatchEvent(new Event("input", { bubbles: true }));
+    seriEl.dispatchEvent(new Event("change", { bubbles: true }));
   }
   lookupModel(upperCode);
+  saveFormDraft();
   toast("✓ Berhasil memindai: " + upperCode, "#15803d", 1000);
+  return true;
 }
 
 // Bersihkan riwayat lokal yang kotor / data uji coba lama pada startup
