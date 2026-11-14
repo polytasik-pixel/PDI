@@ -947,7 +947,7 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   align-items:center;
   margin-bottom:10px;
 }
-.btn-flash, .btn-flip-cam{
+.btn-flash{
   background:rgba(255,255,255,0.15);
   color:#fff;
   border:1px solid rgba(255,255,255,0.3);
@@ -964,10 +964,10 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
   transition:all .2s ease;
   user-select:none;
 }
-.btn-flash:hover, .btn-flip-cam:hover{
+.btn-flash:hover{
   background:rgba(255,255,255,0.25);
 }
-.btn-flash:active, .btn-flip-cam:active{
+.btn-flash:active{
   transform:scale(0.94);
 }
 .btn-flash.active{
@@ -1610,15 +1610,6 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
         <button type="button" id="btnToggleFlash" class="btn-flash" onclick="toggleScannerFlash()" title="Nyalakan / Matikan Lampu Flash">
           <svg id="flashIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-        </button>
-        <button type="button" id="btnFlipCamera" class="btn-flip-cam" onclick="flipScannerCamera()" title="Balik Kamera (Depan / Belakang)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-            <path d="M8.5 13.5a3.5 3.5 0 0 0 5.5 1.5l1.5-1.5"></path>
-            <path d="M15.5 12.5a3.5 3.5 0 0 0-5.5-1.5l-1.5 1.5"></path>
-            <polyline points="8 10 8 13 11 13"></polyline>
-            <polyline points="16 16 16 13 13 13"></polyline>
           </svg>
         </button>
       </div>
@@ -5585,48 +5576,9 @@ async function stopActiveStreams() {
   }
 }
 
-let currentCameraFacingMode = "environment"; // default kamera belakang
-
-async function flipScannerCamera() {
-  if (isScannerStarting) return;
-  // Toggle antara kamera belakang ('environment') dan kamera depan ('user')
-  currentCameraFacingMode = (currentCameraFacingMode === "environment") ? "user" : "environment";
-
-  const flipBtn = document.getElementById("btnFlipCamera");
-  if (flipBtn) {
-    flipBtn.style.opacity = "0.5";
-    flipBtn.style.pointerEvents = "none";
-  }
-
-  try {
-    // Matikan flash jika sedang aktif sebelum beralih kamera
-    if (isFlashlightOn) {
-      try {
-        if (window.AndroidPrint && typeof window.AndroidPrint.toggleTorch === "function") {
-          window.AndroidPrint.toggleTorch(false);
-        }
-      } catch(e){}
-      resetFlashUI();
-    }
-
-    await stopActiveStreams();
-    resetScanCandidates();
-    await startScannerStream(currentCameraFacingMode);
-    toast("Kamera: " + (currentCameraFacingMode === "user" ? "Depan" : "Belakang"), "#2563eb", 1000);
-  } catch(err) {
-    console.error("Gagal membalik kamera:", err);
-  } finally {
-    if (flipBtn) {
-      flipBtn.style.opacity = "1";
-      flipBtn.style.pointerEvents = "auto";
-    }
-  }
-}
-
 async function startScanner(push = true) {
   saveFormDraft();
   resetScanCandidates();
-  currentCameraFacingMode = "environment"; // WAJIB DEFAULT KAMERA BELAKANG SETIAP MEMBUKA SCANNER
   if (isScannerStarting) return;
   isScannerStarting = true;
 
@@ -5646,11 +5598,11 @@ async function startScanner(push = true) {
   // 2. Bersihkan stream sebelumnya
   await stopActiveStreams();
 
-  // 3. Mulai stream kamera sesuai facingMode aktif (default: environment / kamera belakang)
-  await startScannerStream(currentCameraFacingMode);
+  // 3. Mulai stream kamera belakang
+  await startScannerStream();
 }
 
-async function startScannerStream(facingMode = "environment") {
+async function startScannerStream() {
   isScannerStarting = true;
   const readerEl = document.getElementById("reader");
   if (!readerEl) {
@@ -5684,7 +5636,7 @@ async function startScannerStream(facingMode = "environment") {
     if (v) forceVideoElementPlay(v);
   };
 
-  // STRATEGI 1: Gunakan Html5Qrcode dengan deteksi hardware cerdas & BarcodeDetector
+  // STRATEGI 1: Gunakan Html5Qrcode dengan deteksi hardware cerdas & BarcodeDetector (Kamera Belakang)
   let started = false;
   if (typeof Html5Qrcode !== "undefined") {
     try {
@@ -5712,10 +5664,10 @@ async function startScannerStream(facingMode = "environment") {
         }
       };
 
-      // PENTING: Html5Qrcode mewajibkan objek cameraIdOrConfig HANYA memiliki 1 key: { facingMode: "environment" } atau { facingMode: "user" }
+      // 1A. Selalu gunakan kamera belakang via { facingMode: "environment" }
       try {
         await html5QrScanner.start(
-          { facingMode: facingMode },
+          { facingMode: "environment" },
           qrConfig,
           (decodedText) => onScanSuccess(decodedText),
           () => {}
@@ -5724,19 +5676,13 @@ async function startScannerStream(facingMode = "environment") {
         hideScannerStatus();
         tryApplyContinuousFocus();
       } catch(primaryErr) {
-        console.warn("Kamera " + facingMode + " via facingMode gagal, mencoba deteksi kamera via getCameras():", primaryErr);
+        console.warn("Kamera environment gagal via facingMode, mencari kamera belakang via getCameras():", primaryErr);
         try {
           const devices = await Html5Qrcode.getCameras();
           if (devices && devices.length > 0) {
-            let targetDevice = null;
-            if (facingMode === "environment") {
-              // Cari kamera yang labelnya mengandung kata back / rear / environment / belakang
-              targetDevice = devices.find(d => /back|rear|environment|belakang/i.test(d.label)) || devices[devices.length - 1];
-            } else {
-              // Cari kamera yang labelnya mengandung kata front / user / depan
-              targetDevice = devices.find(d => /front|user|depan/i.test(d.label)) || devices[0];
-            }
-            if (targetDevice && targetDevice.id) {
+            // Prioritaskan kamera belakang berdasarkan label atau kamera terakhir (standar kamera utama Android)
+            const backDevice = devices.find(d => /back|rear|environment|belakang/i.test(d.label)) || devices[devices.length - 1];
+            if (backDevice && backDevice.id) {
               if (html5QrScanner) {
                 try { html5QrScanner.clear(); } catch(e){}
               }
@@ -5747,7 +5693,7 @@ async function startScannerStream(facingMode = "environment") {
                 verbose: false
               });
               await html5QrScanner.start(
-                targetDevice.id,
+                backDevice.id,
                 qrConfig,
                 (decodedText) => onScanSuccess(decodedText),
                 () => {}
@@ -5774,14 +5720,14 @@ async function startScannerStream(facingMode = "environment") {
       readerEl.innerHTML = "";
       
       let constraints = {
-        video: { facingMode: { ideal: facingMode }, width: { ideal: 1280 } },
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 } },
         audio: false
       };
       
       try {
         nativeMediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       } catch(e) {
-        nativeMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        nativeMediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
       }
 
       const nativeVideo = document.createElement("video");
@@ -5811,7 +5757,6 @@ async function startScannerStream(facingMode = "environment") {
       started = true;
       hideScannerStatus();
 
-      // Mulai scanning loop menggunakan Native BarcodeDetector bawaan Chromium jika ada
       if ("BarcodeDetector" in window) {
         try {
           const detector = new BarcodeDetector({
@@ -5853,7 +5798,6 @@ async function startScannerStream(facingMode = "environment") {
 }
 
 async function stopScanner(fromBack = false) {
-  currentCameraFacingMode = "environment";
   resetScanCandidates();
   if (isFlashlightOn) {
     try {
