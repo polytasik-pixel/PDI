@@ -5589,6 +5589,7 @@ let currentCameraFacingMode = "environment"; // default kamera belakang
 
 async function flipScannerCamera() {
   if (isScannerStarting) return;
+  // Toggle antara kamera belakang ('environment') dan kamera depan ('user')
   currentCameraFacingMode = (currentCameraFacingMode === "environment") ? "user" : "environment";
 
   const flipBtn = document.getElementById("btnFlipCamera");
@@ -5625,6 +5626,7 @@ async function flipScannerCamera() {
 async function startScanner(push = true) {
   saveFormDraft();
   resetScanCandidates();
+  currentCameraFacingMode = "environment"; // WAJIB DEFAULT KAMERA BELAKANG SETIAP MEMBUKA SCANNER
   if (isScannerStarting) return;
   isScannerStarting = true;
 
@@ -5644,7 +5646,7 @@ async function startScanner(push = true) {
   // 2. Bersihkan stream sebelumnya
   await stopActiveStreams();
 
-  // 3. Mulai stream kamera sesuai facingMode aktif
+  // 3. Mulai stream kamera sesuai facingMode aktif (default: environment / kamera belakang)
   await startScannerStream(currentCameraFacingMode);
 }
 
@@ -5710,13 +5712,10 @@ async function startScannerStream(facingMode = "environment") {
         }
       };
 
-      // Coba 1A: Start dengan facingMode yang diminta & resolusi tajam
+      // PENTING: Html5Qrcode mewajibkan objek cameraIdOrConfig HANYA memiliki 1 key: { facingMode: "environment" } atau { facingMode: "user" }
       try {
         await html5QrScanner.start(
-          {
-            facingMode: facingMode,
-            width: { ideal: 1280 }
-          },
+          { facingMode: facingMode },
           qrConfig,
           (decodedText) => onScanSuccess(decodedText),
           () => {}
@@ -5725,30 +5724,41 @@ async function startScannerStream(facingMode = "environment") {
         hideScannerStatus();
         tryApplyContinuousFocus();
       } catch(primaryErr) {
-        console.warn("Kamera " + facingMode + " gagal, mencoba mode alternatif:", primaryErr);
-        const altMode = (facingMode === "environment") ? "user" : "environment";
+        console.warn("Kamera " + facingMode + " via facingMode gagal, mencoba deteksi kamera via getCameras():", primaryErr);
         try {
-          if (html5QrScanner) {
-            try { html5QrScanner.clear(); } catch(e){}
+          const devices = await Html5Qrcode.getCameras();
+          if (devices && devices.length > 0) {
+            let targetDevice = null;
+            if (facingMode === "environment") {
+              // Cari kamera yang labelnya mengandung kata back / rear / environment / belakang
+              targetDevice = devices.find(d => /back|rear|environment|belakang/i.test(d.label)) || devices[devices.length - 1];
+            } else {
+              // Cari kamera yang labelnya mengandung kata front / user / depan
+              targetDevice = devices.find(d => /front|user|depan/i.test(d.label)) || devices[0];
+            }
+            if (targetDevice && targetDevice.id) {
+              if (html5QrScanner) {
+                try { html5QrScanner.clear(); } catch(e){}
+              }
+              html5QrScanner = new Html5Qrcode("reader", {
+                experimentalFeatures: {
+                  useBarCodeDetectorIfSupported: true
+                },
+                verbose: false
+              });
+              await html5QrScanner.start(
+                targetDevice.id,
+                qrConfig,
+                (decodedText) => onScanSuccess(decodedText),
+                () => {}
+              );
+              started = true;
+              hideScannerStatus();
+              tryApplyContinuousFocus();
+            }
           }
-          html5QrScanner = new Html5Qrcode("reader", {
-            experimentalFeatures: {
-              useBarCodeDetectorIfSupported: true
-            },
-            verbose: false
-          });
-          await html5QrScanner.start(
-            { facingMode: altMode },
-            qrConfig,
-            (decodedText) => onScanSuccess(decodedText),
-            () => {}
-          );
-          currentCameraFacingMode = altMode;
-          started = true;
-          hideScannerStatus();
-          tryApplyContinuousFocus();
-        } catch(altErr) {
-          console.warn("Kamera alternatif juga gagal:", altErr);
+        } catch(camErr) {
+          console.warn("Fallback getCameras() juga gagal:", camErr);
         }
       }
     } catch(err1) {
@@ -5840,21 +5850,6 @@ async function startScannerStream(facingMode = "environment") {
   }
 
   isScannerStarting = false;
-}
-
-function tryApplyContinuousFocus() {
-  try {
-    const v = document.querySelector("#reader video");
-    if (v && v.srcObject && typeof v.srcObject.getVideoTracks === "function") {
-      const track = v.srcObject.getVideoTracks()[0];
-      if (track && track.applyConstraints) {
-        const caps = track.getCapabilities ? track.getCapabilities() : {};
-        if (caps.focusMode && caps.focusMode.includes("continuous")) {
-          track.applyConstraints({ advanced: [{ focusMode: "continuous" }] }).catch(() => {});
-        }
-      }
-    }
-  } catch(e) {}
 }
 
 async function stopScanner(fromBack = false) {
