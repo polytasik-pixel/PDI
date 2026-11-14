@@ -1862,8 +1862,9 @@ function isEvCategory(c) {
 }
 
 function normalizeCategory(raw) {
-  if (!raw) return CATS[0];
+  if (!raw) return "";
   const s = String(raw).trim();
+  if (s.toLowerCase().includes("pilih")) return "";
   const exact = CATS.find(c => c.toUpperCase() === s.toUpperCase());
   if (exact) return exact;
 
@@ -1901,7 +1902,16 @@ try {
 
 let currentSite = normalizeSite(localStorage.getItem(SITE_STORAGE_KEY) || "");
 let cur = "IN";
-let cat = CATS[0];
+let cat = "";
+try {
+  const dRaw = localStorage.getItem(DRAFT_KEY_IN);
+  if (dRaw) {
+    const dObj = JSON.parse(dRaw);
+    if (dObj && dObj.cat && CATS.includes(dObj.cat)) {
+      cat = dObj.cat;
+    }
+  }
+} catch(e){}
 let selectedSCL = "";
 let pendingSCLItems = [];
 
@@ -2431,7 +2441,8 @@ function render(preserveSCL=""){
     <legend>Kategori Produk</legend>
     <label class="f">Pilih kategori produk
       <select id="cat" style="text-transform:uppercase;">
-        ${CATS.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}
+        <option value=""${!cat ? " selected" : ""}>Pilih kategori</option>
+        ${CATS.map(c=>`<option value="${c}"${c===cat?" selected":""}>${c}</option>`).join("")}
       </select>
     </label>
   </fieldset>`;
@@ -2545,6 +2556,15 @@ function render(preserveSCL=""){
  // ==========================================
  // 3. CHECKLIST SECTIONS
  // ==========================================
+ if(cur === "IN" && !cat){
+  h += `
+  <fieldset class="header-box" style="text-align:center; padding:32px 16px; margin:16px 0;">
+    <div style="font-size:32px; margin-bottom:8px;">📋</div>
+    <div style="font-weight:700; font-size:15px; color:#1e3a8a; margin-bottom:4px;">Silakan Pilih Kategori Produk</div>
+    <div style="font-size:13px; color:#64748b;">Pilih salah satu kategori produk di atas (HOME APPLIANCES, EV 2 WHEELS, atau AUDIO/VIDEO) untuk memuat form checklist pemeriksaan PDI IN.</div>
+  </fieldset>
+  `;
+ } else {
  secs.forEach((s, si) => {
   h += `<fieldset><legend>${s[0]}</legend>`;
   s[1].forEach((it, ii) => {
@@ -2623,13 +2643,20 @@ function render(preserveSCL=""){
    </div>
  </fieldset>
  <button class="send" type="submit">${cur === "OUT" ? "SIMPAN PDI OUT" : "SIMPAN PDI IN"}</button>
+`;
+ }
+ h += `
  </form>`;
 
  $("#app").innerHTML = h;
 
  // Event Listeners
  if($("#cat")){
-  $("#cat").onchange = e => { cat = e.target.value; render(); };
+  $("#cat").onchange = e => { 
+    saveFormDraft();
+    cat = e.target.value; 
+    render(); 
+  };
  }
  if($("#catOut")){
   $("#catOut").onchange = e => { 
@@ -4764,6 +4791,18 @@ async function submit(e){
  
  let firstBad = null;
 
+ // 0. Validasi Kategori Produk di PDI IN
+ if(cur === "IN" && (!cat || cat === "" || cat === "PILIH KATEGORI")){
+  toast("Silakan pilih Kategori Produk terlebih dahulu!", "#C8102E", 2500);
+  const catEl = $("#cat");
+  if(catEl){
+   catEl.classList.add("field-warn");
+   catEl.scrollIntoView({behavior:"smooth", block:"center"});
+   catEl.focus();
+  }
+  return;
+ }
+
  // 1. Validasi Input Standar
  const reqInputs = f.querySelectorAll("input[required], select[required]");
  reqInputs.forEach(el => {
@@ -5074,6 +5113,12 @@ async function submit(e){
   }
  }
 
+ if (cur === "IN") {
+  cat = "";
+  try { localStorage.removeItem(DRAFT_KEY_IN); } catch(e){}
+  render();
+ }
+
  // Bersihkan kanvas tanda tangan secara menyeluruh
  Object.keys(pads).forEach(k => {
   if (pads[k]) {
@@ -5124,6 +5169,17 @@ function tab(w, push=true){
   } else {
    history.pushState({tab:"IN"}, "", "#pdi-in");
   }
+ }
+ if(w === "IN"){
+   try {
+     const dRaw = localStorage.getItem(DRAFT_KEY_IN);
+     if (dRaw) {
+       const dObj = JSON.parse(dRaw);
+       cat = (dObj && dObj.cat && CATS.includes(dObj.cat)) ? dObj.cat : "";
+     } else {
+       cat = "";
+     }
+   } catch(e){ cat = ""; }
  }
  render();
  syncTopNavSpacer();
