@@ -1510,7 +1510,7 @@ button.send:disabled{opacity:.5;cursor:not-allowed}
 
     <label class="f" style="margin-bottom:14px; font-size:13px; font-weight:600;">Pilih No Case:
       <select id="printSclSelect" onchange="onPrintSCLSelected()" style="width:100%; padding:10px; font-size:13.5px; font-weight:600; border:1px solid #aaa; border-radius:4px;">
-        <option value="">Memuat daftar No Case...</option>
+        <option value="">Memuat Data..</option>
       </select>
     </label>
 
@@ -2469,7 +2469,7 @@ function render(preserveSCL=""){
     </div>
     <div class="f">
       <select id="sclSelect" name="No SCL" required disabled style="opacity:0.65; cursor:not-allowed;">
-        <option value="" disabled selected>Memuat data...</option>
+        <option value="" disabled selected>Memuat Data..</option>
       </select>
     </div>
     <div id="noCaseWarning" class="warn-msg" style="display:none; margin-top:5px; font-size:12px;">
@@ -2787,7 +2787,11 @@ function closePrintModal(fromBack=false) {
   const modal = $("#printModal");
   if (modal) modal.style.display = "none";
   if (!fromBack && location.hash === "#modal-print") {
-    history.back();
+    try {
+      history.replaceState({ tab: cur }, "", cur === "OUT" ? "#pdi-out" : "#pdi-in");
+    } catch(e) {
+      history.back();
+    }
   }
 }
 
@@ -2798,7 +2802,7 @@ async function loadPrintSclList() {
   if (!sel) return;
 
   sel.disabled = true;
-  sel.innerHTML = '<option value="">Memuat daftar NO. CASE...</option>';
+  sel.innerHTML = '<option value="">Memuat Data..</option>';
   if (prevBox) prevBox.style.display = "none";
   if (btnPrint) btnPrint.disabled = true;
 
@@ -3270,12 +3274,18 @@ async function executePrintPDF() {
     btn.innerHTML = origBtnText;
 
     // Nama cetak / dokumen PDF = No Case tanpa karakter terlarang (seperti / \ : * ? " < > |)
-    const cleanDocName = String(targetSCL).replace(/[\/\:*?"<>|]/g, "_").trim();
+    const cleanDocName = String(targetSCL || "").replace(/[\/\:*?"<>|&_#%^~`!+=\[\]{}();',.\-]/g, "").replace(/\s+/g, " ").trim() || "PDI_Document";
+
+    window._currentPrintJobName = cleanDocName;
+    document.title = cleanDocName;
+    const domTitle = document.querySelector("title");
+    if (domTitle) domTitle.innerText = cleanDocName;
 
     // A. JIKA BERADA DI DALAM APLIKASI ANDROID (APK) -> Gunakan Android PrintManager Native
     if (window.AndroidPrint) {
       closePrintModal();
-      // Dialog cetak langsung dibuka tanpa toast
+      document.title = cleanDocName;
+      if (domTitle) domTitle.innerText = cleanDocName;
       setTimeout(() => {
         try {
           if (typeof window.AndroidPrint.printHtml === "function") {
@@ -3292,18 +3302,25 @@ async function executePrintPDF() {
 
     // B. JIKA BERADA DI BROWSER (Chrome / PC) -> Gunakan dialog cetak browser
     // Layar aplikasi tetap utuh (tidak di-hide) karena @media print sudah mengatur dokumen cetak
-    const origTitle = document.title;
-    document.title = cleanDocName;
     closePrintModal();
+    document.title = cleanDocName;
+    if (domTitle) domTitle.innerText = cleanDocName;
+
     setTimeout(() => {
+      document.title = cleanDocName;
+      if (domTitle) domTitle.innerText = cleanDocName;
       const restoreTitle = () => {
-        document.title = origTitle;
         window.removeEventListener("afterprint", restoreTitle);
+        setTimeout(() => {
+          document.title = "Form PDI - Service Center";
+          const dt = document.querySelector("title");
+          if (dt) dt.innerText = "Form PDI - Service Center";
+          window._currentPrintJobName = null;
+        }, 3000);
       };
       window.addEventListener("afterprint", restoreTitle);
-      setTimeout(restoreTitle, 3000);
       window.print();
-    }, 200);
+    }, 250);
 
   } catch(err) {
     alert("Gagal memproses cetak PDF: " + err.message);
@@ -3682,7 +3699,7 @@ function renderPrintDocument(scl, inData, outData, prefetchedSigs = null) {
   </div>`;
 
   area.innerHTML = htmlDoc;
-  const cleanDocTitle = String(scl).replace(/[\/\:*?"<>|]/g, "_").trim();
+  const cleanDocTitle = String(scl || "").replace(/[\/\:*?"<>|&_#%^~`!+=\[\]{}();',.\-]/g, "").replace(/\s+/g, " ").trim() || "PDI_Document";
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -3993,7 +4010,7 @@ async function loadSCL(preselectSCL=""){
     pendingSCLItems = localRecords;
     renderSclDropdown(pendingSCLItems, preselectSCL, true);
   } else {
-    sel.innerHTML = '<option value="" disabled selected>Memuat data...</option>';
+    sel.innerHTML = '<option value="" disabled selected>Memuat Data..</option>';
     sel.disabled = true;
     sel.style.opacity = "0.65";
     sel.style.cursor = "not-allowed";
@@ -6012,6 +6029,15 @@ updateSiteUI();
 if(!currentSite){
  openSiteModal(false);
 }
+</script>
+<script>
+window.addEventListener("beforeprint", () => {
+  if (window._currentPrintJobName) {
+    document.title = window._currentPrintJobName;
+    const t = document.querySelector("title");
+    if (t) t.innerText = window._currentPrintJobName;
+  }
+});
 </script>
 </body>
 </html>
